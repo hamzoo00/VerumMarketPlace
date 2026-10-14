@@ -30,6 +30,8 @@ Verum task runner — PHP runs inside Docker, never on the host.
   ./verum assets           Build production frontend assets
   ./verum fix-perms        Restore exec bits lost on the WSL bind mount
   ./verum setup            First-time setup
+  ./verum urls             Print every local URL
+  ./verum health           Check the stack and key pages
 EOF
 }
 
@@ -76,6 +78,29 @@ case "$cmd" in
         $EXEC php artisan migrate --force
         $EXEC php artisan storage:link || true
         echo "Ready: http://localhost:8000 | Mail: http://localhost:8025 | Horizon: http://localhost:8000/horizon"
+        ;;
+    urls)
+        cat <<'EOF'
+App          http://localhost:8000
+Shop         http://localhost:8000/shop
+Auctions     http://localhost:8000/auctions
+Sellers      http://localhost:8000/sellers
+Verify       http://localhost:8000/verify/VR-2026-002448
+Horizon      http://localhost:8000/horizon
+Mailpit      http://localhost:8025
+Meilisearch  http://localhost:7700
+Vite (HMR)   http://localhost:5173
+Postgres     localhost:5433  (bundled container)
+Redis        localhost:6380
+EOF
+        ;;
+    health)
+        $DC ps --format '{{.Service}}	{{.Status}}'
+        echo
+        for path in / /shop /auctions /sellers /stones/burmese-ruby /verify /about /up; do
+            printf '%-28s ' "$path"
+            curl -s -o /dev/null -w 'HTTP %{http_code}\n' "http://localhost:8000$path"
+        done
         ;;
     help|--help|-h) usage ;;
     *) echo "Unknown command: $cmd" >&2; echo; usage; exit 1 ;;

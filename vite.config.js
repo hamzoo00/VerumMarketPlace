@@ -23,6 +23,15 @@ export default defineConfig({
     ]),
     server: {
         cors: true,
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        // Advertise a browser-reachable origin, not the container bind address.
+        origin: 'http://localhost:5173',
+        hmr: {
+            host: 'localhost',
+            protocol: 'ws',
+        },
         watch: {
             ignored: [
                 '**/.agents/**',

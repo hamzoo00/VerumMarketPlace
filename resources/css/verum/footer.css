@@ -1,0 +1,243 @@
+/* Verum — Footer.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Footer
+   ============================================================= */
+.ft {
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(64px, 8vw, 110px);
+  background: var(--ink);
+  border-top: 1px solid var(--line);
+}
+
+.ft__top {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 40px;
+}
+
+.ft__brand p {
+  max-width: 38ch;
+  margin-top: 20px;
+  color: var(--mute);
+}
+
+.brand--ft .brand__mark {
+  width: 44px;
+  height: 42px;
+}
+
+.brand--ft .brand__word {
+  width: 150px;
+  height: 25px;
+}
+
+.news {
+  max-width: 420px;
+  margin-top: 28px;
+}
+
+.news__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  border-bottom: 1px solid var(--line-3);
+  transition: border-color .3s;
+}
+
+.news__row:focus-within {
+  border-color: var(--ruby-hi);
+}
+
+.news__row input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--bone);
+  font-size: .95rem;
+}
+
+.news__row input:focus {
+  outline: none;
+}
+
+.ft__col h3 {
+  margin-bottom: 18px;
+  color: var(--ruby-hi);
+  font: 500 .66rem var(--mono);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.ft__col a {
+  display: block;
+  width: fit-content;
+  padding: 6px 0;
+  color: var(--mute);
+  transition: color .3s, transform .4s var(--ease);
+}
+
+.ft__col a:hover {
+  color: var(--bone);
+  transform: translateX(6px);
+}
+
+.ft__giant {
+  display: flex;
+  justify-content: space-between;
+  margin-top: clamp(40px, 6vw, 90px);
+  padding-inline: var(--gutter);
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line-3);
+  user-select: none;
+  font: 400 clamp(5rem, 22vw, 22rem)/.78 var(--serif);
+  letter-spacing: -.03em;
+}
+
+.ft__giant span {
+  display: inline-block;
+  transition: color .6s var(--ease), -webkit-text-stroke-color .6s, translate 1.2s var(--ease), opacity 1s var(--ease);
+}
+
+.js .ft__giant[data-reveal] {
+  opacity: 1;
+  translate: none;
+}
+
+.js .ft__giant[data-reveal] span {
+  opacity: 0;
+  translate: 0 40%;
+}
+
+.js .ft__giant[data-reveal].is-in span {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.ft__giant span:nth-child(2) {
+  transition-delay: .07s;
+}
+
+.ft__giant span:nth-child(3) {
+  transition-delay: .14s;
+}
+
+.ft__giant span:nth-child(4) {
+  transition-delay: .21s;
+}
+
+.ft__giant span:nth-child(5) {
+  transition-delay: .28s;
+}
+
+.ft__giant span:hover {
+  color: var(--ruby);
+  -webkit-text-stroke-color: var(--ruby);
+  transition-delay: 0s;
+}
+
+.ft__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 28px;
+  margin-top: 12px;
+  padding-block: 26px 34px;
+  border-top: 1px solid var(--line);
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.ft__demo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 .64rem var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.ft__social {
+  display: flex;
+  gap: 8px;
+}
+
+.ft__sign {
+  color: var(--bone);
+  font: italic 400 1.1rem var(--serif);
+}
+
+@media (min-width: 641px) {
+  .ft__bottom {
+    padding-right: 84px;
+  }
+}
+
+/* back to top with scroll-progress ring */
+.totop {
+  position: fixed;
+  right: 30px;
+  bottom: 104px;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(11, 27, 45, .84);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--bone);
+  opacity: 0;
+  transform: translateY(20px) scale(.8);
+  pointer-events: none;
+  transition: opacity .4s, transform .5s var(--ease), background .3s, translate .5s var(--ease);
+}
+
+.totop.is-on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.totop:hover {
+  background: var(--ruby);
+}
+
+.totop__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.totop__ring circle {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 1.5;
+}
+
+.totop__ring .totop__fill {
+  stroke: var(--ruby-hi);
+  stroke-dasharray: 138.2;
+  stroke-dashoffset: 138.2;
+}
+
+.totop .ic {
+  width: 20px;
+  height: 20px;
+  transition: transform .4s var(--ease);
+}
+
+.totop:hover .ic {
+  transform: translateY(-3px);
+}

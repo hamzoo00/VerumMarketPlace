@@ -1,0 +1,149 @@
+/* Verum — Auctions page and lot cards.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Auctions page
+   ============================================================= */
+.auch {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(36px, 6vw, 84px));
+  padding-bottom: clamp(40px, 6vw, 80px);
+}
+
+.auch__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+  background: radial-gradient(60% 80% at 85% 30%, rgba(200, 16, 46, .28), transparent 70%), radial-gradient(40% 50% at 10% 100%, rgba(200, 16, 46, .12), transparent);
+}
+
+.auch__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto;
+  align-items: end;
+  gap: 40px;
+}
+
+.auch .phead__title {
+  margin-top: 16px;
+}
+
+.auch .phead__lede {
+  margin-top: 22px;
+}
+
+.auch__clock {
+  position: relative;
+  display: grid;
+  justify-items: end;
+  gap: 14px;
+  padding: 28px;
+  background: rgba(11, 27, 45, .68);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--line-2);
+}
+
+.auch__when {
+  color: var(--mute);
+  font: .68rem var(--mono);
+  letter-spacing: .1em;
+}
+
+.pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding-bottom: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 20px;
+  color: var(--mute);
+  font-size: .84rem;
+  transition: color .3s, border-color .3s, background .3s;
+}
+
+.pill span:not(:empty) {
+  color: var(--mute-2);
+  font: .68rem var(--mono);
+}
+
+.pill:hover {
+  border-color: var(--line-3);
+  color: var(--bone);
+}
+
+.pill.is-active {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--ink);
+}
+
+.pill.is-active span {
+  color: var(--ink-mute);
+}
+
+.lots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.6vw, 24px);
+  padding-bottom: 40px;
+}
+
+.aucsteps {
+  border-top: 1px solid var(--line);
+  margin-top: clamp(40px, 6vw, 80px);
+}
+
+.steps4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+}
+
+.steps4 li {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 36px 28px 10px 0;
+}
+
+.steps4 li+li {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.steps4__n {
+  color: var(--ruby-hi);
+  font: 500 .64rem var(--mono);
+  letter-spacing: .14em;
+}
+
+.steps4 .ic {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.2;
+}
+
+.steps4 h3 {
+  font: 400 1.6rem var(--serif);
+}
+
+.steps4 p {
+  color: var(--mute);
+  font-size: .92rem;
+}

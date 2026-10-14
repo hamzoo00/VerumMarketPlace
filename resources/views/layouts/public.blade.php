@@ -1,47 +1,43 @@
+@props([
+    'title' => null,
+    'description' => null,
+    'canonical' => null,
+    'ogImage' => null,
+    'ogType' => 'website',
+    'robots' => null,
+    'bodyClass' => null,
+])
+
 {{--
-    Public-facing layout for crawlable marketplace pages (home, listings,
-    categories, seller storefronts). Unlike layouts::app it must render for
-    guests, so it never assumes an authenticated user.
+    Public marketplace layout: the crawlable storefront chrome.
+    Guests must be able to render every page that uses it, so nothing here
+    assumes an authenticated user.
 --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="no-js">
 <head>
-    @include('partials.head')
+    @include('partials.head', [
+        'title' => $title,
+        'description' => $description,
+        'canonical' => $canonical,
+        'ogImage' => $ogImage,
+        'ogType' => $ogType,
+        'robots' => $robots,
+    ])
+    <script>document.documentElement.classList.replace('no-js', 'js');</script>
 </head>
-<body class="min-h-dvh bg-white font-sans antialiased dark:bg-neutral-900 dark:text-white">
-    <header class="border-b border-neutral-200 dark:border-white/10">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 font-semibold" wire:navigate>
-                <x-app-logo-icon class="size-7" />
-                <span>{{ config('app.name') }}</span>
-            </a>
+<body @class([$bodyClass])>
+    <a class="skip" href="#main">{{ __('Skip to content') }}</a>
 
-            <div class="flex items-center gap-3">
-                @auth
-                    <flux:button href="{{ route('dashboard') }}" size="sm" variant="primary" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:button>
-                @else
-                    <flux:button href="{{ route('login') }}" size="sm" variant="ghost" wire:navigate>
-                        {{ __('Log in') }}
-                    </flux:button>
-                    <flux:button href="{{ route('register') }}" size="sm" variant="primary" wire:navigate>
-                        {{ __('Register') }}
-                    </flux:button>
-                @endauth
-            </div>
-        </nav>
-    </header>
+    <x-verum.sprite />
+    <x-verum.header />
 
-    <main class="mx-auto max-w-7xl px-6 py-10">
+    <main id="main" tabindex="-1">
         {{ $slot }}
     </main>
 
-    <footer class="border-t border-neutral-200 py-8 dark:border-white/10">
-        <div class="mx-auto max-w-7xl px-6 text-sm text-neutral-500">
-            &copy; {{ now()->year }} {{ config('app.name') }}
-        </div>
-    </footer>
+    <x-verum.footer />
+    <x-verum.overlays />
 
     @fluxScripts
 </body>

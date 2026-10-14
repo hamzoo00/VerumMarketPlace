@@ -1,0 +1,245 @@
+/* Verum — Design tokens, reset and base element styles. */
+
+/* Verum — Tokens, reset, typography, buttons and shared primitives.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   VERUM — Natural & Certified Gemstones
+   Demo UI stylesheet. Palette: midnight sapphire, champagne gold, bone white.
+   ============================================================= */
+
+@property --glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #E0213F;
+}
+
+@property --ang {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+:root {
+  --ink: #071321;
+  --ink-1: #0B1A2A;
+  --ink-2: #10243A;
+  --ink-3: #172E48;
+  --ink-4: #203C5A;
+  --line: rgba(243, 238, 228, .08);
+  --line-2: rgba(243, 238, 228, .13);
+  --line-3: rgba(243, 238, 228, .23);
+  --bone: #EDE4D2;
+  --paper: #F4EBDD;
+  --plate: #0D1E30;
+  --mute: #A5ADBA;
+  --mute-2: #6F7C8D;
+  --ink-text: #0A1828;
+  --ink-mute: #526276;
+  --gold: #B99552;
+  --gold-hi: #E3C98C;
+  --gold-deep: #705226;
+  --gold-pale: #F2E3BE;
+  --ruby: var(--gold);
+  --ruby-hi: var(--gold-hi);
+  --ruby-deep: var(--gold-deep);
+  --ruby-ink: #261C0D;
+  --ok: #71A986;
+
+  --serif: 'Bodoni Moda', 'Didot', 'Bodoni 72', 'Times New Roman', serif;
+  --sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --ease-io: cubic-bezier(.76, 0, .24, 1);
+  --ease-back: cubic-bezier(.34, 1.56, .64, 1);
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --maxw: 1440px;
+  --hdr: 76px;
+  --tick: 34px;
+  --shadow: 0 16px 40px -10px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+/* ---------- reset & base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--ruby) var(--ink);
+  scrollbar-width: thin;
+  scroll-padding-top: calc(var(--hdr) + 24px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:focus-within {
+    scroll-behavior: smooth;
+  }
+}
+
+html.is-locked {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--bone);
+  font: 400 16px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ruby-hi);
+  border-radius: 20px;
+  border: 3px solid var(--ink);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ruby-hi);
+}
+
+::selection {
+  background: var(--ruby);
+  color: #fff;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote,
+fieldset,
+legend {
+  margin: 0;
+  padding: 0;
+}
+
+fieldset {
+  border: 0;
+  min-width: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+em {
+  font-style: italic;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ruby-hi);
+  outline-offset: 3px;
+}
+
+main:focus {
+  outline: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  left: 16px;
+  top: -64px;
+  z-index: 600;
+  padding: 12px 18px;
+  background: var(--ruby);
+  color: #fff;
+  font-weight: 700;
+  transition: top .3s var(--ease);
+}
+
+.skip:focus {
+  top: 16px;
+}
+
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.page {
+  min-height: 70vh;
+  overflow-x: clip;
+}

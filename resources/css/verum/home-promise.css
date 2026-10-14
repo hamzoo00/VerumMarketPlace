@@ -1,0 +1,299 @@
+/* Verum — Promise band, trust strip and category panels. */
+
+/* ---------- ruby marquee band ---------- */
+.band {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  margin-block: 4px;
+  padding-block: clamp(7px, .8vw, 11px);
+  background: linear-gradient(110deg, #8A682F 0%, #D4B574 34%, #B58B46 68%, #E0C78E 100%);
+  color: #171107;
+  transform: rotate(-1.4deg) scale(1.03);
+  box-shadow: 0 24px 70px -24px rgba(185, 149, 82, .58);
+}
+
+.band__item {
+  padding: 0 .8em;
+  white-space: nowrap;
+  font: 500 clamp(.95rem, 1.5vw, 1.25rem)/1.1 var(--serif);
+  letter-spacing: .035em;
+}
+
+.band__item em {
+  color: var(--ruby-ink);
+}
+
+.band__star {
+  flex: none;
+  width: clamp(12px, 1.2vw, 17px);
+  height: clamp(12px, 1.2vw, 17px);
+  fill: #171107;
+  stroke: none;
+  animation: spin 9s linear infinite;
+}
+
+/* ---------- trust strip ---------- */
+.trust {
+  --line: rgba(18, 16, 20, .1);
+  --line-2: rgba(18, 16, 20, .16);
+  --line-3: rgba(18, 16, 20, .24);
+  --bone: var(--ink-text);
+  --mute: var(--ink-mute);
+  --mute-2: #8F8B85;
+  padding-top: clamp(70px, 9vw, 130px);
+  padding-bottom: clamp(30px, 4vw, 60px);
+  background: linear-gradient(180deg, #F1E9DA 0%, #E6D9C3 100%);
+  color: var(--ink-text);
+  border-bottom: 1px solid rgba(18, 16, 20, .08);
+}
+
+.trust__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.trust__item {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 44px 30px 40px;
+  border-left: 1px solid var(--line);
+}
+
+.trust__item:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.trust__item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: radial-gradient(120% 90% at 50% 100%, rgba(185, 149, 82, .18), transparent 70%);
+  transition: opacity .6s;
+}
+
+.trust__item:hover::before {
+  opacity: 1;
+}
+
+.trust__n {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  color: var(--mute-2);
+  font: 500 .64rem var(--mono);
+  letter-spacing: .14em;
+}
+
+.trust__ic {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .52);
+  color: var(--ruby-hi);
+  transition: transform .6s var(--ease), background .4s, color .4s, border-color .4s;
+}
+
+.trust__ic .ic {
+  width: 24px;
+  height: 24px;
+}
+
+.trust__item:hover .trust__ic {
+  transform: rotate(-12deg) scale(1.08);
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: #fff;
+  box-shadow: 0 14px 34px -18px rgba(124, 10, 29, .75);
+}
+
+.trust__item h3 {
+  margin-top: 26px;
+  font: 400 1.6rem/1.15 var(--serif);
+}
+
+.trust__item p {
+  margin-top: 10px;
+  max-width: 30ch;
+  color: var(--mute);
+  font-size: .92rem;
+}
+
+/* Warm ivory creates a visual pause while the gemstone cards stay cinematic. */
+.feat {
+  overflow: hidden;
+  background:
+    radial-gradient(44% 60% at 100% 0%, rgba(185, 149, 82, .14), transparent 72%),
+    var(--paper);
+  color: var(--ink-text);
+  border-block: 1px solid rgba(18, 16, 20, .08);
+}
+
+.feat>.wrap {
+  position: relative;
+}
+
+.feat .kicker,
+.feat .h2 em {
+  color: var(--gold-deep);
+}
+
+.feat .scard {
+  color: var(--bone);
+  box-shadow: 0 28px 70px -44px rgba(18, 8, 12, .75);
+}
+
+/* ---------- category panels ---------- */
+.cats {
+  display: flex;
+  gap: 10px;
+  height: clamp(440px, 44vw, 580px);
+}
+
+.cat {
+  --tx: flex-grow .9s var(--ease), border-color .5s;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--ink-1);
+  border: 1px solid var(--line);
+}
+
+.cat.is-open {
+  flex-grow: 4.6;
+  border-color: color-mix(in srgb, var(--gem) 45%, transparent);
+}
+
+.cat__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .45;
+  background: radial-gradient(80% 50% at 50% 100%, color-mix(in srgb, var(--gem) 48%, transparent), transparent 70%);
+  transition: opacity .8s;
+}
+
+.cat.is-open .cat__glow {
+  opacity: 1;
+}
+
+.cat__idx {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  color: var(--mute);
+  font: 500 .66rem var(--mono);
+  letter-spacing: .14em;
+}
+
+.cat__v {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  translate: -50% 0;
+  rotate: 180deg;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font: 400 clamp(1.8rem, 2.5vw, 2.5rem)/1 var(--serif);
+  letter-spacing: -.01em;
+  transition: opacity .4s;
+}
+
+.cat.is-open .cat__v {
+  opacity: 0;
+}
+
+.cat__body {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s;
+}
+
+.cat.is-open .cat__body {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity .7s .25s;
+}
+
+.cat__plate {
+  align-self: center;
+  justify-self: center;
+  width: min(62%, 290px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .8), 0 0 0 1px rgba(243, 238, 228, .12), 0 0 90px -10px color-mix(in srgb, var(--gem) 60%, transparent);
+  transform: scale(.82) rotate(-12deg);
+  transition: transform 1.1s var(--ease);
+}
+
+.cat.is-open .cat__plate {
+  transform: none;
+}
+
+.cat__plate img {
+  transform: scale(1.55);
+}
+
+.cat__text {
+  display: grid;
+  gap: 8px;
+}
+
+.cat__name {
+  font: 400 clamp(2.2rem, 3.4vw, 3.3rem)/1 var(--serif);
+  letter-spacing: -.02em;
+}
+
+.cat__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: var(--mute);
+  font: 500 .64rem var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.cat__facts span:first-child {
+  color: color-mix(in srgb, var(--gem) 60%, #fff);
+}
+
+.cat__note {
+  max-width: 42ch;
+  color: var(--mute);
+  font-size: .9rem;
+}
+
+.cat__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font: 700 .7rem var(--sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.cat__go .ic {
+  transition: transform .5s var(--ease);
+}
+
+.cat:hover .cat__go .ic {
+  transform: translateX(6px);
+}

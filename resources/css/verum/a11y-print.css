@@ -1,0 +1,99 @@
+/* Verum — Reduced motion and print (certificate only).
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Reduced motion
+   ============================================================= */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hp__bar i,
+  .qdot i::after,
+  .grain,
+  .hero__ring,
+  .hero__disc::after,
+  .band__star,
+  .chat__orb,
+  .chat__orb-ring {
+    animation: none !important;
+  }
+
+  .js [data-reveal] {
+    opacity: 1;
+    translate: none;
+    scale: none;
+    clip-path: none;
+  }
+
+  .split .wi {
+    translate: none;
+    rotate: none;
+  }
+}
+
+/* =============================================================
+   Print: certificate only
+   ============================================================= */
+@media print {
+
+  .chat,
+  .toasts,
+  .totop,
+  .hdr,
+  .ft,
+  .srail,
+  .buybar,
+  .curtain,
+  .preloader,
+  .mnav {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .js [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+    scale: none !important;
+    clip-path: none !important;
+  }
+
+  body.print-cert main>.page:not([data-page="product"]),
+  body.print-cert #pdp,
+  body.print-cert .more,
+  body.print-cert .certsec__copy,
+  body.print-cert .certsec__bg {
+    display: none !important;
+  }
+
+  body.print-cert .certsec {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  body.print-cert .certsec__grid {
+    display: block;
+  }
+
+  body.print-cert .cert {
+    transform: none !important;
+  }
+
+  body.print-cert .cert__paper {
+    box-shadow: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

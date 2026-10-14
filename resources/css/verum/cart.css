@@ -1,0 +1,685 @@
+/* Verum — Cart and checkout.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Cart
+   ============================================================= */
+.cart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: start;
+  gap: clamp(24px, 4vw, 56px);
+  padding-bottom: clamp(80px, 10vw, 140px);
+}
+
+.cart__lines {
+  display: grid;
+  gap: 18px;
+}
+
+.parcel {
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+}
+
+.parcel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 14px 20px;
+  background: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.parcel__n {
+  color: var(--ruby-hi);
+  font: 500 .6rem var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.parcel__seller {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 400 1.1rem var(--serif);
+  transition: color .3s;
+}
+
+.parcel__seller:hover {
+  color: var(--ruby-hi);
+}
+
+.parcel__ship {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--mute);
+  font-size: .78rem;
+}
+
+.parcel__ship .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.cline {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto auto;
+  grid-template-areas: "img info qty price" "img acts acts acts";
+  align-items: center;
+  gap: 6px 22px;
+  padding: 20px;
+  transition: opacity .35s, transform .4s var(--ease);
+}
+
+.cline+.cline {
+  border-top: 1px solid var(--line);
+}
+
+.cline.is-removing {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.cline__img {
+  grid-area: img;
+  width: 96px;
+  height: 96px;
+}
+
+.cline__img img {
+  transform: scale(1.15);
+}
+
+.cline__info {
+  grid-area: info;
+  min-width: 0;
+}
+
+.cline h3 {
+  font: 400 1.4rem/1.15 var(--serif);
+}
+
+.cline h3 a {
+  transition: color .3s;
+}
+
+.cline h3 a:hover {
+  color: var(--ruby-hi);
+}
+
+.cline__meta {
+  margin-top: 4px;
+  color: var(--mute);
+  font-size: .82rem;
+}
+
+.cline__cert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--mute);
+  font: .68rem var(--mono);
+}
+
+.cline__cert .ic {
+  width: 14px;
+  height: 14px;
+  color: var(--ok);
+}
+
+.cline__qty {
+  grid-area: qty;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.cline__qty .lbl {
+  font-size: .54rem;
+}
+
+.cline__one {
+  font: 500 1.05rem var(--mono);
+}
+
+.cline__qty small {
+  color: var(--mute);
+  font: .56rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.cline__price {
+  grid-area: price;
+  min-width: 100px;
+  text-align: right;
+  font: 500 1.15rem var(--mono);
+}
+
+.cline__acts {
+  grid-area: acts;
+  display: flex;
+  gap: 18px;
+}
+
+.cline__acts .link {
+  color: var(--mute);
+  font-size: .78rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cline__acts .link:hover {
+  color: var(--bone);
+}
+
+.cline__acts .ic {
+  width: 15px;
+  height: 15px;
+}
+
+.cline__acts .link--danger:hover {
+  color: var(--ruby-hi);
+}
+
+.cart__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px dashed var(--line-2);
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.cart__note .ic {
+  flex: none;
+  margin-top: 2px;
+  color: var(--ruby-hi);
+}
+
+.summary {
+  position: sticky;
+  top: calc(var(--hdr) + 24px);
+  padding: 28px;
+  background: linear-gradient(180deg, var(--ink-2), var(--ink-1));
+  border: 1px solid var(--line-2);
+}
+
+.summary h2 {
+  margin-bottom: 18px;
+  font: 400 1.8rem var(--serif);
+}
+
+.summary__rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: .92rem;
+}
+
+.summary__rows dt {
+  display: grid;
+  color: var(--mute);
+}
+
+.summary__rows dt small {
+  color: var(--mute-2);
+  font-size: .72rem;
+}
+
+.summary__rows dd {
+  font-family: var(--mono);
+  font-weight: 500;
+  text-align: right;
+}
+
+.summary__rows dd.muted {
+  color: var(--mute);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: .84rem;
+}
+
+.summary__rows .summary__total {
+  padding-top: 18px;
+  border-bottom: 0;
+}
+
+.summary__total dt {
+  color: var(--bone);
+  font: 400 1.4rem var(--serif);
+}
+
+.summary__total dd {
+  font-size: 1.5rem;
+}
+
+.summary .btn--block {
+  margin-top: 18px;
+}
+
+.summary__trust {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.summary__trust li {
+  display: flex;
+  gap: 10px;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.summary__trust .ic {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--ruby-hi);
+}
+
+.summary__pay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.summary__pay span {
+  padding: 5px 9px;
+  border: 1px solid var(--line-2);
+  color: var(--mute);
+  font: 500 .58rem var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.summary__esc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.summary__esc .ic {
+  width: 17px;
+  height: 17px;
+  color: var(--ok);
+}
+
+.cartempty {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin-bottom: 100px;
+  padding: clamp(50px, 8vw, 110px) 20px;
+  border: 1px dashed var(--line-2);
+  text-align: center;
+}
+
+.cartempty__ic {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  color: var(--ruby-hi);
+}
+
+.cartempty__ic .ic {
+  width: 30px;
+  height: 30px;
+}
+
+.cartempty h2 {
+  font: 400 2.2rem var(--serif);
+}
+
+.cartempty p {
+  color: var(--mute);
+}
+
+.cartempty__btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* =============================================================
+   Checkout
+   ============================================================= */
+.costeps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.costeps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mute);
+  font: 600 .7rem var(--sans);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.costeps li+li::before {
+  content: "";
+  width: 34px;
+  height: 1px;
+  margin-right: 4px;
+  background: var(--line-2);
+}
+
+.costeps span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  font: 500 .72rem var(--mono);
+  transition: background .4s, border-color .4s, color .4s;
+}
+
+.costeps li.is-on {
+  color: var(--bone);
+}
+
+.costeps li.is-on span {
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: #fff;
+}
+
+.co {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: start;
+  gap: clamp(24px, 4vw, 56px);
+  padding-bottom: clamp(80px, 10vw, 140px);
+}
+
+.co__form {
+  display: grid;
+  gap: 14px;
+}
+
+.costep {
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  transition: border-color .4s;
+}
+
+.costep.is-open {
+  border-color: var(--line-3);
+}
+
+.costep__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.costep__n {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-3);
+  border-radius: 50%;
+  font: 500 .8rem var(--mono);
+  transition: background .4s, border-color .4s, color .4s;
+}
+
+.costep.is-open .costep__n {
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: #fff;
+}
+
+.costep.is-done .costep__n {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+  font-size: 0;
+}
+
+.costep.is-done .costep__n::before {
+  content: "✓";
+  font-size: .9rem;
+}
+
+.costep__head h2 {
+  font: 400 1.5rem var(--serif);
+}
+
+.costep__sum {
+  display: none;
+  order: 3;
+  flex-basis: 100%;
+  padding-left: 50px;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.costep.is-done .costep__sum:not(:empty) {
+  display: block;
+}
+
+.costep__edit {
+  display: none;
+  margin-left: auto;
+  font-size: .8rem;
+}
+
+.costep.is-done .costep__edit {
+  display: inline-flex;
+}
+
+.costep__body {
+  display: none;
+  padding: 4px 24px 26px;
+}
+
+.costep.is-open .costep__body {
+  display: grid;
+  gap: 20px;
+  animation: fadeup .5s var(--ease) both;
+}
+
+.costep__body>.btn {
+  justify-self: start;
+}
+
+.costep__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.costep__note .ic {
+  flex: none;
+  margin-top: 2px;
+  color: var(--ruby-hi);
+}
+
+#coParcels {
+  display: grid;
+  gap: 18px;
+}
+
+.cparcel {
+  display: grid;
+  gap: 10px;
+}
+
+.cparcel__h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: .9rem;
+}
+
+.cparcel__h span {
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.rcards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rcard {
+  position: relative;
+  cursor: pointer;
+}
+
+.rcard input {
+  position: absolute;
+  opacity: 0;
+}
+
+.rcard__in {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-2);
+  transition: border-color .3s, background .3s, box-shadow .3s;
+}
+
+.rcard__in b {
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+.rcard__in small {
+  grid-column: 1;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.rcard__in em,
+.rcard__in .ic {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.rcard__in em {
+  font: 500 .95rem var(--mono);
+  font-style: normal;
+}
+
+.rcard__in .ic {
+  color: var(--mute);
+}
+
+.rcard:hover .rcard__in {
+  border-color: var(--line-3);
+}
+
+.rcard input:checked+.rcard__in {
+  border-color: var(--ruby-hi);
+  background: rgba(224, 33, 63, .07);
+  box-shadow: inset 3px 0 0 var(--ruby-hi);
+}
+
+.rcard input:focus-visible+.rcard__in {
+  outline: 2px solid var(--ruby-hi);
+  outline-offset: 2px;
+}
+
+.escrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--ok) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.escrow .ic {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--ok);
+}
+
+.escrow b {
+  color: var(--bone);
+}
+
+.paywire p {
+  color: var(--mute);
+  font-size: .9rem;
+}
+
+.mini {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mini li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.mini__img {
+  width: 52px;
+  height: 52px;
+}
+
+.mini__img img {
+  transform: scale(1.15);
+}
+
+.mini__t {
+  display: grid;
+  min-width: 0;
+}
+
+.mini__t b {
+  font-size: .88rem;
+  font-weight: 600;
+}
+
+.mini__t small {
+  color: var(--mute);
+  font: .64rem var(--mono);
+}
+
+.mini__p {
+  font: 500 .88rem var(--mono);
+}

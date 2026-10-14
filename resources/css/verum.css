@@ -1,0 +1,30 @@
+/* Verum design system, split by concern. Ported from the static demo.
+   Order matters: tokens and base styles first, responsive and print last. */
+
+@import './verum/tokens.css';
+@import './verum/typography.css';
+@import './verum/buttons.css';
+@import './verum/plates.css';
+@import './verum/header.css';
+@import './verum/hero.css';
+@import './verum/home-promise.css';
+@import './verum/cards.css';
+@import './verum/home-rails.css';
+@import './verum/testimonials.css';
+@import './verum/footer.css';
+@import './verum/chat.css';
+@import './verum/overlays.css';
+@import './verum/motion.css';
+@import './verum/page-head.css';
+@import './verum/shop.css';
+@import './verum/auctions.css';
+@import './verum/product.css';
+@import './verum/verify.css';
+@import './verum/sellers.css';
+@import './verum/about.css';
+@import './verum/forms.css';
+@import './verum/cart.css';
+@import './verum/sell.css';
+@import './verum/help.css';
+@import './verum/responsive.css';
+@import './verum/a11y-print.css';

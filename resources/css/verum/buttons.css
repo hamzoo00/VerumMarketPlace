@@ -1,0 +1,375 @@
+/* Verum — Buttons, chips, tags and the live dot. */
+
+/* ---------- buttons ---------- */
+.btn {
+  --bg: transparent;
+  --fg: var(--bone);
+  --bd: var(--line-3);
+  --fill: var(--bone);
+  --fg-h: var(--ink);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .7em;
+  min-height: 52px;
+  padding: 0 1.75em;
+  font: 700 .72rem/1 var(--sans);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  user-select: none;
+  transition: color .45s var(--ease), border-color .45s var(--ease), translate .5s var(--ease), opacity .3s;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: var(--fill);
+  border-radius: 50% 50% 0 0 / 40% 40% 0 0;
+  transform: translateY(101%);
+  transition: transform .65s var(--ease), border-radius .65s var(--ease);
+}
+
+.btn:hover::before {
+  transform: none;
+  border-radius: 0;
+}
+
+.btn:hover {
+  color: var(--fg-h);
+  border-color: var(--fill);
+}
+
+.btn .ic {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.btn--ruby {
+  --bg: var(--ruby);
+  --bd: var(--ruby);
+  --fg: #120F09;
+  --fill: var(--gold-pale);
+  --fg-h: #120F09;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.btn--ruby:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--bone), inset 0 0 0 4px var(--ruby-deep);
+}
+
+.btn--ghost {
+  --fill: var(--bone);
+  --fg-h: var(--ink);
+}
+
+.btn--light {
+  --bg: var(--bone);
+  --bd: var(--bone);
+  --fg: var(--ink);
+  --fill: var(--ink);
+  --fg-h: var(--bone);
+}
+
+.btn--ink {
+  --bg: var(--ink-text);
+  --bd: var(--ink-text);
+  --fg: var(--bone);
+  --fill: var(--ruby);
+  --fg-h: #fff;
+}
+
+.btn--sm {
+  min-height: 42px;
+  padding: 0 1.3em;
+  font-size: .66rem;
+}
+
+.btn--xs {
+  min-height: 34px;
+  padding: 0 1em;
+  font-size: .6rem;
+  letter-spacing: .14em;
+}
+
+.btn--lg {
+  min-height: 60px;
+  padding: 0 2.1em;
+  font-size: .76rem;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn.is-done {
+  --bg: transparent;
+  --bd: color-mix(in srgb, var(--ok) 55%, transparent);
+  --fg: var(--ok);
+  clip-path: none;
+}
+
+.btn:disabled {
+  opacity: .5;
+}
+
+.btn:disabled::before {
+  display: none;
+}
+
+.btn.is-loading {
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.btn.is-loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid rgba(255, 255, 255, .35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+.arr {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  overflow: hidden;
+}
+
+.arr svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .55s var(--ease);
+}
+
+.arr svg:last-child {
+  transform: translateX(-130%);
+}
+
+.btn:hover .arr svg:first-child,
+a:hover>.arr svg:first-child {
+  transform: translateX(130%);
+}
+
+.btn:hover .arr svg:last-child,
+a:hover>.arr svg:last-child {
+  transform: none;
+}
+
+.ibtn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--bone);
+  transition: background .3s, color .3s, border-color .3s, transform .4s var(--ease);
+}
+
+.ibtn:hover {
+  background: rgba(243, 238, 228, .08);
+}
+
+.ibtn .ic {
+  width: 20px;
+  height: 20px;
+}
+
+.ibtn--line {
+  border: 1px solid var(--line-2);
+}
+
+.ibtn--line:hover {
+  background: var(--bone);
+  color: var(--ink);
+  border-color: var(--bone);
+}
+
+.ibtn--sm {
+  width: 32px;
+  height: 32px;
+}
+
+.ibtn--sm .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.ibtn--lg {
+  width: 60px;
+  height: 60px;
+  border-radius: 0;
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--ruby);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--ink);
+  font: 700 .62rem/18px var(--sans);
+  text-align: center;
+  letter-spacing: 0;
+}
+
+.bump {
+  animation: bump .6s var(--ease-back);
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.45);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ibtn[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    background: var(--bone);
+    color: var(--ink);
+    white-space: nowrap;
+    pointer-events: none;
+    font: 700 .58rem/1 var(--sans);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    animation: fadeup .3s var(--ease) both;
+  }
+}
+
+/* ---------- chips, tags, live dot ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  color: var(--bone);
+  font: 500 .8rem/1 var(--sans);
+  transition: border-color .3s, color .3s, background .3s;
+}
+
+.chip:hover {
+  border-color: var(--ruby-hi);
+  color: var(--ruby-hi);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  background: var(--ink);
+  color: var(--bone);
+  font: 500 .58rem/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.tag--live {
+  background: var(--ruby);
+  color: #fff;
+}
+
+.tag--live .dot-live {
+  background: #fff;
+}
+
+.dot-live {
+  display: inline-block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ruby-hi);
+  animation: livepulse 1.8s infinite;
+}
+
+@keyframes livepulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 69, 89, .6);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(255, 69, 89, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 69, 89, 0);
+  }
+}
+
+.stars {
+  color: var(--ruby-hi);
+  letter-spacing: .12em;
+  font-size: .9rem;
+}
+
+.stars__off {
+  color: var(--line-3);
+}
+
+.star {
+  color: var(--ruby-hi);
+  margin-left: 3px;
+  font-size: .8em;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: rgba(243, 238, 228, .08);
+  color: var(--mute);
+  font: 500 .64rem/1 var(--mono);
+  letter-spacing: .04em;
+}

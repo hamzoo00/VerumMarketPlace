@@ -1,0 +1,422 @@
+/* Verum — Form fields shared by contact, checkout and seller application.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Contact & form fields (shared by checkout and seller application)
+   ============================================================= */
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: clamp(28px, 5vw, 80px);
+  padding-bottom: clamp(80px, 10vw, 140px);
+}
+
+.contact__info {
+  display: grid;
+  gap: 12px;
+}
+
+.cinfo {
+  --tx: border-color .3s, background .3s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  text-align: left;
+}
+
+.cinfo:hover {
+  border-color: var(--line-3);
+  background: var(--ink-2);
+}
+
+.cinfo--static:hover {
+  border-color: var(--line-2);
+  background: var(--ink-1);
+}
+
+.cinfo__ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(224, 33, 63, .12);
+  color: var(--ruby-hi);
+}
+
+.cinfo__t {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cinfo__t b {
+  overflow-wrap: anywhere;
+  font: 400 1.2rem var(--serif);
+}
+
+.cinfo__t small {
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.cinfo__act {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mute);
+  font: 700 .6rem var(--sans);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: color .3s;
+}
+
+.cinfo:hover .cinfo__act {
+  color: var(--ruby-hi);
+}
+
+.cinfo.is-copied .cinfo__act {
+  color: var(--ok);
+}
+
+.smap {
+  position: relative;
+  overflow: hidden;
+  height: 240px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+}
+
+.smap__grid {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 28px 28px, linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 28px 28px;
+}
+
+.smap__roads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.smap__roads path {
+  fill: none;
+  stroke: rgba(243, 238, 228, .14);
+  stroke-width: 6;
+}
+
+.smap__roads path:first-child {
+  stroke: rgba(224, 33, 63, .3);
+  stroke-width: 8;
+}
+
+.smap__pin {
+  position: absolute;
+  left: 52%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 1px solid var(--ruby-hi);
+}
+
+.smap__pin svg {
+  width: 22px;
+  height: 21px;
+}
+
+.smap__pin i {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--ruby-hi);
+  border-radius: 50%;
+  animation: ping 2s infinite;
+}
+
+@keyframes ping {
+  from {
+    transform: scale(.9);
+    opacity: .9;
+  }
+
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.smap__label {
+  position: absolute;
+  left: calc(52% + 34px);
+  top: calc(50% - 12px);
+  padding: 6px 10px;
+  background: var(--bone);
+  color: var(--ink);
+  font: 700 .58rem var(--sans);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.cform {
+  position: relative;
+  padding: clamp(24px, 3.4vw, 44px);
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+}
+
+.cform__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  position: relative;
+  min-width: 0;
+}
+
+.field--full {
+  grid-column: 1 / -1;
+}
+
+.field> :is(input, textarea, select) {
+  width: 100%;
+  height: 60px;
+  padding: 24px 16px 8px;
+  border-radius: 0;
+  appearance: none;
+  background: var(--ink);
+  border: 1px solid var(--line-2);
+  color: var(--bone);
+  font-size: .98rem;
+  transition: border-color .3s, box-shadow .3s;
+}
+
+.field>textarea {
+  height: auto;
+  min-height: 150px;
+  padding-top: 30px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.field>select {
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.field>select option {
+  background: var(--ink-2);
+  color: var(--bone);
+}
+
+.field>label {
+  position: absolute;
+  left: 17px;
+  top: 19px;
+  color: var(--mute);
+  font-size: .95rem;
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform .3s var(--ease), color .3s;
+}
+
+.field> :is(input, textarea, select):focus {
+  outline: none;
+  border-color: var(--ruby-hi);
+  box-shadow: 0 0 0 3px rgba(224, 33, 63, .14);
+}
+
+.field> :is(input, textarea):is(:focus, :not(:placeholder-shown))+label,
+.field>select:is(:focus, :valid)+label {
+  transform: translateY(-11px) scale(.74);
+  letter-spacing: .03em;
+}
+
+.field> :is(input, textarea, select):focus+label {
+  color: var(--ruby-hi);
+}
+
+.field__chev {
+  position: absolute;
+  right: 16px;
+  top: 22px;
+  width: 16px;
+  height: 16px;
+  color: var(--mute);
+  pointer-events: none;
+}
+
+.field__err {
+  display: none;
+  margin-top: 6px;
+  color: var(--ruby-hi);
+  font-size: .78rem;
+}
+
+.field.is-bad> :is(input, textarea, select) {
+  border-color: var(--ruby-hi);
+}
+
+.field.is-bad .field__err {
+  display: block;
+  animation: fadeup .3s var(--ease);
+}
+
+.field__count {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  color: var(--mute-2);
+  font: .64rem var(--mono);
+}
+
+.field--choice legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 12px;
+  color: var(--mute);
+  font: 500 .6rem var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.choice {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice label {
+  position: relative;
+  cursor: pointer;
+}
+
+.choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.choice span {
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  color: var(--mute);
+  font-size: .86rem;
+  transition: background .25s, color .25s, border-color .25s;
+}
+
+.choice label:hover span {
+  border-color: var(--line-3);
+  color: var(--bone);
+}
+
+.choice input:checked+span {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--ink);
+}
+
+.choice input:focus-visible+span {
+  outline: 2px solid var(--ruby-hi);
+  outline-offset: 2px;
+}
+
+.choice--multi input:checked+span::before {
+  content: "✓";
+  margin-right: 8px;
+  color: var(--ruby);
+  font-weight: 700;
+}
+
+.field--choice.is-bad .choice span {
+  border-color: rgba(255, 69, 89, .5);
+}
+
+.cform__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.cform__note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mute);
+  font-size: .78rem;
+}
+
+.cform__note .ic {
+  width: 15px;
+  height: 15px;
+}
+
+.cform.is-sent> :not(.cform__ok) {
+  opacity: .12;
+  filter: blur(2px);
+  pointer-events: none;
+  transition: opacity .5s, filter .5s;
+}
+
+.cform__ok {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 30px;
+  text-align: center;
+  animation: fadeup .6s var(--ease) both;
+}
+
+.cform__ok h3 {
+  font: 400 2.2rem var(--serif);
+}
+
+.cform__ok p {
+  max-width: 40ch;
+  color: var(--mute);
+}
+
+.cform__ok b {
+  color: var(--bone);
+}
+
+.shake {
+  animation: shake .45s;
+}
+
+@keyframes shake {
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}

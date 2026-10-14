@@ -1,0 +1,417 @@
+/* Verum — Shop listing grid, filters and toolbar.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Shop
+   ============================================================= */
+.shop {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 3vw, 48px);
+  padding-bottom: clamp(80px, 10vw, 140px);
+}
+
+.filters {
+  position: sticky;
+  top: calc(var(--hdr) + 20px);
+  max-height: calc(100vh - var(--hdr) - 40px);
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+
+.filters__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.filters__head h2 {
+  margin-right: auto;
+  font: 400 1.5rem var(--serif);
+}
+
+.filters__head .link {
+  font-size: .78rem;
+}
+
+.filters__x,
+.filters__foot,
+.filters__scrim {
+  display: none;
+}
+
+.fgroup {
+  border-bottom: 1px solid var(--line);
+}
+
+.fgroup summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  cursor: pointer;
+  list-style: none;
+  font: 500 .64rem var(--mono);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.fgroup summary::-webkit-details-marker {
+  display: none;
+}
+
+.fgroup summary .ic {
+  width: 16px;
+  height: 16px;
+  color: var(--mute);
+  transition: transform .4s var(--ease);
+}
+
+.fgroup[open] summary .ic {
+  transform: rotate(180deg);
+}
+
+.fgroup__body {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 14px;
+}
+
+.fopt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 3px;
+  color: var(--mute);
+  font-size: .9rem;
+  transition: background .2s, color .2s;
+}
+
+.fopt:hover:not(:disabled) {
+  background: rgba(243, 238, 228, .05);
+  color: var(--bone);
+}
+
+.fopt__box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line-3);
+  border-radius: 50%;
+  transition: background .25s, border-color .25s;
+}
+
+.fopt--multi .fopt__box {
+  border-radius: 3px;
+}
+
+.fopt__box .ic {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.6;
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity .3s, transform .3s var(--ease-back);
+}
+
+.fopt.is-on {
+  color: var(--bone);
+}
+
+.fopt.is-on .fopt__box {
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: #fff;
+}
+
+.fopt.is-on .fopt__box .ic {
+  opacity: 1;
+  transform: none;
+}
+
+.fopt__l {
+  flex: 1;
+}
+
+.fopt__n {
+  color: var(--mute-2);
+  font: .68rem var(--mono);
+}
+
+.fopt:disabled {
+  opacity: .35;
+}
+
+.ftoggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px;
+  color: var(--mute);
+  font-size: .9rem;
+}
+
+.ftoggle__sw {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--ink-4);
+  transition: background .3s;
+}
+
+.ftoggle__sw i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bone);
+  transition: transform .4s var(--ease-back);
+}
+
+.ftoggle.is-on {
+  color: var(--bone);
+}
+
+.ftoggle.is-on .ftoggle__sw {
+  background: var(--ruby);
+}
+
+.ftoggle.is-on .ftoggle__sw i {
+  transform: translateX(16px);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toolbar__filters {
+  display: none;
+}
+
+.toolbar__fc:not(:empty) {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--ruby);
+  color: #fff;
+  font-size: .6rem;
+}
+
+.toolbar__count {
+  color: var(--mute);
+  font-size: .95rem;
+}
+
+.toolbar__count strong {
+  color: var(--bone);
+  font: 500 1.05rem var(--mono);
+}
+
+.toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.select {
+  position: relative;
+}
+
+.select__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  font-size: .84rem;
+  transition: border-color .3s;
+}
+
+.select__btn:hover {
+  border-color: var(--line-3);
+}
+
+.select__lbl {
+  color: var(--mute);
+}
+
+.select__btn .ic {
+  width: 16px;
+  height: 16px;
+  transition: transform .3s;
+}
+
+.select.is-open .select__btn .ic {
+  transform: rotate(180deg);
+}
+
+.select__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  min-width: 250px;
+  padding: 6px;
+  background: var(--ink-2);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity .2s, transform .3s var(--ease);
+}
+
+.select.is-open .select__list {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.select__list:focus {
+  outline: none;
+}
+
+.select__list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: var(--mute);
+  font-size: .86rem;
+  cursor: pointer;
+}
+
+.select__list li:hover,
+.select__list li.is-focus {
+  background: var(--ink-3);
+  color: var(--bone);
+}
+
+.select__list li[aria-selected="true"] {
+  color: var(--ruby-hi);
+}
+
+.select__list li[aria-selected="true"]::after {
+  content: "✓";
+}
+
+.seg {
+  display: flex;
+  border: 1px solid var(--line-2);
+}
+
+.seg button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 40px;
+  color: var(--mute);
+  transition: background .3s, color .3s;
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--bone);
+  color: var(--ink);
+}
+
+.seg .ic {
+  width: 18px;
+  height: 18px;
+}
+
+.chipsbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0 24px;
+}
+
+.chipsbar:empty {
+  padding: 12px 0;
+}
+
+.achip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: var(--ink-3);
+  font-size: .8rem;
+  transition: border-color .25s;
+  animation: fadeup .4s var(--ease) both;
+}
+
+.achip .ic {
+  width: 14px;
+  height: 14px;
+  color: var(--mute);
+}
+
+.achip:hover {
+  border-color: var(--ruby-hi);
+}
+
+.achip:hover .ic {
+  color: var(--ruby-hi);
+}
+
+.chipsbar .link {
+  font-size: .8rem;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 80px 20px;
+  border: 1px dashed var(--line-2);
+  text-align: center;
+}
+
+.empty__ic {
+  width: 48px;
+  height: 48px;
+  fill: none;
+  stroke: var(--ruby-hi);
+  stroke-width: 1.2;
+}
+
+.empty h3 {
+  font: 400 1.8rem var(--serif);
+}
+
+.empty p {
+  margin-bottom: 8px;
+  color: var(--mute);
+}
+
+.empty-sm {
+  grid-column: 1 / -1;
+  padding: 40px 0;
+  color: var(--mute);
+}

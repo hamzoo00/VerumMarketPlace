@@ -1,0 +1,376 @@
+/* Verum — Verify a report.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Verify page
+   ============================================================= */
+.verify {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(36px, 6vw, 84px));
+  padding-bottom: 100px;
+}
+
+.verify__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(50% 60% at 80% 40%, rgba(200, 16, 46, .2), transparent 70%), repeating-linear-gradient(90deg, rgba(243, 238, 228, .025) 0 1px, transparent 1px 120px);
+}
+
+.verify__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(32px, 6vw, 96px);
+}
+
+.verify .phead__title {
+  margin-top: 16px;
+}
+
+.verify .phead__lede {
+  margin-top: 22px;
+}
+
+.vform {
+  max-width: 580px;
+  margin-top: 36px;
+}
+
+.vform__row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.vform__in {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 64px;
+  padding: 0 20px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-3);
+  color: var(--bone);
+  font: 500 1.3rem var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: border-color .3s, box-shadow .3s;
+}
+
+.vform__in::placeholder {
+  color: var(--mute-2);
+}
+
+.vform__in:focus {
+  outline: none;
+  border-color: var(--ruby-hi);
+  box-shadow: 0 0 0 4px rgba(224, 33, 63, .15);
+}
+
+.vform .btn {
+  min-height: 64px;
+}
+
+.vform__hint {
+  margin-top: 14px;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.vform__hint .link {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.verify__out {
+  display: grid;
+  min-height: 460px;
+}
+
+.vidle,
+.vscan {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 24px;
+  padding: 30px;
+  border: 1px dashed var(--line-2);
+  color: var(--mute);
+  text-align: center;
+}
+
+.vidle p,
+.vscan p {
+  max-width: 34ch;
+}
+
+.vscan b {
+  color: var(--bone);
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.vidle__doc {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  width: 210px;
+  aspect-ratio: .78;
+  padding: 22px 20px;
+  background: var(--paper);
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8);
+  transform: rotate(-4deg);
+}
+
+.vidle__mark svg {
+  width: 28px;
+  height: 27px;
+  --mk-1: #121014;
+  --mk-2: #45434A;
+}
+
+.vidle__doc i {
+  display: block;
+  height: 5px;
+  background: rgba(18, 16, 20, .15);
+}
+
+.vidle__doc i:nth-of-type(2) {
+  width: 70%;
+}
+
+.vidle__doc i:nth-of-type(3) {
+  width: 85%;
+}
+
+.vidle__doc i:nth-of-type(4) {
+  width: 55%;
+  background: rgba(200, 16, 46, .35);
+}
+
+.vidle__qr {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 54px;
+  height: 54px;
+  background: repeating-conic-gradient(#121014 0 25%, #fff 0 50%) 0 0 / 9px 9px;
+}
+
+.vidle__beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  opacity: .5;
+  background: var(--ruby-hi);
+  box-shadow: 0 0 20px 4px rgba(255, 69, 89, .6);
+  animation: scan 2.6s var(--ease-io) infinite alternate;
+}
+
+.is-scanning .vidle__beam {
+  opacity: 1;
+  animation-duration: .7s;
+}
+
+.vres {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 3vw, 36px);
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  animation: vin .7s var(--ease) both;
+}
+
+@keyframes vin {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.vres--ok {
+  border-color: color-mix(in srgb, var(--ok) 40%, transparent);
+}
+
+.vres--ok::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 50% at 100% 0%, color-mix(in srgb, var(--ok) 14%, transparent), transparent 70%);
+}
+
+.vres__stamp {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 2px solid var(--ok);
+  color: var(--ok);
+  font: 700 .78rem var(--mono);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  rotate: -8deg;
+  animation: stamp .6s var(--ease-back) .2s both;
+}
+
+.vres__stamp .ic {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    scale: 2.2;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.vres__head {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding-right: 140px;
+}
+
+.vres__img {
+  width: 96px;
+  height: 96px;
+}
+
+.vres__img img {
+  transform: scale(1.3);
+}
+
+.vres h2 {
+  margin-top: 8px;
+  font: 400 clamp(1.6rem, 2.4vw, 2.2rem)/1.1 var(--serif);
+}
+
+.vres h2 em {
+  color: var(--ruby-hi);
+}
+
+.vres__sub {
+  margin-top: 6px;
+  color: var(--mute);
+  font: .7rem var(--mono);
+}
+
+.vres__rows {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.vres__rows div {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.vres__rows dt {
+  color: var(--mute);
+  font: 500 .56rem var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.vres__rows dd {
+  margin-top: 4px;
+  font-size: .92rem;
+}
+
+.vres__match {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--ok) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  font-size: .88rem;
+}
+
+.vres__match .ic {
+  flex: none;
+  margin-top: 2px;
+  color: var(--ok);
+}
+
+.vres__match a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vres__btns {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.vres--bad {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 14px;
+}
+
+.vres__x {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--ruby-hi);
+  border-radius: 50%;
+  color: var(--ruby-hi);
+}
+
+.vres__x .ic {
+  width: 24px;
+  height: 24px;
+}
+
+.vres--bad h2 {
+  font: 400 2rem var(--serif);
+}
+
+.vres--bad p {
+  max-width: 44ch;
+  color: var(--mute);
+}
+
+.vres--bad b {
+  color: var(--bone);
+  font-family: var(--mono);
+  font-weight: 500;
+}

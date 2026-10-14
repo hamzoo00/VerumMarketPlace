@@ -1,0 +1,79 @@
+/* Verum — Page headers and breadcrumbs.
+   Ported from the static demo stylesheet. */
+
+/* =============================================================
+   Page headers & breadcrumbs
+   ============================================================= */
+.phead {
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(36px, 6vw, 84px));
+  padding-bottom: clamp(32px, 4.5vw, 60px);
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
+  color: var(--mute);
+  font: 500 .64rem var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.crumbs a {
+  transition: color .3s;
+}
+
+.crumbs a:hover {
+  color: var(--ruby-hi);
+}
+
+.crumbs [aria-current] {
+  color: var(--bone);
+}
+
+.phead__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 64px;
+  margin-top: 16px;
+}
+
+.phead__title {
+  font: 400 clamp(3.1rem, 7.6vw, 7.8rem)/.92 var(--serif);
+  letter-spacing: -.04em;
+}
+
+.phead__title em {
+  color: var(--ruby-hi);
+}
+
+.phead__lede {
+  max-width: 44ch;
+  color: var(--mute);
+  font-size: 1.05rem;
+}
+
+.phead__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px clamp(24px, 5vw, 72px);
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.phead__stats strong {
+  display: block;
+  font: 400 clamp(2.2rem, 4vw, 3.4rem)/1 var(--serif);
+}
+
+.phead__stats span {
+  color: var(--mute);
+  font: 500 .6rem var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}

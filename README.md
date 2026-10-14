@@ -45,6 +45,20 @@ Then open:
 Host ports avoid the defaults (5433, 6380) so they don't collide with a
 Postgres/Redis already running on Windows or in another project.
 
+## Viewing it in a browser
+
+The stack is already running after `./verum setup`. Open
+**http://localhost:8000** in your normal (Windows) browser — WSL mirrored
+networking means `localhost` reaches the containers with no port forwarding.
+
+`./verum urls` prints every local URL; `./verum health` checks the stack and
+the main pages in one go.
+
+Assets are served by the Vite dev container, which binds `0.0.0.0` inside
+Docker but advertises `http://localhost:5173` to the browser (`server.origin`
+in `vite.config.js`). Without that the page loads unstyled, because a browser
+cannot connect to `0.0.0.0`.
+
 ## Daily use
 
 ```bash
