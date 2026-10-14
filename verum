@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# Verum task runner.
+# PHP is not installed on the host, so every PHP command is proxied into Docker.
+# Usage: ./verum <command> [args]
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+DC="docker compose"
+EXEC="$DC exec -T app"
+
+usage() {
+    cat <<'EOF'
+Verum task runner — PHP runs inside Docker, never on the host.
+
+  ./verum up               Start the stack
+  ./verum down             Stop the stack
+  ./verum ps               Container status
+  ./verum logs [service]   Tail logs
+  ./verum shell            Bash inside the app container
+  ./verum artisan <args>   Run an artisan command
+  ./verum composer <args>  Run a composer command
+  ./verum npm <args>       Run an npm command
+  ./verum migrate          Run migrations
+  ./verum fresh            Drop, re-migrate, seed
+  ./verum test             Run the test suite
+  ./verum lint             Fix style with Pint
+  ./verum types            Static analysis with PHPStan
+  ./verum check            Full gate: lint + types + tests
+  ./verum assets           Build production frontend assets
+  ./verum fix-perms        Restore exec bits lost on the WSL bind mount
+  ./verum setup            First-time setup
+EOF
+}
+
+cmd="${1:-help}"; shift || true
+
+case "$cmd" in
+    up)        $DC up -d ;;
+    down)      $DC down ;;
+    restart)   $DC restart "$@" ;;
+    ps)        $DC ps ;;
+    logs)      $DC logs -f "$@" ;;
+    shell)     $DC exec app bash ;;
+    artisan)   $EXEC php artisan "$@" ;;
+    composer)  $DC run --rm --no-deps app composer "$@" ;;
+    npm)       $DC exec -T -u root vite npm "$@" ;;
+    tinker)    $DC exec app php artisan tinker ;;
+    migrate)   $EXEC php artisan migrate ;;
+    fresh)     $EXEC php artisan migrate:fresh --seed ;;
+    seed)      $EXEC php artisan db:seed ;;
+    test)      $EXEC php artisan test "$@" ;;
+    lint)      $EXEC php ./vendor/bin/pint --parallel ;;
+    types)     $EXEC php ./vendor/bin/phpstan analyse --no-progress ;;
+    check)
+        $EXEC php ./vendor/bin/pint --parallel --test
+        $EXEC php ./vendor/bin/phpstan analyse --no-progress
+        $EXEC php artisan test
+        ;;
+    assets)
+        $DC exec -T -u root vite sh -c 'cd /var/www/html && npm run build'
+        $DC exec -T -u root vite chown -R 1000:1000 /var/www/html/public/build
+        ;;
+    fix-perms)
+        chmod +x vendor/bin/* 2>/dev/null || true
+        $DC exec -T -u root vite sh -c \
+            'chmod -R +x /var/www/html/node_modules/.bin/ 2>/dev/null || true; chown -R 1000:1000 /var/www/html/node_modules' || true
+        echo "Permissions restored."
+        ;;
+    setup)
+        $DC build
+        $DC up -d
+        $DC run --rm --no-deps app composer install
+        chmod +x vendor/bin/* 2>/dev/null || true
+        $EXEC php artisan key:generate
+        $EXEC php artisan migrate --force
+        $EXEC php artisan storage:link || true
+        echo "Ready: http://localhost:8000 | Mail: http://localhost:8025 | Horizon: http://localhost:8000/horizon"
+        ;;
+    help|--help|-h) usage ;;
+    *) echo "Unknown command: $cmd" >&2; echo; usage; exit 1 ;;
+esac

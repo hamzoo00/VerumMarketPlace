@@ -1,0 +1,24 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    paths:
+        - app/
+        - bootstrap/app.php
+        - config/
+        - database/
+        - routes/
+
+    level: 7
+
+    ignoreErrors:
+        # Media Library Pro is a paid add-on we don't install; the published
+        # config references its class in a default we never use.
+        -
+            message: '#Class Spatie\\MediaLibraryPro\\Models\\TemporaryUpload not found\.#'
+            path: config/media-library.php
+        # Horizon's own published config passes env() (bool|string) to Str::slug().
+        -
+            message: '#Parameter \#1 \$title of static method Illuminate\\Support\\Str::slug\(\) expects string, bool\|string given\.#'
+            path: config/horizon.php

@@ -1,0 +1,186 @@
+name: verum
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    environment:
+      PHP_IDE_CONFIG: serverName=verum
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [verum]
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [app]
+    networks: [verum]
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      # 5433 on the host: avoids clashing with a Windows/pgAdmin Postgres on 5432.
+      - "${DB_HOST_PORT:-5433}:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-verum}
+      POSTGRES_USER: ${DB_USERNAME:-verum}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-12345}
+      # Deterministic collation so ORDER BY matches across machines.
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-verum} -d ${DB_DATABASE:-verum}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [verum]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [verum]
+
+  # Live bidding: WebSocket server for outbid alerts and countdown sync.
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    restart: unless-stopped
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "${REVERB_HOST_PORT:-8080}:8080"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks: [verum]
+
+  # Queue worker: bid-extension jobs, email notifications, image conversions.
+  horizon:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    restart: unless-stopped
+    command: ["php", "artisan", "horizon"]
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    stop_grace_period: 30s
+    networks: [verum]
+
+  # Auction closing, scheduled reindexing, sitemap regeneration.
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      app:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks: [verum]
+
+  # Faceted search over listings (carat, colour, origin, price).
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    restart: unless-stopped
+    ports:
+      - "${MEILI_HOST_PORT:-7700}:7700"
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_KEY:-masterKeyForLocalDevOnly}
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [verum]
+
+  # Catches every outbound mail in dev; UI on :8025.
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: 500
+    networks: [verum]
+
+  # Vite dev server for Tailwind/Flux asset HMR.
+  vite:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: ["sh", "-c", "npm install && npm run dev -- --host 0.0.0.0"]
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - .:/var/www/html
+    networks: [verum]
+
+volumes:
+  postgres_data:
+  redis_data:
+  meili_data:
+
+networks:
+  verum:
+    driver: bridge
