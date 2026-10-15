@@ -33,7 +33,7 @@
 
                 @if (config('verum.demo_mode'))
                     <p class="cform__note">
-                        <x-verum.icon name="info" />{{ __('This form is not connected yet. Use WhatsApp or email below.') }}
+                        <x-verum.icon name="info" />{{ __('This form is not connected yet. Use email or phone below.') }}
                     </p>
                 @endif
 

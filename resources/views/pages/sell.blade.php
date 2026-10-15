@@ -31,13 +31,8 @@
             {{ __('Verum is a closed marketplace. Sellers are vetted by hand, and every listing carries an independent report. Buyers pay into escrow; you are paid once the stone is confirmed.') }}
         </p>
         <div class="abt__ctas" data-reveal style="--d:150">
-            <a
-                class="btn btn--ruby"
-                href="https://wa.me/{{ config('verum.contact.whatsapp') }}?text={{ urlencode(__('Hello Verum, I would like to apply as a seller.')) }}"
-                target="_blank"
-                rel="noopener"
-            >
-                <x-verum.icon name="wa" />{{ __('Apply to sell') }}
+            <a class="btn btn--ruby" href="{{ route('contact') }}" wire:navigate>
+                <x-verum.icon name="mail" />{{ __('Apply to sell') }}
             </a>
             <a class="btn btn--ghost" href="{{ route('sellers.index') }}" wire:navigate>{{ __('See current sellers') }}</a>
         </div>

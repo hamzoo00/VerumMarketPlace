@@ -928,7 +928,7 @@ final class DemoCatalogData
                 'stars' => 5,
                 'reviewed_on' => '2026-09-22',
                 'stone_name' => 'Swat valley emerald',
-                'body' => 'No oil, small but intense. Exactly what I asked for over WhatsApp.',
+                'body' => 'No oil, small but intense. Exactly what I was looking for.',
             ],
             [
                 'seller' => 'peshawar',

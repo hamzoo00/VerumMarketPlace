@@ -4,16 +4,6 @@
 
 <ul class="cmethods">
     <li>
-        <span class="cmethods__ic"><x-verum.icon name="wa" /></span>
-        <div>
-            <b>{{ __('WhatsApp') }}</b>
-            <a href="https://wa.me/{{ $contact['whatsapp'] }}" target="_blank" rel="noopener">
-                {{ __('Message us') }}
-            </a>
-            <small>{{ __('Fastest for questions about a specific stone') }}</small>
-        </div>
-    </li>
-    <li>
         <span class="cmethods__ic"><x-verum.icon name="mail" /></span>
         <div>
             <b>{{ __('Email') }}</b>

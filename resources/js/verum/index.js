@@ -1,4 +1,5 @@
 import { initCart } from './cart.js';
+import { initCategories } from './categories.js';
 import { initCountdowns } from './countdown.js';
 import { initHeader } from './header.js';
 import { initLayers } from './layers.js';
@@ -17,6 +18,7 @@ import { initWishlist } from './wishlist.js';
 export function boot() {
     initHeader();
     initLayers();
+    initCategories();
     initSearch();
     initWishlist();
     initCart();

@@ -38,13 +38,8 @@
                     <span class="vbadge"><x-verum.icon name="shield" />{{ __('Verified :date', ['date' => $seller->verified_on?->format('d/m/Y')]) }}</span>
                 </p>
             </div>
-            <a
-                class="btn btn--ruby"
-                href="https://wa.me/{{ config('verum.contact.whatsapp') }}?text={{ urlencode(__('Hello :seller, I have a question about one of your stones on Verum.', ['seller' => $seller->name])) }}"
-                target="_blank"
-                rel="noopener"
-            >
-                <x-verum.icon name="wa" />{{ __('Message seller') }}
+            <a class="btn btn--ruby" href="{{ route('contact') }}" wire:navigate>
+                <x-verum.icon name="mail" />{{ __('Contact Verum') }}
             </a>
         </div>
 

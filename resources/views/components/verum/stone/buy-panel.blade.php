@@ -3,15 +3,6 @@
 @php
     $lot = $stone->auctionLot;
     $seller = $stone->seller;
-    $whatsappMessage = __(
-        "Hello :seller, I'm interested in the :name (:ct, report :report) on Verum.",
-        [
-            'seller' => $seller->name,
-            'name' => $stone->name,
-            'ct' => $stone->caratLabel(),
-            'report' => $stone->report_number,
-        ],
-    );
 @endphp
 
 <div class="buy">
@@ -49,13 +40,8 @@
                     {{ __('Add to cart') }}
                     <span class="arr" aria-hidden="true"><svg><use href="#i-arrow" /></svg><svg><use href="#i-arrow" /></svg></span>
                 </button>
-                <a
-                    class="btn btn--ghost btn--lg"
-                    href="https://wa.me/{{ config('verum.contact.whatsapp') }}?text={{ urlencode($whatsappMessage) }}"
-                    target="_blank"
-                    rel="noopener"
-                >
-                    <x-verum.icon name="wa" />{{ __('Ask seller') }}
+                <a class="btn btn--ghost btn--lg" href="{{ route('contact') }}" wire:navigate>
+                    <x-verum.icon name="mail" />{{ __('Ask about this stone') }}
                 </a>
                 <button
                     class="ibtn ibtn--line ibtn--lg wish"

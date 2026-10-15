@@ -112,6 +112,23 @@ it('renders the static content pages', function (string $route): void {
     $this->get(route($route))->assertOk();
 })->with(['about', 'contact', 'sell', 'help', 'cart', 'checkout']);
 
+it('does not offer WhatsApp across public storefront pages', function (): void {
+    $urls = [
+        route('home'),
+        route('contact'),
+        route('sell'),
+        route('stones.show', $this->stone),
+        route('sellers.show', $this->seller),
+    ];
+
+    foreach ($urls as $url) {
+        $this->get($url)
+            ->assertOk()
+            ->assertDontSee('WhatsApp')
+            ->assertDontSee('wa.me', escape: false);
+    }
+});
+
 it('keeps cart and checkout out of the index', function (string $route): void {
     $this->get(route($route))
         ->assertOk()

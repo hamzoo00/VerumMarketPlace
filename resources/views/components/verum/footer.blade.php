@@ -36,27 +36,20 @@
             <p class="ft__demo"><i class="dot-live"></i>{{ __('Demo UI — not a live store') }}</p>
         @endif
 
-        <div class="ft__social">
-            @if ($instagram = config('verum.social.instagram'))
-                <a class="ibtn ibtn--line" href="{{ $instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
-                    <x-verum.icon name="ig" />
-                </a>
-            @endif
-            @if ($youtube = config('verum.social.youtube'))
-                <a class="ibtn ibtn--line" href="{{ $youtube }}" target="_blank" rel="noopener" aria-label="YouTube">
-                    <x-verum.icon name="yt" />
-                </a>
-            @endif
-            <a
-                class="ibtn ibtn--line"
-                href="https://wa.me/{{ config('verum.contact.whatsapp') }}"
-                target="_blank"
-                rel="noopener"
-                aria-label="WhatsApp"
-            >
-                <x-verum.icon name="wa" />
-            </a>
-        </div>
+        @if (config('verum.social.instagram') || config('verum.social.youtube'))
+            <div class="ft__social">
+                @if ($instagram = config('verum.social.instagram'))
+                    <a class="ibtn ibtn--line" href="{{ $instagram }}" target="_blank" rel="noopener" aria-label="Instagram">
+                        <x-verum.icon name="ig" />
+                    </a>
+                @endif
+                @if ($youtube = config('verum.social.youtube'))
+                    <a class="ibtn ibtn--line" href="{{ $youtube }}" target="_blank" rel="noopener" aria-label="YouTube">
+                        <x-verum.icon name="yt" />
+                    </a>
+                @endif
+            </div>
+        @endif
 
         <p class="ft__sign">{{ config('verum.signature') }}</p>
     </div>

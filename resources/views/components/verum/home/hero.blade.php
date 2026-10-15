@@ -25,13 +25,8 @@
                         <svg><use href="#i-arrow" /></svg><svg><use href="#i-arrow" /></svg>
                     </span>
                 </a>
-                <a
-                    class="btn btn--ghost"
-                    href="https://wa.me/{{ config('verum.contact.whatsapp') }}"
-                    target="_blank"
-                    rel="noopener"
-                >
-                    <x-verum.icon name="wa" />{{ __('WhatsApp inquiry') }}
+                <a class="btn btn--ghost" href="{{ route('contact') }}" wire:navigate>
+                    <x-verum.icon name="mail" />{{ __('Contact us') }}
                 </a>
             </div>
         </div>

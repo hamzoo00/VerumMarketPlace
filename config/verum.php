@@ -17,7 +17,6 @@ return [
     'contact' => [
         'email' => env('VERUM_CONTACT_EMAIL', 'hello@verumgems.com'),
         'phone' => env('VERUM_CONTACT_PHONE', '+92 300 000 0000'),
-        'whatsapp' => env('VERUM_WHATSAPP', '10000000000'),
         'address' => env('VERUM_ADDRESS', 'Saddar Gem Market, Peshawar, Pakistan'),
     ],
 

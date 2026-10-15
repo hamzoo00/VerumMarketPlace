@@ -26,7 +26,6 @@
     <symbol id="i-badge" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="5.8"/><path d="m8.6 14.2-1.4 6.6 4.8-2.5 4.8 2.5-1.4-6.6"/><path d="m9.7 9.6 1.6 1.6 3-3.1"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="1.6"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7M12 14.5v2.2"/></symbol>
     <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.7"/><path d="M3.3 12h17.4M12 3.3c2.4 2.5 3.6 5.4 3.6 8.7s-1.2 6.2-3.6 8.7c-2.4-2.5-3.6-5.4-3.6-8.7S9.6 5.8 12 3.3z"/></symbol>
-    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4.2 19.8 5.3 16a8.2 8.2 0 1 1 2.9 2.8l-4 1z"/><path d="M9.3 8.6c0 3.3 2.8 6.1 6.1 6.1l1.2-1.5-2.1-1-.9.8a4.4 4.4 0 0 1-2.6-2.6l.8-.9-.9-2.1-1.6 1.2z"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="1.6"/><path d="m4 6.5 8 6.4 8-6.4"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5.6 4.3h3.3l1.5 4.2-2.1 1.3a10.6 10.6 0 0 0 5.9 5.9l1.3-2.1 4.2 1.5v3.3a1.5 1.5 0 0 1-1.6 1.5C10.9 19.4 4.6 13.1 4.1 5.9a1.5 1.5 0 0 1 1.5-1.6z"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.3-5.5-6.3-10.8a6.3 6.3 0 0 1 12.6 0C18.3 15.5 12 21 12 21z"/><circle cx="12" cy="10.2" r="2.3"/></symbol>
