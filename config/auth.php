@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Admin;
+use App\Models\Buyer;
+use App\Models\SellerAccount;
 use App\Models\User;
 
 return [
@@ -42,6 +45,24 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Buyers and sellers are separate account types with separate screens
+        // and access; one person is never both, so they get their own guards.
+        'buyer' => [
+            'driver' => 'session',
+            'provider' => 'buyers',
+        ],
+
+        'seller' => [
+            'driver' => 'session',
+            'provider' => 'seller_accounts',
+        ],
+
+        // Staff only. No public registration touches this guard.
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -67,10 +88,20 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'buyers' => [
+            'driver' => 'eloquent',
+            'model' => Buyer::class,
+        ],
+
+        'seller_accounts' => [
+            'driver' => 'eloquent',
+            'model' => SellerAccount::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => Admin::class,
+        ],
     ],
 
     /*
@@ -96,6 +127,27 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'buyers' => [
+            'provider' => 'buyers',
+            'table' => 'buyer_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'seller_accounts' => [
+            'provider' => 'seller_accounts',
+            'table' => 'seller_account_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'admin_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

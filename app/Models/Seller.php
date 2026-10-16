@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\SellerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -32,6 +33,16 @@ class Seller extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * The login account that owns this storefront, once approved.
+     *
+     * @return BelongsTo<SellerAccount, $this>
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(SellerAccount::class, 'seller_account_id');
     }
 
     /** @return HasMany<Stone, $this> */
