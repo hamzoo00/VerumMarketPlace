@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Demo Recipient
+    |--------------------------------------------------------------------------
+    |
+    | While the Mailtrap sandbox is in use, flows that would email a real
+    | customer can be pointed here instead.
+    |
+    */
+
+    'demo_recipient' => env('MAIL_DEMO_RECIPIENT'),
+
 ];

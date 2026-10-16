@@ -1,54 +1,46 @@
-<x-layouts::auth :title="__('Reset password')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
+<x-layouts::account
+    :title="__('Choose a new password')"
+    :kicker="$area === 'seller' ? __('Seller account') : __('Buyer account')"
+    :heading="__('Choose a new password')"
+    :lede="__('Pick something you have not used here before.')"
+>
+    <form method="POST" action="{{ route('password.update', ['area' => $area]) }}" class="cform" data-validate>
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        <x-verum.form.field
+            name="email"
+            type="email"
+            :label="__('Email')"
+            :value="$email"
+            autocomplete="email"
+            required
+            full
+            readonly
+        />
 
-        <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-6">
-            @csrf
-            <!-- Token -->
-            <input type="hidden" name="token" value="{{ request()->route('token') }}">
+        <x-verum.form.field
+            name="password"
+            type="password"
+            :label="__('New password')"
+            autocomplete="new-password"
+            rule="password"
+            required
+            full
+        />
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                value="{{ request('email') }}"
-                :label="__('Email')"
-                type="email"
-                required
-                autocomplete="email"
-            />
+        <x-verum.form.field
+            name="password_confirmation"
+            type="password"
+            :label="__('Confirm new password')"
+            autocomplete="new-password"
+            confirms="password"
+            required
+            full
+        />
 
-            <!-- Password -->
-            <flux:input
-                name="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Password')"
-                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                viewable
-            />
-
-            <!-- Confirm Password -->
-            <flux:input
-                name="password_confirmation"
-                :label="__('Confirm password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Confirm password')"
-                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                viewable
-            />
-
-            <div class="flex items-center justify-end">
-                <flux:button type="submit" variant="primary" class="w-full" data-test="reset-password-button">
-                    {{ __('Reset password') }}
-                </flux:button>
-            </div>
-        </form>
-    </div>
-</x-layouts::auth>
+        <button class="btn btn--ruby btn--lg btn--block" type="submit">
+            {{ __('Set new password') }}
+        </button>
+    </form>
+</x-layouts::account>
