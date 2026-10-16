@@ -37,3 +37,9 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
+
+# Reference material, not part of the application.
+# The static demo this storefront was ported from: its markup now lives in
+# resources/views, its CSS in resources/css/verum, its JS in resources/js/verum,
+# and its images in public/images. Keep it locally, out of the repo.
+/My Demo
