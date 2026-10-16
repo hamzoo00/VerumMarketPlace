@@ -1,0 +1,456 @@
+/* Verum — sign-in, application and the private buyer/seller areas. */
+
+/* ---------- auth shell ---------- */
+.authwrap {
+  width: min(100% - 3rem, 1120px);
+  margin-inline: auto;
+  padding-block: clamp(2rem, 6vw, 4.5rem);
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.authwrap--wide {
+  width: min(100% - 3rem, 1180px);
+}
+
+@media (min-width: 62rem) {
+  .authwrap--wide {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr);
+    align-items: start;
+    justify-items: stretch;
+  }
+}
+
+.authcard {
+  width: min(100%, 34rem);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--plate);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.authwrap--wide .authcard {
+  width: 100%;
+}
+
+.authcard--status {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.authcard__title {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3.6vw, 2.3rem);
+  line-height: 1.1;
+  margin: .35rem 0 .5rem;
+}
+
+.authcard__lede {
+  color: var(--mute);
+  margin-bottom: 1.5rem;
+}
+
+.authcard__alt,
+.authcard__note {
+  margin-top: 1.25rem;
+  font-size: .9rem;
+  color: var(--mute);
+}
+
+.authcard__note {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-start;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.authcard__note .ic {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: .1rem;
+}
+
+/* ---------- buyer / seller switcher ---------- */
+.authswitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  margin-bottom: 1.75rem;
+}
+
+.authswitch__tab {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  padding: .75rem .85rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .18s, background-color .18s;
+}
+
+.authswitch__tab:hover {
+  border-color: var(--line-2);
+}
+
+.authswitch__tab.is-on {
+  border-color: var(--ruby);
+  background: color-mix(in srgb, var(--ruby) 10%, transparent);
+}
+
+.authswitch__tab .ic {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.authswitch__tab span {
+  display: grid;
+  line-height: 1.25;
+}
+
+.authswitch__tab small {
+  font-size: .76rem;
+  color: var(--mute);
+}
+
+/* ---------- aside checklist ---------- */
+.authaside {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px dashed var(--line-2);
+  border-radius: 14px;
+}
+
+.checklist {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: .85rem;
+}
+
+.checklist li {
+  display: flex;
+  gap: .65rem;
+  align-items: flex-start;
+  font-size: .92rem;
+}
+
+.checklist .ic {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: .12rem;
+  color: var(--ruby);
+}
+
+.authaside__note {
+  margin-top: 1.25rem;
+  font-size: .85rem;
+  color: var(--mute);
+}
+
+/* ---------- notices ---------- */
+.notice {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  padding: .85rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--line-2);
+  font-size: .9rem;
+}
+
+.notice .ic {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: .1rem;
+}
+
+.notice ul {
+  margin: .35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.notice--ok {
+  border-color: rgb(22 180 122 / 45%);
+  background: rgb(22 180 122 / 10%);
+}
+
+.notice--bad {
+  border-color: color-mix(in srgb, var(--ruby) 45%, transparent);
+  background: color-mix(in srgb, var(--ruby) 12%, transparent);
+}
+
+/* ---------- private area ---------- */
+.acct-area {
+  display: grid;
+  gap: 2rem;
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 60rem) {
+  .acct-area {
+    grid-template-columns: 16rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.acct-side {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.acct-side__who {
+  display: flex;
+  gap: .7rem;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.acct-side__who b {
+  display: block;
+  line-height: 1.2;
+}
+
+.acct-side__who small {
+  font-size: .78rem;
+  color: var(--mute);
+}
+
+.acct-nav {
+  display: grid;
+  gap: .15rem;
+}
+
+.acct-nav__link {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  padding: .6rem .7rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--mute);
+  font-size: .92rem;
+  transition: background-color .16s, color .16s;
+}
+
+.acct-nav__link:hover {
+  background: color-mix(in srgb, var(--bone) 6%, transparent);
+  color: inherit;
+}
+
+.acct-nav__link.is-on {
+  background: color-mix(in srgb, var(--ruby) 14%, transparent);
+  color: #fff;
+}
+
+.acct-nav__link .ic {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.acct-main__head {
+  margin-bottom: 1.75rem;
+}
+
+.acct-main__lede {
+  color: var(--mute);
+  margin-top: .35rem;
+}
+
+/* ---------- stats + panels ---------- */
+.astats {
+  list-style: none;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+}
+
+.astat {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.astat b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.astat span {
+  display: block;
+  margin-top: .3rem;
+  font-size: .82rem;
+  color: var(--mute);
+}
+
+.apanels {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.apanel {
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.apanel__head {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.apanel__ic {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bone) 7%, transparent);
+}
+
+.apanel__ic .ic {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.apanel__t {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.apanel__hint,
+.apanel__note {
+  margin: .2rem 0 0;
+  font-size: .82rem;
+  color: var(--mute);
+}
+
+.apanel__empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border: 1px dashed var(--line-2);
+  border-radius: 10px;
+  margin-bottom: .9rem;
+}
+
+.apanel__empty p {
+  margin: .35rem 0 0;
+  font-size: .88rem;
+  color: var(--mute);
+}
+
+.apanel__empty-ic {
+  width: 1.6rem;
+  height: 1.6rem;
+  opacity: .5;
+}
+
+/* ---------- inline checkbox ---------- */
+.chk--inline {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin: .25rem 0 1.25rem;
+  font-size: .9rem;
+}
+
+/* ---------- validation ---------- */
+.field__err {
+  margin: .3rem 0 0;
+  font-size: .78rem;
+  color: var(--ruby);
+  min-height: 0;
+}
+
+.field__hint {
+  margin: .3rem 0 0;
+  font-size: .78rem;
+  color: var(--mute);
+}
+
+.field.has-error input,
+.field.has-error textarea,
+.field.has-error select {
+  border-color: var(--ruby);
+}
+
+.field.has-error input:focus,
+.field.has-error textarea:focus {
+  outline-color: var(--ruby);
+}
+
+/* ---------- password strength meter ---------- */
+.pwbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: .45rem;
+  height: 1rem;
+}
+
+/* The track the fill runs along. */
+.pwbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 11rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line-2);
+  transform: translateY(-50%);
+}
+
+.pwbar > i {
+  position: relative;
+  flex: none;
+  display: block;
+  height: 3px;
+  width: 0;
+  max-width: 11rem;
+  border-radius: 2px;
+  background: var(--ruby);
+  transition: width .2s ease, background-color .2s ease;
+}
+
+.pwbar span {
+  margin-left: 11.6rem;
+  font-size: .72rem;
+  color: var(--mute);
+  letter-spacing: .02em;
+}
+
+.pwbar[data-score="2"] i { background: var(--gold); }
+.pwbar[data-score="3"] i { background: color-mix(in srgb, var(--ok) 70%, var(--gold)); }
+.pwbar[data-score="4"] i { background: var(--ok); }
+
+.cform__forgot {
+  margin: -.4rem 0 .9rem;
+  font-size: .85rem;
+  text-align: right;
+}

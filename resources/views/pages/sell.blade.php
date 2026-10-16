@@ -15,8 +15,8 @@
 @endphp
 
 <x-layouts::public
-    :title="__('Sell on Verum')"
-    :description="__('Apply to sell certified gemstones on Verum. Vetted sellers only: trade license, identity, and one sample listing.')"
+    :title="__('Sell on :app', ['app' => config('app.name')])"
+    :description="__('Apply to sell certified gemstones on :app. Vetted sellers only: trade license, identity, and one sample listing.', ['app' => config('app.name')])"
 >
     <header class="sellh wrap">
         <nav class="crumbs" aria-label="{{ __('Breadcrumb') }}">
@@ -28,7 +28,7 @@
         <p class="kicker" data-reveal>{{ __('For cutters, miners and dealers') }}</p>
         <h1 class="phead__title" data-split>{{ __('Sell to buyers who') }} <em>{{ __('read the report.') }}</em></h1>
         <p class="lede" data-reveal>
-            {{ __('Verum is a closed marketplace. Sellers are vetted by hand, and every listing carries an independent report. Buyers pay into escrow; you are paid once the stone is confirmed.') }}
+            {{ __(':app is a closed marketplace. Sellers are vetted by hand, and every listing carries an independent report. Buyers pay into escrow; you are paid once the stone is confirmed.', ['app' => config('app.name')]) }}
         </p>
         <div class="abt__ctas" data-reveal style="--d:150">
             <a class="btn btn--ruby" href="{{ route('contact') }}" wire:navigate>

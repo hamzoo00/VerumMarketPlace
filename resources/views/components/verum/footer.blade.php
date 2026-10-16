@@ -30,7 +30,7 @@
     </div>
 
     <div class="wrap ft__bottom">
-        <p>{{ __('© :year Verum. All rights reserved.', ['year' => now()->year]) }}</p>
+        <p>{{ __('© :year :app. All rights reserved.', ['year' => now()->year, 'app' => config('app.name')]) }}</p>
 
         @if (config('verum.demo_mode'))
             <p class="ft__demo"><i class="dot-live"></i>{{ __('Demo UI — not a live store') }}</p>

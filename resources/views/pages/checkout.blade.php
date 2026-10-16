@@ -1,6 +1,6 @@
 <x-layouts::public
     :title="__('Checkout')"
-    :description="__('Complete your Verum order.')"
+    :description="__('Complete your :app order.', ['app' => config('app.name')])"
     robots="noindex, nofollow"
 >
     <x-verum.page-head

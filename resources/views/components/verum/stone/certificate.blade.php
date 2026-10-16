@@ -23,7 +23,7 @@
             <header class="cert__head">
                 <svg class="cert__mark" aria-hidden="true"><use href="#vm-mark" /></svg>
                 <div>
-                    <p class="cert__t">{{ __('Verum Report') }}</p>
+                    <p class="cert__t">{{ __(':app Report', ['app' => config('app.name')]) }}</p>
                     <p class="cert__n">{{ $stone->report_number }}</p>
                 </div>
                 <span class="cert__lab">{{ $stone->lab }}</span>

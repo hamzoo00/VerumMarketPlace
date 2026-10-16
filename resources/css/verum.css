@@ -26,5 +26,7 @@
 @import './verum/cart.css';
 @import './verum/sell.css';
 @import './verum/help.css';
+@import './verum/account.css';
+@import './verum/admin.css';
 @import './verum/responsive.css';
 @import './verum/a11y-print.css';

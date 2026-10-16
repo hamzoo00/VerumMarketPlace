@@ -7,6 +7,7 @@ import { initMarquees } from './marquee.js';
 import { initReveal } from './reveal.js';
 import { initScroll } from './scroll.js';
 import { initSearch } from './search.js';
+import { initValidation } from './validate.js';
 import { initWishlist } from './wishlist.js';
 
 /**
@@ -26,4 +27,5 @@ export function boot() {
     initReveal();
     initMarquees();
     initScroll();
+    initValidation();
 }

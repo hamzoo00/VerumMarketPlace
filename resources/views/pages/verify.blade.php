@@ -1,6 +1,6 @@
 <x-layouts::public
     :title="__('Verify a report')"
-    :description="__('Check a Verum report number against the stone it was issued for. Species, weight, treatment and origin, exactly as graded.')"
+    :description="__('Check a :app report number against the stone it was issued for. Species, weight, treatment and origin, exactly as graded.', ['app' => config('app.name')])"
 >
     <x-verum.page-head
         :title="__('Verify a')"

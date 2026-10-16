@@ -15,7 +15,7 @@
                 <x-verum.icon name="shield" />{{ __('Verify a report') }}
             </a>
             <a href="{{ route('sell') }}" wire:navigate>
-                <x-verum.icon name="gem" />{{ __('Sell on Verum') }}
+                <x-verum.icon name="gem" />{{ __('Sell on :app', ['app' => config('app.name')]) }}
             </a>
             <a href="mailto:{{ config('verum.contact.email') }}">
                 <x-verum.icon name="mail" />{{ config('verum.contact.email') }}

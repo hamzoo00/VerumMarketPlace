@@ -4,7 +4,7 @@
         class="chat__orb"
         id="chatOrb"
         type="button"
-        aria-label="{{ __('Open the Verum gem guide') }}"
+        aria-label="{{ __('Open the :app gem guide', ['app' => config('app.name')]) }}"
         aria-expanded="false"
         aria-controls="chatPanel"
     >
@@ -14,11 +14,11 @@
         <span class="chat__ask" aria-hidden="true">{{ __('Ask me') }}</span>
     </button>
 
-    <div class="chat__panel" id="chatPanel" role="dialog" aria-label="{{ __('Verum gem guide') }}" hidden>
+    <div class="chat__panel" id="chatPanel" role="dialog" aria-label="{{ __(':app gem guide', ['app' => config('app.name')]) }}" hidden>
         <header class="chat__head">
             <span class="chat__av"><svg aria-hidden="true"><use href="#vm-mark" /></svg></span>
             <div>
-                <p class="chat__t">{{ __('Verum gem guide') }}</p>
+                <p class="chat__t">{{ __(':app gem guide', ['app' => config('app.name')]) }}</p>
                 <p class="chat__s"><i class="dot-live"></i>{{ __('Demo · scripted replies') }}</p>
             </div>
             <button class="ibtn" type="button" data-close-chat aria-label="{{ __('Close chat') }}">

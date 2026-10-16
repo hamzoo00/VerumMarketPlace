@@ -11,7 +11,7 @@
 
     <div class="wrap contact">
         <div class="contact__grid">
-            <form class="cform" data-reveal onsubmit="return false">
+            <form class="cform" data-validate data-reveal onsubmit="return false">
                 <div class="fgrid">
                     <p class="field">
                         <label class="lbl" for="cName">{{ __('Your name') }}</label>

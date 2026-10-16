@@ -13,9 +13,20 @@ function initStickyHeader() {
         'scroll',
         () => {
             const y = window.scrollY;
-            header.classList.toggle('is-stuck', y > 24);
-            // Hide on the way down, reveal on the way up.
-            header.classList.toggle('is-hidden', y > lastY && y > 320);
+            const dy = y - lastY;
+
+            // Must match .hdr.is-scrolled in css/verum/header.css, which paints
+            // the background so content stays readable behind the header.
+            header.classList.toggle('is-scrolled', y > 30);
+
+            // Hide going down, reveal going up. The 4px threshold stops the
+            // header flickering on sub-pixel and momentum scrolls.
+            if (y > 280 && dy > 4) {
+                header.classList.add('is-hidden');
+            } else if (dy < -4 || y < 280) {
+                header.classList.remove('is-hidden');
+            }
+
             lastY = y;
         },
         { passive: true },
@@ -27,24 +38,46 @@ function initAccountPopover() {
     const popover = $('#acctPop');
     if (!button || !popover) return;
 
+    let isOpen = false;
+    let hideTimer;
+
+    // The CSS fades the panel in on .is-in, so unhiding alone leaves it at
+    // opacity 0 — invisible and unclickable.
     const setOpen = (open) => {
-        popover.hidden = !open;
+        isOpen = open;
         button.setAttribute('aria-expanded', String(open));
+        clearTimeout(hideTimer);
+
+        if (open) {
+            popover.hidden = false;
+            // Next frame, so the transition has a start state to run from.
+            requestAnimationFrame(() => popover.classList.add('is-in'));
+            return;
+        }
+
+        popover.classList.remove('is-in');
+        // Keep it in the tree until the fade-out finishes.
+        hideTimer = setTimeout(() => {
+            popover.hidden = true;
+        }, 300);
     };
 
     on(button, 'click', (event) => {
         event.stopPropagation();
-        setOpen(popover.hidden);
+        setOpen(!isOpen);
     });
 
     on(document, 'click', (event) => {
-        if (!popover.hidden && !popover.contains(event.target) && event.target !== button) {
+        if (isOpen && !popover.contains(event.target) && !button.contains(event.target)) {
             setOpen(false);
         }
     });
 
     on(document, 'keydown', (event) => {
-        if (event.key === 'Escape') setOpen(false);
+        if (event.key === 'Escape' && isOpen) {
+            setOpen(false);
+            button.focus();
+        }
     });
 }
 
@@ -54,6 +87,9 @@ function initMobileMenu() {
     if (!burger || !menu) return;
 
     const setOpen = (open) => {
+        // A hidden header would clip the open menu.
+        if (open) $('#hdr')?.classList.remove('is-hidden');
+
         menu.classList.toggle('is-open', open);
         menu.setAttribute('aria-hidden', String(!open));
         burger.setAttribute('aria-expanded', String(open));

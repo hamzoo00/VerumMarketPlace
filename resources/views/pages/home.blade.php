@@ -1,6 +1,6 @@
 <x-layouts::public
     :title="__('Natural & Certified Gemstones')"
-    :description="__('Verum is a marketplace for natural, independently certified gemstones. Disclosed origin, independent grading, vetted sellers, insured worldwide shipping.')"
+    :description="__(':app is a marketplace for natural, independently certified gemstones. Disclosed origin, independent grading, vetted sellers, insured worldwide shipping.', ['app' => config('app.name')])"
     body-class="page--home"
 >
     <x-verum.home.hero :$heroStones />

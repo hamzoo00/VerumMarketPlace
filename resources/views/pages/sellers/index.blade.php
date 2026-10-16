@@ -1,6 +1,6 @@
 <x-layouts::public
     :title="__('Our sellers')"
-    :description="__('Every Verum seller is vetted by hand: licensed, trading under their own name, and accountable for what they list.')"
+    :description="__('Every :app seller is vetted by hand: licensed, trading under their own name, and accountable for what they list.', ['app' => config('app.name')])"
 >
     <x-verum.page-head
         :title="__('Our')"
