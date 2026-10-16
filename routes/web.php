@@ -12,42 +12,43 @@ use App\Http\Controllers\SellWithUsController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StoneController;
 use App\Http\Controllers\VerifyController;
+use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Public marketplace
 |--------------------------------------------------------------------------
-| Each of these was a client-side panel in the demo. They are real,
-| server-rendered URLs here so listings and storefronts can be crawled.
+| Paths come from config/verum_routes.php so any URL can be renamed there
+| without touching this file. Route names are the stable contract.
 */
 
 Route::get('/', HomeController::class)->name('home');
 
-Route::get('shop', ShopController::class)->name('shop');
-Route::get('stones/{stone:slug}', StoneController::class)->name('stones.show');
+Route::get(Seg::get('shop'), ShopController::class)->name('shop');
+Route::get(Seg::get('stones').'/{stone:slug}', StoneController::class)->name('stones.show');
 
-Route::get('auctions', AuctionController::class)->name('auctions');
+Route::get(Seg::get('auctions'), AuctionController::class)->name('auctions');
 
-Route::get('sellers', [SellerController::class, 'index'])->name('sellers.index');
-Route::get('sellers/{seller:slug}', [SellerController::class, 'show'])->name('sellers.show');
+Route::get(Seg::get('sellers'), [SellerController::class, 'index'])->name('sellers.index');
+Route::get(Seg::get('sellers').'/{seller:slug}', [SellerController::class, 'show'])->name('sellers.show');
 
-Route::get('verify/{report?}', VerifyController::class)->name('verify');
+Route::get(Seg::get('verify').'/{report?}', VerifyController::class)->name('verify');
 
-Route::get('about', AboutController::class)->name('about');
-Route::get('contact', ContactController::class)->name('contact');
-Route::get('sell', SellWithUsController::class)->name('sell');
-Route::get('help', HelpController::class)->name('help');
+Route::get(Seg::get('about'), AboutController::class)->name('about');
+Route::get(Seg::get('contact'), ContactController::class)->name('contact');
+Route::get(Seg::get('sell'), SellWithUsController::class)->name('sell');
+Route::get(Seg::get('help'), HelpController::class)->name('help');
 
 // JSON endpoint for the command-palette search.
-Route::get('search', SearchController::class)->name('search');
+Route::get(Seg::get('search'), SearchController::class)->name('search');
 
-Route::get('cart', [CartController::class, 'index'])->name('cart');
-Route::get('checkout', [CartController::class, 'checkout'])->name('checkout');
+Route::get(Seg::get('cart'), [CartController::class, 'index'])->name('cart');
+Route::get(Seg::get('checkout'), [CartController::class, 'checkout'])->name('checkout');
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated area
+| Starter-kit area (Fortify `web` guard)
 |--------------------------------------------------------------------------
 */
 
@@ -60,25 +61,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
  * which the robots.txt spec requires, without hardcoding the domain.
  */
 Route::get('robots.txt', function () {
-    $lines = [
-        'User-agent: *',
-        'Disallow: /dashboard',
-        'Disallow: /settings',
-        'Disallow: /horizon',
-        'Disallow: /cart',
-        'Disallow: /checkout',
-        'Disallow: /login',
-        'Disallow: /register',
-        'Disallow: /forgot-password',
-        'Disallow: /reset-password',
-        'Disallow: /two-factor-challenge',
-        'Disallow: /confirm-password',
-        '',
-        'Sitemap: '.url('sitemap.xml'),
+    $disallow = [
+        Seg::get('buyer'),
+        Seg::get('seller'),
+        Seg::get('admin'),
+        Seg::get('cart'),
+        Seg::get('checkout'),
+        'dashboard',
+        'settings',
+        'horizon',
+        'login',
+        'register',
     ];
+
+    $lines = ['User-agent: *'];
+
+    foreach ($disallow as $path) {
+        $lines[] = "Disallow: /{$path}";
+    }
+
+    $lines[] = '';
+    $lines[] = 'Sitemap: '.url('sitemap.xml');
 
     return response(implode(PHP_EOL, $lines), 200)
         ->header('Content-Type', 'text/plain');
 })->name('robots');
 
+require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

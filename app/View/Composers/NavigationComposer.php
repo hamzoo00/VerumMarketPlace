@@ -90,7 +90,7 @@ class NavigationComposer
                     ['label' => __('About us'), 'url' => route('about')],
                     ['label' => __('Our sellers'), 'url' => route('sellers.index')],
                     ['label' => __('Contact'), 'url' => route('contact')],
-                    ['label' => __('Sell on Verum'), 'url' => route('sell')],
+                    ['label' => __('Sell on :app', ['app' => config('app.name')]), 'url' => route('sell')],
                 ],
             ],
             'support' => [

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\View\Composers\AccountNavComposer;
 use App\View\Composers\NavigationComposer;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
             ['components.verum.header', 'components.verum.footer'],
             NavigationComposer::class,
         );
+
+        // Private buyer/seller areas get their own navigation.
+        View::composer('pages.buyer.*', AccountNavComposer::class);
+        View::composer('pages.seller.*', AccountNavComposer::class);
     }
 
     /**
@@ -45,14 +50,13 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
+        // One strong rule for every account type, in every environment.
+        // Mirrored client-side by resources/js/verum/validate.js — change both.
+        Password::defaults(fn (): Password => Password::min(config('verum_auth.password.min'))
+            ->mixedCase()
+            ->letters()
+            ->numbers()
+            ->symbols(),
         );
     }
 }
