@@ -5,11 +5,18 @@
     'heading' => null,
     'lede' => null,
     'wide' => false,
+    'bare' => false,
 ])
 
 {{-- Centred shell for sign-in, registration and application screens. --}}
-<x-layouts::public :$title :$description robots="noindex, nofollow">
-    <div @class(['authwrap', 'authwrap--wide' => $wide])>
+@php
+    // `bare` renders without the storefront header, ticker, footer and chat —
+    // used by the admin sign-in, which is not a customer-facing page.
+    $shell = $bare ? 'layouts::blank' : 'layouts::public';
+@endphp
+
+<x-dynamic-component :component="$shell" :title="$title" :description="$description" robots="noindex, nofollow">
+    <div @class(['authwrap', 'authwrap--wide' => $wide, 'authwrap--bare' => $bare])>
         <div class="authcard" data-reveal>
             @if ($kicker)
                 <p class="kicker">{{ $kicker }}</p>
@@ -41,4 +48,4 @@
             </div>
         @endisset
     </div>
-</x-layouts::public>
+</x-dynamic-component>

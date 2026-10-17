@@ -4,7 +4,9 @@
 .authwrap {
   width: min(100% - 3rem, 1120px);
   margin-inline: auto;
-  padding-block: clamp(2rem, 6vw, 4.5rem);
+  /* The header is fixed, so every page must clear ticker + header itself. */
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(24px, 5vw, 56px));
+  padding-bottom: clamp(3rem, 8vw, 6rem);
   display: grid;
   gap: 2rem;
   grid-template-columns: minmax(0, 1fr);
@@ -57,6 +59,22 @@
   margin-top: 1.25rem;
   font-size: .9rem;
   color: var(--mute);
+}
+
+.authcard__alt {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+/* The form's own fields should fill the card, not sit in a narrower column. */
+.authcard .cform {
+  display: grid;
+  gap: 0;
+}
+
+.authcard .cform > .btn {
+  margin-top: .25rem;
 }
 
 .authcard__note {
@@ -193,7 +211,8 @@
 .acct-area {
   display: grid;
   gap: 2rem;
-  padding-block: clamp(1.5rem, 4vw, 3rem);
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(16px, 3vw, 32px));
+  padding-bottom: clamp(2rem, 5vw, 4rem);
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -376,6 +395,14 @@
   align-items: center;
   margin: .25rem 0 1.25rem;
   font-size: .9rem;
+  cursor: pointer;
+}
+
+.chk--inline input {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  accent-color: var(--ruby);
 }
 
 /* ---------- validation ---------- */
@@ -449,8 +476,120 @@
 .pwbar[data-score="3"] i { background: color-mix(in srgb, var(--ok) 70%, var(--gold)); }
 .pwbar[data-score="4"] i { background: var(--ok); }
 
-.cform__forgot {
-  margin: -.4rem 0 .9rem;
-  font-size: .85rem;
-  text-align: right;
+/* "Keep me signed in" and "Forgot your password?" share one row. */
+.cform__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: .1rem 0 1.4rem;
+  font-size: .88rem;
+}
+
+.cform__row .chk--inline {
+  margin: 0;
+}
+
+.cform__row .link {
+  white-space: nowrap;
+}
+
+/* ---------- chrome-free shell (admin sign-in) ---------- */
+.blankbody {
+  min-height: 100dvh;
+  background: var(--ink);
+  color: var(--bone);
+}
+
+.blankbar {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem clamp(1rem, 4vw, 2rem);
+}
+
+.blankbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  text-decoration: none;
+  color: inherit;
+  font: 400 1.05rem/1 var(--serif);
+  letter-spacing: .06em;
+}
+
+.blankbar__brand .brand__mark {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+/* The bare shell has no fixed header, so it needs no clearance. */
+.authwrap--bare {
+  padding-top: clamp(1rem, 4vw, 2.5rem);
+}
+
+/* ---------- Google / OAuth ---------- */
+.oauth {
+  margin-bottom: 1.5rem;
+}
+
+.oauth__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  width: 100%;
+  padding: .8rem 1rem;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bone) 6%, transparent);
+  color: var(--bone);
+  font: 500 .92rem/1 var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+
+.oauth__btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--bone) 35%, transparent);
+  background: color-mix(in srgb, var(--bone) 10%, transparent);
+}
+
+.oauth__btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.oauth__g {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+}
+
+.oauth__note {
+  margin: .5rem 0 0;
+  font-size: .76rem;
+  color: var(--mute);
+  text-align: center;
+}
+
+/* Rule with the label sitting in a gap, rather than drawn over the line. */
+.oauth__or {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  margin: 1.5rem 0 0;
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.oauth__or::before,
+.oauth__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-2);
 }

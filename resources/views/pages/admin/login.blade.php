@@ -1,4 +1,5 @@
 <x-layouts::account
+    bare
     :title="__('Admin sign in')"
     :kicker="__('Staff only')"
     :heading="__('Administrator sign in')"
@@ -24,10 +25,12 @@
             full
         />
 
-        <label class="chk chk--inline">
-            <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-            <span>{{ __('Keep me signed in') }}</span>
-        </label>
+        <div class="cform__row">
+            <label class="chk chk--inline">
+                <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
+                <span>{{ __('Keep me signed in') }}</span>
+            </label>
+        </div>
 
         <button class="btn btn--ruby btn--lg btn--block" type="submit">{{ __('Sign in') }}</button>
     </form>

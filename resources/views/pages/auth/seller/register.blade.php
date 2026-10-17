@@ -7,6 +7,8 @@
 >
     <x-verum.auth.switcher active="seller" />
 
+    <x-verum.auth.google-button area="seller" action="up" />
+
     <form method="POST" action="{{ route('seller.register') }}" class="cform" data-validate>
         @csrf
 

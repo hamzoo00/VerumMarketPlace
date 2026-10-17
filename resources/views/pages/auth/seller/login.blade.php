@@ -6,6 +6,8 @@
 >
     <x-verum.auth.switcher active="seller" />
 
+    <x-verum.auth.google-button area="seller" action="in" />
+
     <form method="POST" action="{{ route('seller.login') }}" class="cform" data-validate>
         @csrf
 
@@ -27,16 +29,16 @@
             full
         />
 
-        <p class="cform__forgot">
+        <div class="cform__row">
+            <label class="chk chk--inline">
+                <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
+                <span>{{ __('Keep me signed in') }}</span>
+            </label>
+
             <a class="link" href="{{ route('password.request', ['area' => config('verum_routes.seller')]) }}" wire:navigate>
                 {{ __('Forgot your password?') }}
             </a>
-        </p>
-
-        <label class="chk chk--inline">
-            <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
-            <span>{{ __('Keep me signed in') }}</span>
-        </label>
+        </div>
 
         <button class="btn btn--ruby btn--lg btn--block" type="submit">
             {{ __('Sign in') }}
