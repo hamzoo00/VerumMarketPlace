@@ -1,9 +1,9 @@
-import { $, $$, on, delegate, prefersReducedMotion } from './dom.js';
+import { $, $$, delegate, on, onceGlobal, prefersReducedMotion } from './dom.js';
 
 /** Smooth in-page jumps and the back-to-top progress control. */
 
 function initAnchorScroll() {
-    delegate(document, 'click', '[data-scrollto]', (event, trigger) => {
+    onceGlobal('scroll-anchor', () => delegate(document, 'click', '[data-scrollto]', (event, trigger) => {
         const target = $(trigger.dataset.scrollto);
         if (!target) return;
 
@@ -12,7 +12,7 @@ function initAnchorScroll() {
             behavior: prefersReducedMotion() ? 'auto' : 'smooth',
             block: 'start',
         });
-    });
+    }));
 }
 
 function initBackToTop() {
@@ -37,7 +37,7 @@ function initBackToTop() {
         }
     };
 
-    on(window, 'scroll', update, { passive: true });
+    onceGlobal('scroll-totop', () => on(window, 'scroll', update, { passive: true }));
     update();
 
     on(button, 'click', () => {

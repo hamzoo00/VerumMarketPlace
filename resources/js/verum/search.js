@@ -1,4 +1,4 @@
-import { $, on, delegate } from './dom.js';
+import { $, delegate, on, onceGlobal } from './dom.js';
 import { store } from './storage.js';
 
 /**
@@ -136,9 +136,9 @@ export function initSearch() {
         }
     });
 
-    delegate(document, 'click', '[data-q]', (event, chip) => {
+    onceGlobal('search-chips', () => delegate(document, 'click', '[data-q]', (event, chip) => {
         input.value = chip.dataset.q;
         runSearch(input.value);
         input.focus();
-    });
+    }));
 }

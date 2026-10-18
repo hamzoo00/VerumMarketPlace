@@ -1,4 +1,4 @@
-import { $, $$, delegate } from './dom.js';
+import { $, $$, delegate, onceGlobal } from './dom.js';
 import { store } from './storage.js';
 import { toast } from './toasts.js';
 
@@ -105,8 +105,10 @@ export function initWishlist() {
     syncButtons(ids);
     renderDrawer(ids);
 
-    delegate(document, 'click', '[data-wish]', (event, button) => {
-        event.preventDefault();
-        toggleWish(button.dataset.wish);
+    onceGlobal('wishlist', () => {
+        delegate(document, 'click', '[data-wish]', (event, button) => {
+            event.preventDefault();
+            toggleWish(button.dataset.wish);
+        });
     });
 }

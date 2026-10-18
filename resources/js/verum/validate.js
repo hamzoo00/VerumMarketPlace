@@ -1,4 +1,4 @@
-import { $$, on, delegate } from './dom.js';
+import { $$, delegate, on, onceGlobal } from './dom.js';
 
 /**
  * Client-side form validation.
@@ -157,7 +157,7 @@ export function initValidation() {
     });
 
     // blur does not bubble, so use its capturing counterpart.
-    on(
+    onceGlobal('validate-focusout', () => on(
         document,
         'focusout',
         (event) => {
@@ -166,9 +166,9 @@ export function initValidation() {
             if (rulesFor(field).length > 0) validateField(field);
         },
         true,
-    );
+    ));
 
-    delegate(document, 'input', 'form[data-validate] .has-error input, form[data-validate] .has-error textarea', (event, field) => {
+    onceGlobal('validate-input', () => delegate(document, 'input', 'form[data-validate] .has-error input, form[data-validate] .has-error textarea', (event, field) => {
         if (rulesFor(field).length > 0) validateField(field);
-    });
+    }));
 }

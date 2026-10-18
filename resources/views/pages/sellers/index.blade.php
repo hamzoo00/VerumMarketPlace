@@ -10,7 +10,7 @@
     />
 
     <div class="wrap">
-        <div class="scells">
+        <div class="houses">
             @foreach ($sellers as $index => $seller)
                 <x-verum.seller.card :$seller :$index />
             @endforeach

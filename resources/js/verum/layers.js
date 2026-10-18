@@ -1,4 +1,4 @@
-import { $, $$, on, delegate } from './dom.js';
+import { $, $$, delegate, on, onceGlobal } from './dom.js';
 
 /**
  * Search palette, drawers and modals.
@@ -70,38 +70,42 @@ function trapFocus(event) {
 }
 
 export function initLayers() {
-    const triggers = [
-        ['[data-open-search]', '#search', '#searchIn'],
-        ['[data-open-wish]', '#wish', null],
-        ['[data-open-filters]', '#filters', null],
-    ];
+    onceGlobal('layers', () => {
+        const triggers = [
+            ['[data-open-search]', '#search', '#searchIn'],
+            ['[data-open-wish]', '#wish', null],
+            ['[data-open-filters]', '#filters', null],
+        ];
 
-    triggers.forEach(([trigger, layer, focus]) => {
-        delegate(document, 'click', trigger, () => {
-            openLayerEl($(layer), focus ? { focus } : {});
+        triggers.forEach(([trigger, layer, focus]) => {
+            delegate(document, 'click', trigger, () => {
+                openLayerEl($(layer), focus ? { focus } : {});
+            });
         });
-    });
 
-    [
-        '[data-close-search]',
-        '[data-close-wish]',
-        '[data-close-modal]',
-        '[data-close-filters]',
-    ].forEach((selector) => delegate(document, 'click', selector, closeLayer));
+        [
+            '[data-close-search]',
+            '[data-close-wish]',
+            '[data-close-modal]',
+            '[data-close-filters]',
+        ].forEach((selector) => delegate(document, 'click', selector, closeLayer));
 
-    on(document, 'keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeLayer();
-            return;
-        }
+        on(document, 'keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeLayer();
 
-        // Ctrl/Cmd+K opens the search palette from anywhere.
-        if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
-            event.preventDefault();
-            openLayerEl($('#search'), { focus: '#searchIn' });
-            return;
-        }
+                return;
+            }
 
-        trapFocus(event);
+            // Ctrl/Cmd+K opens the search palette from anywhere.
+            if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                openLayerEl($('#search'), { focus: '#searchIn' });
+
+                return;
+            }
+
+            trapFocus(event);
+        });
     });
 }

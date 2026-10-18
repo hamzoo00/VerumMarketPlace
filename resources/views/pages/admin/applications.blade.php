@@ -3,6 +3,7 @@
         'pending' => __('Pending'),
         'approved' => __('Approved'),
         'rejected' => __('Rejected'),
+        'archived' => __('Archived'),
     ];
 @endphp
 
@@ -16,6 +17,7 @@
             <a
                 href="{{ route('admin.applications', ['status' => $value]) }}"
                 @class(['chip', 'is-on' => $status === $value])
+                @if ($status === $value) aria-current="page" @endif
                 wire:navigate
             >{{ $label }}</a>
         @endforeach
@@ -30,7 +32,7 @@
         </x-verum.account.panel>
     @else
         <div class="tablewrap">
-            <table class="otable">
+            <table class="atable">
                 <thead>
                     <tr>
                         <th scope="col">{{ __('Reference') }}</th>
@@ -38,20 +40,42 @@
                         <th scope="col">{{ __('Applicant') }}</th>
                         <th scope="col">{{ __('Submitted') }}</th>
                         <th scope="col">{{ __('Status') }}</th>
+                        <th scope="col"><span class="sr-only">{{ __('Actions') }}</span></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($applications as $application)
+                        @php($email = mb_strtolower((string) $application->sellerAccount?->email))
                         <tr>
-                            <th scope="row">
+                            <th scope="row" data-label="{{ __('Reference') }}">
                                 <a class="link link--mono" href="{{ route('admin.applications.show', $application) }}" wire:navigate>
                                     {{ $application->reference }}
                                 </a>
                             </th>
-                            <td>{{ $application->business_name }}<br><small>{{ $application->country }}</small></td>
-                            <td>{{ $application->sellerAccount?->email }}</td>
-                            <td>{{ $application->submitted_at?->format('d/m/Y') }}</td>
-                            <td><x-verum.admin.status-pill :status="$application->status" /></td>
+                            <td data-label="{{ __('Business') }}">
+                                <span class="atable__strong">{{ $application->business_name }}</span>
+                                <small>{{ $application->country }}</small>
+                            </td>
+                            <td data-label="{{ __('Applicant') }}">
+                                {{ $application->sellerAccount?->email }}
+                                @if (isset($blockedEmails[$email]))
+                                    <span class="pill pill--bad">{{ __('Blocked') }}</span>
+                                @endif
+                            </td>
+                            <td data-label="{{ __('Submitted') }}">
+                                <time datetime="{{ $application->submitted_at?->toIso8601String() }}">
+                                    {{ $application->submitted_at?->format('d/m/Y') }}
+                                </time>
+                            </td>
+                            <td data-label="{{ __('Status') }}">
+                                <x-verum.admin.status-pill :status="$application->status" :archived="$application->isArchived()" />
+                            </td>
+                            <td class="atable__actions">
+                                <x-verum.admin.actions-menu
+                                    :application="$application"
+                                    :blocked="isset($blockedEmails[$email])"
+                                />
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

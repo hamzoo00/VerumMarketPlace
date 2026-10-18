@@ -1,4 +1,4 @@
-import { $, on, delegate } from './dom.js';
+import { $, delegate, on, onceGlobal } from './dom.js';
 
 /** Sticky header state, account popover and the mobile menu. */
 
@@ -8,7 +8,7 @@ function initStickyHeader() {
 
     let lastY = window.scrollY;
 
-    on(
+    onceGlobal('header-scroll', () => on(
         window,
         'scroll',
         () => {
@@ -30,7 +30,7 @@ function initStickyHeader() {
             lastY = y;
         },
         { passive: true },
-    );
+    ));
 }
 
 function initAccountPopover() {
@@ -67,17 +67,19 @@ function initAccountPopover() {
         setOpen(!isOpen);
     });
 
-    on(document, 'click', (event) => {
-        if (isOpen && !popover.contains(event.target) && !button.contains(event.target)) {
-            setOpen(false);
-        }
-    });
+    onceGlobal('header-acct', () => {
+        on(document, 'click', (event) => {
+            if (isOpen && !popover.contains(event.target) && !button.contains(event.target)) {
+                setOpen(false);
+            }
+        });
 
-    on(document, 'keydown', (event) => {
-        if (event.key === 'Escape' && isOpen) {
-            setOpen(false);
-            button.focus();
-        }
+        on(document, 'keydown', (event) => {
+            if (event.key === 'Escape' && isOpen) {
+                setOpen(false);
+                button.focus();
+            }
+        });
     });
 }
 
@@ -102,9 +104,9 @@ function initMobileMenu() {
     // Close when a destination is chosen.
     delegate(menu, 'click', 'a', () => setOpen(false));
 
-    on(document, 'keydown', (event) => {
+    onceGlobal('header-menu-esc', () => on(document, 'keydown', (event) => {
         if (event.key === 'Escape') setOpen(false);
-    });
+    }));
 }
 
 export function initHeader() {

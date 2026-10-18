@@ -14,7 +14,13 @@
                     {{ __('How selling works') }}
                 </a>
             @else
-                @if ($application->isRejected())
+                @if ($application->isOnHold())
+                    <p class="kicker">{{ __('On hold') }}</p>
+                    <h1 class="authcard__title">{{ __('We need a little more') }}</h1>
+                    <p class="authcard__lede">
+                        {{ $application->decision_note ?? __('We have asked you for some extra detail by email.') }}
+                    </p>
+                @elseif ($application->isRejected())
                     <p class="kicker">{{ __('Decision') }}</p>
                     <h1 class="authcard__title">{{ __('Not approved this time') }}</h1>
                     <p class="authcard__lede">

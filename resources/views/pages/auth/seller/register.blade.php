@@ -40,9 +40,23 @@
             <legend class="lbl">{{ __('Your business') }}</legend>
             <div class="cform__grid">
                 <x-verum.form.field name="business_name" :label="__('Store name')" required full />
-                <x-verum.form.field name="country" :label="__('Country / region')" autocomplete="country-name" required />
+
+                <x-verum.form.country name="country" required />
+
                 <x-verum.form.field name="trade_license_number" :label="__('Trade license number (optional)')" />
-                <x-verum.form.field name="specialties" :label="__('What do you mainly sell?')" :hint="__('For example: Ruby, Sapphire, Spinel')" full />
+
+                <x-verum.form.phone name="phone" :label="__('Phone number')" required />
+
+                <x-verum.form.select
+                    name="category"
+                    :label="__('What do you sell?')"
+                    :options="\App\Support\SellerCategories::options()"
+                    required
+                    full
+                />
+
+                <x-verum.form.specialties category-name="category" name="specialties" />
+
                 <x-verum.form.textarea name="about" :label="__('Tell us about your house')" :rows="5" />
             </div>
         </fieldset>

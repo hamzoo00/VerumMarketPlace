@@ -34,6 +34,16 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
             ->name('applications.approve');
         Route::post(Seg::get('account.applications').'/{application}/reject', [AdminApplicationController::class, 'reject'])
             ->name('applications.reject');
+        Route::post(Seg::get('account.applications').'/{application}/hold', [AdminApplicationController::class, 'hold'])
+            ->name('applications.hold');
+        Route::post(Seg::get('account.applications').'/{application}/archive', [AdminApplicationController::class, 'archive'])
+            ->name('applications.archive');
+        Route::post(Seg::get('account.applications').'/{application}/unarchive', [AdminApplicationController::class, 'unarchive'])
+            ->name('applications.unarchive');
+        Route::post(Seg::get('account.applications').'/{application}/unblock', [AdminApplicationController::class, 'unblock'])
+            ->name('applications.unblock');
+        Route::delete(Seg::get('account.applications').'/{application}', [AdminApplicationController::class, 'destroy'])
+            ->name('applications.destroy');
 
         Route::get('buyers', [AdminDashboardController::class, 'buyers'])->name('buyers');
         Route::get('sellers', [AdminDashboardController::class, 'sellers'])->name('sellers');

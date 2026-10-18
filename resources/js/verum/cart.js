@@ -1,4 +1,4 @@
-import { $, $$, delegate } from './dom.js';
+import { $, $$, delegate, onceGlobal } from './dom.js';
 import { store } from './storage.js';
 import { toast } from './toasts.js';
 
@@ -119,13 +119,15 @@ export function initCart() {
     syncButtons(slugs);
     renderCartPage(slugs);
 
-    delegate(document, 'click', '[data-add]', (event, button) => {
-        event.preventDefault();
-        addToCart(button.dataset.add);
-    });
+    onceGlobal('cart', () => {
+        delegate(document, 'click', '[data-add]', (event, button) => {
+            event.preventDefault();
+            addToCart(button.dataset.add);
+        });
 
-    delegate(document, 'click', '[data-remove]', (event, button) => {
-        event.preventDefault();
-        removeFromCart(button.dataset.remove);
+        delegate(document, 'click', '[data-remove]', (event, button) => {
+            event.preventDefault();
+            removeFromCart(button.dataset.remove);
+        });
     });
 }

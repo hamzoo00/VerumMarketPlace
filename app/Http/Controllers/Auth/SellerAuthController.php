@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\SellerAccount;
 use App\Models\SellerApplication;
+use App\Rules\NotBlockedEmail;
+use App\Support\Countries;
+use App\Support\SellerCategories;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 /**
@@ -45,32 +49,48 @@ class SellerAuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:seller_accounts,email'],
+            'email' => [
+                'required', 'string', 'email', 'max:255',
+                'unique:seller_accounts,email',
+                new NotBlockedEmail,
+            ],
             'password' => ['required', 'confirmed', Password::defaults()],
             'business_name' => ['required', 'string', 'max:255'],
-            'country' => ['required', 'string', 'max:120'],
+            'country' => ['required', 'string', 'size:2', Rule::in(array_keys(Countries::all()))],
+            'dial_code' => ['required', 'string', 'max:6'],
+            'phone' => ['required', 'string', 'min:6', 'max:20'],
+            'category' => ['required', Rule::in(array_keys(SellerCategories::options()))],
+            'specialties' => ['required', 'array', 'min:1'],
+            'specialties.*' => [Rule::in(SellerCategories::allSpecialtyKeys())],
             'trade_license_number' => ['nullable', 'string', 'max:120'],
-            'specialties' => ['nullable', 'string', 'max:500'],
             'about' => ['nullable', 'string', 'max:2000'],
         ]);
 
         // The account and its application are created together: an account
         // without an application could never be reviewed.
         $account = DB::transaction(function () use ($validated): SellerAccount {
+            // Stored as one E.164 string; the form collects it in two parts.
+            $phone = $validated['dial_code'].preg_replace('/\D+/', '', $validated['phone']);
+            $countryName = Countries::name($validated['country']) ?? $validated['country'];
+
             $account = SellerAccount::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
-                'country' => $validated['country'],
+                'country' => $countryName,
+                'phone' => $phone,
             ]);
 
             $account->application()->create([
                 'reference' => SellerApplication::generateReference(),
                 'status' => SellerApplication::STATUS_SUBMITTED,
                 'business_name' => $validated['business_name'],
-                'country' => $validated['country'],
+                'category' => $validated['category'],
+                'specialty_keys' => $validated['specialties'],
+                'country' => $countryName,
+                'country_code' => $validated['country'],
+                'phone' => $phone,
                 'trade_license_number' => $validated['trade_license_number'] ?? null,
-                'specialties' => $validated['specialties'] ?? null,
                 'about' => $validated['about'] ?? null,
                 'submitted_at' => now(),
             ]);

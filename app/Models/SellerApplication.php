@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SellerCategories;
 use Database\Factories\SellerApplicationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,9 @@ class SellerApplication extends Model
 
     public const STATUS_REJECTED = 'rejected';
 
+    /** Still undecided, but waiting on the applicant for something. */
+    public const STATUS_ON_HOLD = 'on_hold';
+
     protected $guarded = [];
 
     /** @return array<string, string> */
@@ -36,6 +40,8 @@ class SellerApplication extends Model
         return [
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
+            'archived_at' => 'datetime',
+            'specialty_keys' => 'array',
         ];
     }
 
@@ -45,15 +51,50 @@ class SellerApplication extends Model
         return $this->belongsTo(SellerAccount::class);
     }
 
-    /** @param  Builder<self>  $query */
+    /**
+     * Undecided and still in the queue.
+     *
+     * @param  Builder<self>  $query
+     */
     public function scopePending(Builder $query): void
     {
-        $query->whereIn('status', [self::STATUS_SUBMITTED, self::STATUS_IN_REVIEW]);
+        $query->whereIn('status', [self::STATUS_SUBMITTED, self::STATUS_IN_REVIEW, self::STATUS_ON_HOLD])
+            ->whereNull('archived_at');
+    }
+
+    /** @param  Builder<self>  $query */
+    public function scopeArchived(Builder $query): void
+    {
+        $query->whereNotNull('archived_at');
     }
 
     public function isPending(): bool
     {
-        return in_array($this->status, [self::STATUS_SUBMITTED, self::STATUS_IN_REVIEW], true);
+        return in_array(
+            $this->status,
+            [self::STATUS_SUBMITTED, self::STATUS_IN_REVIEW, self::STATUS_ON_HOLD],
+            true,
+        );
+    }
+
+    public function isOnHold(): bool
+    {
+        return $this->status === self::STATUS_ON_HOLD;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->archived_at !== null;
+    }
+
+    /**
+     * Readable specialty labels, from the stored keys.
+     *
+     * @return list<string>
+     */
+    public function specialtyLabels(): array
+    {
+        return SellerCategories::labelsFor((array) ($this->specialty_keys ?? []));
     }
 
     public function isApproved(): bool
@@ -67,16 +108,13 @@ class SellerApplication extends Model
     }
 
     /**
-     * Progress stages for the tracker on the seller dashboard.
+     * Progress stages for the tracker the applicant sees.
      *
      * @return list<array{label: string, hint: string, state: string}>
      */
     public function timeline(): array
     {
-        $reviewState = match (true) {
-            $this->isApproved(), $this->isRejected() => 'done',
-            default => 'now',
-        };
+        $decided = $this->isApproved() || $this->isRejected();
 
         return [
             [
@@ -85,9 +123,13 @@ class SellerApplication extends Model
                 'state' => 'done',
             ],
             [
-                'label' => __('Admin review'),
-                'hint' => $this->reviewed_at?->diffForHumans() ?? __('Within 3 business days'),
-                'state' => $reviewState,
+                'label' => $this->isOnHold() ? __('On hold') : __('Admin review'),
+                'hint' => match (true) {
+                    $this->isOnHold() => $this->decision_note ?? __('We need a little more from you'),
+                    $decided => $this->reviewed_at?->diffForHumans() ?? __('Reviewed'),
+                    default => __('Within 3 business days'),
+                },
+                'state' => $decided ? 'done' : 'now',
             ],
             [
                 'label' => $this->isRejected() ? __('Not approved') : __('Storefront goes live'),
