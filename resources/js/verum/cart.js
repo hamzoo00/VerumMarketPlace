@@ -1,6 +1,6 @@
 import { $, $$, delegate, onceGlobal } from './dom.js';
 import { store } from './storage.js';
-import { toast } from './toasts.js';
+import { toast } from './toast.js';
 
 /**
  * Local cart.
@@ -39,7 +39,7 @@ export function addToCart(slug) {
     const slugs = read();
 
     if (slugs.includes(slug)) {
-        toast('Already in your cart');
+        toast('Already in your cart', 'info');
         return;
     }
 
@@ -47,7 +47,7 @@ export function addToCart(slug) {
     write(slugs);
     syncCounts(slugs);
     syncButtons(slugs);
-    toast('Added to your cart', { icon: 'bag' });
+    toast('Added to your cart', 'success');
 }
 
 export function removeFromCart(slug) {

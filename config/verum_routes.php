@@ -22,6 +22,7 @@ return [
     */
     'shop' => env('ROUTE_SHOP', 'shop'),
     'stones' => env('ROUTE_STONES', 'stones'),
+    'listings' => env('ROUTE_LISTINGS_PUBLIC', 'item'),
     'auctions' => env('ROUTE_AUCTIONS', 'auctions'),
     'sellers' => env('ROUTE_SELLERS', 'sellers'),
     'verify' => env('ROUTE_VERIFY', 'verify'),

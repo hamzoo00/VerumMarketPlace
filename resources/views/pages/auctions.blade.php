@@ -1,11 +1,6 @@
-@php
-    $live = $lots->filter(fn ($lot) => ! $lot->hasEnded());
-    $closed = $lots->filter(fn ($lot) => $lot->hasEnded());
-@endphp
-
 <x-layouts::public
     :title="__('Live auctions')"
-    :description="__('Bid on certified gemstones in this week\'s sale. Every lot is independently graded, with its origin and treatment disclosed.')"
+    :description="__('Bid on certified gemstones. Every lot is independently graded, with its origin and treatment disclosed.')"
 >
     <x-verum.page-head
         :title="__('Live')"
@@ -15,14 +10,18 @@
     />
 
     <div class="wrap">
-        @if ($live->isNotEmpty())
-            <div class="cards cards--4">
-                @foreach ($live as $index => $lot)
-                    <x-verum.stone.card :stone="$lot->stone" :$index />
-                @endforeach
-            </div>
-        @else
-            <div class="empty">
+        {{--
+            The grid is always rendered, even when empty: a lot going live
+            over the socket needs somewhere to land.
+        --}}
+        <div class="cards cards--4" data-live-grid data-live-type="auction">
+            @foreach ($live as $index => $listing)
+                <x-verum.listing.card :$listing :$index />
+            @endforeach
+        </div>
+
+        @if ($live->isEmpty())
+            <div class="empty" data-live-empty>
                 <x-verum.icon name="gavel" class="empty__ic" />
                 <h3>{{ __('No live lots right now.') }}</h3>
                 <p>{{ __('The next sale opens shortly. Browse fixed-price stones in the meantime.') }}</p>
@@ -31,15 +30,15 @@
         @endif
     </div>
 
-    <x-verum.auction.steps />
+    <x-verum.auction.rules />
 
     @if ($closed->isNotEmpty())
         <section class="sec">
             <div class="wrap">
                 <x-verum.section-head :kicker="__('Results')" :title="__('Recently')" :emphasis="__('closed.')" />
                 <div class="cards cards--4">
-                    @foreach ($closed as $index => $lot)
-                        <x-verum.stone.card :stone="$lot->stone" :$index />
+                    @foreach ($closed as $index => $listing)
+                        <x-verum.listing.card :$listing :$index />
                     @endforeach
                 </div>
             </div>

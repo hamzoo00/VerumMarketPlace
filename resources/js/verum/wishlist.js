@@ -1,6 +1,6 @@
 import { $, $$, delegate, onceGlobal } from './dom.js';
 import { store } from './storage.js';
-import { toast } from './toasts.js';
+import { toast } from './toast.js';
 
 /**
  * Saved stones.
@@ -51,9 +51,7 @@ export function toggleWish(slug) {
     syncButtons(ids);
     renderDrawer(ids);
 
-    toast(adding ? 'Saved to your stones' : 'Removed from saved', {
-        icon: adding ? 'heart' : 'check',
-    });
+    toast(adding ? 'Saved to your stones' : 'Removed from saved', 'success');
 }
 
 /**

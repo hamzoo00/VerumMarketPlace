@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ListingController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\SellWithUsController;
@@ -29,6 +30,9 @@ Route::get(Seg::get('shop'), ShopController::class)->name('shop');
 Route::get(Seg::get('stones').'/{stone:slug}', StoneController::class)->name('stones.show');
 
 Route::get(Seg::get('auctions'), AuctionController::class)->name('auctions');
+
+// Seller-published listings. `stones` remains for the seeded demo detail pages.
+Route::get(Seg::get('listings').'/{listing:slug}', ListingController::class)->name('listings.show');
 
 Route::get(Seg::get('sellers'), [SellerController::class, 'index'])->name('sellers.index');
 Route::get(Seg::get('sellers').'/{seller:slug}', [SellerController::class, 'show'])->name('sellers.show');

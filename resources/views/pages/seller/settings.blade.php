@@ -1,12 +1,8 @@
-<x-layouts::account-area
+<x-layouts::seller
+    :account="$account"
     :title="__('Settings')"
     :heading="__('Settings')"
     :lede="__('Your account and payout details.')"
-    :nav="$sellerNav"
-    :account-name="$account->name"
-    :account-initials="$account->initials()"
-    :account-meta="__('Verified seller')"
-    logout-route="seller.logout"
 >
     <div class="apanels">
         <x-verum.account.panel :title="__('Your details')" icon="user">
@@ -23,4 +19,4 @@
 
         <x-verum.account.password-form area="seller" />
     </div>
-</x-layouts::account-area>
+</x-layouts::seller>

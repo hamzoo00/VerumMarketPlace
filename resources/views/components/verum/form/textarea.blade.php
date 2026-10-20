@@ -1,6 +1,7 @@
 @props([
     'name',
     'label',
+    'value' => null,
     'rows' => 4,
     'required' => false,
     'full' => true,
@@ -15,7 +16,7 @@
         @required($required)
         @if ($errors->has($name)) aria-invalid="true" aria-describedby="e-{{ $name }}" @endif
         {{ $attributes }}
-    >{{ old($name) }}</textarea>
+    >{{ old($name, $value) }}</textarea>
     <label for="f-{{ $name }}">{{ $label }}</label>
 
     @error($name)

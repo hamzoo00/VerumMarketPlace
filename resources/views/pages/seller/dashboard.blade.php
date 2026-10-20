@@ -1,12 +1,8 @@
-<x-layouts::account-area
+<x-layouts::seller
+    :account="$account"
     :title="__('Seller dashboard')"
     :heading="__('Welcome back, :name', ['name' => $account->name])"
     :lede="__('Your listings, lots and orders.')"
-    :nav="$sellerNav"
-    :account-name="$account->name"
-    :account-initials="$account->initials()"
-    :account-meta="__('Verified seller')"
-    logout-route="seller.logout"
 >
     <ul class="astats">
         <x-verum.account.stat :label="__('Live listings')" value="0" />
@@ -47,4 +43,4 @@
             @endif
         </x-verum.account.panel>
     </div>
-</x-layouts::account-area>
+</x-layouts::seller>

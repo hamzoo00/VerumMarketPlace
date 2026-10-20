@@ -218,7 +218,10 @@
 
 @media (min-width: 60rem) {
   .acct-area {
-    grid-template-columns: 16rem minmax(0, 1fr);
+    /* The working column is capped so form fields stay a readable width
+       instead of stretching across a 1440px page. */
+    grid-template-columns: 16rem minmax(0, 58rem);
+    justify-content: start;
     align-items: start;
   }
 }

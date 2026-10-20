@@ -44,6 +44,81 @@
   display: none;
 }
 
+/* ---------- filter groups ----------
+   Each group is a titled block separated by a hairline, so the panel reads
+   as sections rather than one long run of radios. */
+.filters__body {
+  display: grid;
+}
+
+.filters .fgrp {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.filters .fgrp:last-child {
+  border-bottom: 0;
+}
+
+.filters .fgrp > .lbl {
+  margin-bottom: 10px;
+}
+
+.filters .chklist {
+  gap: 0;
+  margin: 0 -8px;
+}
+
+.filters .chklist .chk {
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 4px;
+  color: var(--mute);
+  transition: background .18s, color .18s;
+}
+
+.filters .chklist .chk:hover {
+  background: color-mix(in srgb, var(--bone) 5%, transparent);
+  color: var(--bone);
+}
+
+/* :has lets the whole row reflect the control's state, not just the dot. */
+.filters .chklist .chk:has(:checked) {
+  color: var(--bone);
+}
+
+.filters__head .link {
+  border: 0;
+  background: none;
+  color: var(--ruby-hi);
+  cursor: pointer;
+  font-size: .78rem;
+}
+
+/* ---------- load more ---------- */
+.loadmore {
+  display: grid;
+  justify-items: center;
+  margin-top: clamp(24px, 3vw, 40px);
+}
+
+.loadmore .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loadmore small {
+  color: var(--mute);
+  font: 500 .6rem var(--mono);
+  letter-spacing: .12em;
+}
+
+/* The browser owns the shop grid, so it carries the two-column layout. */
+.shop__live {
+  display: contents;
+}
+
 .fgroup {
   border-bottom: 1px solid var(--line);
 }
@@ -232,6 +307,62 @@
   align-items: center;
   gap: 10px;
   margin-left: auto;
+}
+
+/* ---------- sort control ----------
+   A native <select>, because its popup is reachable by keyboard and screen
+   reader and behaves correctly on mobile. The popup itself is drawn by the
+   OS and cannot be fully styled, so `color-scheme: dark` is what makes it
+   dark rather than the default white-on-blue list. */
+.sortform {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sortform select {
+  appearance: none;
+  height: 42px;
+  padding: 0 38px 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--ink-2);
+  color: var(--bone);
+  color-scheme: dark;
+  font: 500 .8rem var(--sans);
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: border-color .25s, background .25s;
+}
+
+.sortform select:hover {
+  border-color: var(--line-3);
+  background: var(--plate);
+}
+
+.sortform select:focus-visible {
+  outline: 2px solid var(--ruby-hi);
+  outline-offset: 2px;
+}
+
+/* The chevron, drawn once rather than shipped as an icon. */
+.sortform::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--mute);
+  border-bottom: 1.5px solid var(--mute);
+  rotate: 45deg;
+  translate: 0 -2px;
+  pointer-events: none;
+}
+
+/* Firefox and Windows draw the list from these; Safari ignores them. */
+.sortform select option {
+  background: var(--ink-2);
+  color: var(--bone);
 }
 
 .select {

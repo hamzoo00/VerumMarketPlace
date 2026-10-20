@@ -1,0 +1,322 @@
+/* Verum — global messages and file uploads. */
+
+/* ---------- toasts ----------
+   A small glass capsule, sized to its text and no larger. The faceted
+   bezel carries the status colour; everything else stays near-black so it
+   reads as jewellery rather than a browser alert. */
+.toasts {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  left: 50%;
+  z-index: 200;
+  display: grid;
+  justify-items: center;
+  gap: .35rem;
+  width: max-content;
+  max-width: min(100% - 2rem, 22rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  --facet: var(--mute);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 100%;
+  padding: .3rem .65rem .3rem .35rem;
+  border: 1px solid color-mix(in srgb, var(--facet) 24%, var(--line-2));
+  border-radius: 2rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--facet) 12%, transparent), transparent 55%),
+    color-mix(in srgb, var(--ink) 86%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--bone) 10%, transparent) inset,
+    0 14px 30px -14px rgba(0, 0, 0, .75);
+  font-size: .78rem;
+  line-height: 1.3;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(-10px) scale(.97);
+  transition: opacity .25s, transform .38s var(--ease);
+}
+
+.toast.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* The bezel: a rotated square reads as a cut stone at this size. */
+.toast__gem {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 5px;
+  rotate: 45deg;
+  background: linear-gradient(145deg,
+      color-mix(in srgb, var(--facet) 88%, #fff 12%),
+      color-mix(in srgb, var(--facet) 72%, #000 28%));
+  box-shadow: 0 0 10px -2px color-mix(in srgb, var(--facet) 55%, transparent);
+}
+
+.toast__gem .ic {
+  width: .62rem;
+  height: .62rem;
+  rotate: -45deg;
+  color: #fff;
+  stroke-width: 2.8;
+}
+
+.toast p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: var(--bone);
+  overflow-wrap: anywhere;
+}
+
+.toast__x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-left: .1rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+
+.toast__x:hover {
+  background: color-mix(in srgb, var(--bone) 12%, transparent);
+  color: var(--bone);
+}
+
+.toast__x .ic {
+  width: .58rem;
+  height: .58rem;
+}
+
+/* A hairline of the status colour, draining over the toast's life. */
+.toast__thread {
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 0;
+  height: 1px;
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, var(--facet), transparent);
+  scale: 0 1;
+}
+
+.toast.is-timed .toast__thread {
+  animation: toast-drain var(--life, 4000ms) linear forwards;
+}
+
+@keyframes toast-drain {
+  from { scale: 1 1; }
+  to   { scale: 0 1; }
+}
+
+.toast--success { --facet: var(--ok); }
+.toast--error   { --facet: #e0607c; }
+.toast--warning { --facet: var(--gold); }
+.toast--info    { --facet: var(--ruby-hi); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: opacity .2s;
+    transform: none;
+  }
+
+  .toast.is-timed .toast__thread {
+    animation: none;
+  }
+}
+
+/* ---------- upload widget ---------- */
+.upload + .upload {
+  margin-top: 1.5rem;
+}
+
+.upload__drop {
+  display: grid;
+  justify-items: center;
+  gap: .4rem;
+  padding: 1.6rem 1rem;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  text-align: center;
+  transition: border-color .18s, background-color .18s;
+}
+
+.upload__drop.is-over {
+  border-color: var(--ruby);
+  background: color-mix(in srgb, var(--ruby) 8%, transparent);
+}
+
+.upload__ic {
+  width: 1.5rem;
+  height: 1.5rem;
+  opacity: .6;
+}
+
+.upload__t {
+  margin: 0;
+  font-weight: 600;
+}
+
+.upload__hint {
+  margin: 0 0 .5rem;
+  font-size: .78rem;
+  color: var(--mute);
+}
+
+.upload__drop label {
+  cursor: pointer;
+}
+
+/* ---------- per-file progress ---------- */
+.upload__queue {
+  list-style: none;
+  margin: .75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: .5rem;
+}
+
+.uprog {
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.uprog__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .35rem;
+  font-size: .8rem;
+}
+
+.uprog__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uprog__pct {
+  flex: none;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--mute);
+}
+
+.uprog__bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+
+.uprog__bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ruby);
+  transition: width .2s ease;
+}
+
+/* ---------- uploaded previews ---------- */
+.upload__items {
+  list-style: none;
+  margin: .75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: .6rem;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+}
+
+.umedia {
+  position: relative;
+  aspect-ratio: 1;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--ink-3);
+}
+
+.umedia__img,
+.umedia__v {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.umedia__x {
+  position: absolute;
+  top: .3rem;
+  right: .3rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(7 19 33 / 78%);
+  color: var(--bone);
+  cursor: pointer;
+}
+
+.umedia__x:hover {
+  background: #e0607c;
+}
+
+.umedia__x .ic {
+  width: .8rem;
+  height: .8rem;
+}
+
+/* ---------- filter lists ---------- */
+.chklist {
+  display: grid;
+  gap: .1rem;
+}
+
+.chklist .chk {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .35rem .2rem;
+  font-size: .9rem;
+  cursor: pointer;
+}
+
+.chklist .chk input {
+  flex: none;
+  width: .95rem;
+  height: .95rem;
+  accent-color: var(--ruby);
+}
+
+.chklist .chk span {
+  min-width: 0;
+}
+
+.fgrp__hint {
+  margin: -.3rem 0 .9rem;
+  font-size: .82rem;
+  color: var(--mute);
+}

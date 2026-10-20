@@ -1,0 +1,439 @@
+/* Verum — seller inventory, listing form and the category browser. */
+
+/* ---------- sidebar groups ---------- */
+.acct-nav__group {
+  margin: 1rem 0 .3rem;
+  padding: 0 .7rem;
+  font: 500 .64rem/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.acct-nav:first-of-type .acct-nav__group {
+  margin-top: 0;
+}
+
+.acct-nav__link.is-soon {
+  color: color-mix(in srgb, var(--mute) 70%, transparent);
+  cursor: not-allowed;
+}
+
+.acct-nav__link.is-soon small {
+  margin-left: auto;
+  padding: .05rem .35rem;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: .6rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* ---------- inventory toolbar ---------- */
+.invbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.invbar .adminfilters {
+  margin: 0;
+}
+
+/* ---------- listing form ---------- */
+.listingform .fgrp + .fgrp {
+  margin-top: 1.75rem;
+}
+
+.listingform__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.pricing__set {
+  margin-top: 1rem;
+}
+
+/* ---------- category picker ---------- */
+.catpick {
+  display: grid;
+  gap: .7rem;
+  justify-items: start;
+  margin-bottom: 1.25rem;
+}
+
+.catpick__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.catpick__kinds .chip {
+  cursor: pointer;
+}
+
+.catpick__kinds .chip.is-on {
+  border-color: var(--ruby);
+  background: color-mix(in srgb, var(--ruby) 12%, transparent);
+}
+
+.catpick__chosen {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+  padding: .7rem .9rem;
+  border: 1px dashed var(--line-2);
+  border-radius: 10px;
+  font-size: .9rem;
+}
+
+.catpick__chosen .ic {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ok);
+  flex: none;
+}
+
+.catpick__none {
+  color: var(--mute);
+}
+
+/* ---------- browser modal ---------- */
+.catmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: clamp(.75rem, 4vw, 2rem);
+  opacity: 0;
+  transition: opacity .25s;
+}
+
+.catmodal.is-open {
+  opacity: 1;
+}
+
+.catmodal__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(4 10 18 / 72%);
+  backdrop-filter: blur(4px);
+}
+
+.catmodal__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 60rem);
+  max-height: min(84dvh, 42rem);
+  background: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.catmodal__head {
+  padding: 1.1rem 1.25rem .9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.catmodal__head h2 {
+  margin: 0;
+  font: 400 1.3rem/1.1 var(--serif);
+}
+
+.catmodal__head p {
+  margin: .25rem 0 0;
+  font-size: .84rem;
+  color: var(--mute);
+}
+
+.catmodal__cols {
+  display: flex;
+  gap: 1px;
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  background: var(--line);
+}
+
+.catcol {
+  flex: 0 0 min(17rem, 72vw);
+  min-width: 0;
+  padding: .75rem;
+  overflow-y: auto;
+  background: var(--ink-2);
+}
+
+.catcol__t {
+  margin: 0 0 .5rem;
+  font: 500 .64rem/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.catcol__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  width: 100%;
+  padding: .55rem .65rem;
+  margin-bottom: .2rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--bone);
+  font: 400 .88rem/1.25 var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.catcol__item:hover {
+  background: color-mix(in srgb, var(--bone) 7%, transparent);
+}
+
+.catcol__item.is-on {
+  border-color: var(--ruby);
+  background: color-mix(in srgb, var(--ruby) 14%, transparent);
+}
+
+.catcol__item .ic {
+  width: .9rem;
+  height: .9rem;
+  flex: none;
+  opacity: .6;
+}
+
+.catmodal__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .9rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.catmodal__crumb {
+  margin: 0;
+  min-width: 0;
+  font-size: .85rem;
+  color: var(--mute);
+  overflow-wrap: anywhere;
+}
+
+.catmodal__crumb.is-invalid {
+  color: var(--gold);
+}
+
+.catmodal__btns {
+  display: flex;
+  gap: .5rem;
+  flex: none;
+}
+
+/* =============================================================
+   Rotating card imagery
+   Every shot is in the DOM for crawlers; one is painted at a time.
+   ============================================================= */
+.shots {
+  position: absolute;
+  inset: 0;
+}
+
+.shots__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .7s var(--ease);
+}
+
+.shots__img.is-on {
+  opacity: 1;
+}
+
+.shots__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  translate: -50% 0;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.scard:hover .shots__dots,
+.shots--multi:hover .shots__dots {
+  opacity: 1;
+}
+
+.shots__dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .45);
+  transition: background .3s, width .3s var(--ease);
+}
+
+.shots__dots i.is-on {
+  width: 12px;
+  border-radius: 2px;
+  background: var(--ruby-hi);
+}
+
+/* =============================================================
+   Detail gallery
+   ============================================================= */
+.gallery__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .6s var(--ease);
+}
+
+.gallery__img.is-on {
+  opacity: 1;
+}
+
+.gnav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  translate: 0 -50%;
+  border: 1px solid color-mix(in srgb, var(--bone) 18%, transparent);
+  border-radius: 50%;
+  background: rgba(10, 10, 12, .55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--bone);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .3s, background .3s, border-color .3s, scale .3s var(--ease);
+}
+
+.gallery:hover .gnav,
+.gnav:focus-visible {
+  opacity: 1;
+}
+
+.gnav:hover {
+  background: rgba(10, 10, 12, .78);
+  border-color: var(--ruby-hi);
+  scale: 1.06;
+}
+
+.gnav .ic {
+  width: 18px;
+  height: 18px;
+}
+
+.gnav--prev {
+  left: 14px;
+}
+
+.gnav--prev .ic {
+  rotate: 180deg;
+}
+
+.gnav--next {
+  right: 14px;
+}
+
+/* Touch has no hover, so the arrows must always be reachable. */
+@media (hover: none) {
+  .gnav {
+    opacity: 1;
+  }
+}
+
+.gallery__thumbs .gthumb {
+  padding: 0;
+  border: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+}
+
+.gallery__thumbs .gthumb .plate {
+  display: block;
+  aspect-ratio: 1;
+}
+
+.gallery__thumbs .gthumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery__videos {
+  display: grid;
+  gap: 10px;
+}
+
+.gallery__video {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #000;
+}
+
+/* =============================================================
+   Live arrivals
+   A card pushed in over the socket announces itself, so a change
+   on a page the visitor is already reading is noticed.
+   ============================================================= */
+.is-live-in {
+  animation: live-in .7s var(--ease) both;
+}
+
+@keyframes live-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.is-live-out {
+  opacity: 0;
+  transform: scale(.96);
+  transition: opacity .35s, transform .45s var(--ease);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-live-in {
+    animation: none;
+  }
+
+  .is-live-out {
+    transition: opacity .2s;
+    transform: none;
+  }
+}

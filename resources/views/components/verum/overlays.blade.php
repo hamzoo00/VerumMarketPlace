@@ -70,7 +70,7 @@
 
 <x-verum.chat-widget />
 
-<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+<x-verum.toast-host />
 
 <button class="totop" id="totop" type="button" aria-label="{{ __('Back to top') }}">
     <svg class="totop__ring" viewBox="0 0 48 48" aria-hidden="true">

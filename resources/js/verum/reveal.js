@@ -7,8 +7,11 @@ import { $$, prefersReducedMotion } from './dom.js';
  * nothing is ever hidden from crawlers or from visitors without JavaScript.
  */
 
-export function initReveal() {
-    const items = $$('[data-reveal]');
+export function initReveal(root = document) {
+    // Anything added after boot — a Livewire re-render, a live card — was
+    // never observed, and [data-reveal] starts it faded and shifted down.
+    // Left unobserved it stays there, which reads as a dislocated card.
+    const items = $$('[data-reveal]', root);
     if (items.length === 0) return;
 
     if (prefersReducedMotion() || !('IntersectionObserver' in window)) {

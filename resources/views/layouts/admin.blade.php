@@ -98,6 +98,8 @@
         </section>
     </main>
 
+    <x-verum.toast-host />
+
     @fluxScripts
 </body>
 </html>

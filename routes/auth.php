@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
 use App\Http\Controllers\Seller\SellerDashboardController;
+use App\Http\Controllers\Seller\SellerListingController;
+use App\Http\Controllers\Seller\SellerListingMediaController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -62,7 +64,26 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
 
     Route::middleware('seller.approved')->group(function () {
         Route::get(Seg::get('account.dashboard'), [SellerDashboardController::class, 'index'])->name('dashboard');
-        Route::get(Seg::get('account.listings'), [SellerDashboardController::class, 'listings'])->name('listings');
+
+        // Inventory. `create` sits before `{listing}` so it is not swallowed
+        // by the wildcard.
+        Route::get(Seg::get('account.listings'), [SellerListingController::class, 'index'])->name('listings');
+        Route::get(Seg::get('account.listings').'/new', [SellerListingController::class, 'create'])->name('listings.create');
+        Route::post(Seg::get('account.listings'), [SellerListingController::class, 'store'])->name('listings.store');
+        Route::get(Seg::get('account.listings').'/{listing}/edit', [SellerListingController::class, 'edit'])->name('listings.edit');
+        Route::put(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'update'])->name('listings.update');
+        Route::post(Seg::get('account.listings').'/{listing}/publish', [SellerListingController::class, 'publish'])->name('listings.publish');
+        Route::delete(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'destroy'])->name('listings.destroy');
+
+        // Media. One file per request so progress is real and a single
+        // rejection does not fail the batch.
+        Route::post(Seg::get('account.listings').'/{listing}/media', [SellerListingMediaController::class, 'store'])
+            ->name('listings.media.store');
+        Route::delete(Seg::get('account.listings').'/{listing}/media/{media}', [SellerListingMediaController::class, 'destroy'])
+            ->name('listings.media.destroy');
+
+        // JSON used by the category browser.
+        Route::get('categories/{kind}', [SellerListingController::class, 'categories'])->name('categories');
         Route::get(Seg::get('account.orders'), [SellerDashboardController::class, 'orders'])->name('orders');
         Route::get(Seg::get('account.storefront'), [SellerDashboardController::class, 'storefront'])->name('storefront');
         Route::get(Seg::get('account.settings'), [SellerDashboardController::class, 'settings'])->name('settings');

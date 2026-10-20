@@ -1,8 +1,10 @@
 @props([
     'total',
     'activeSort' => 'newest',
-    'activeType' => null,
+    'activeCategory' => null,
     'untreatedOnly' => false,
+    'activeType' => null,
+    'live' => false,
 ])
 
 @php
@@ -12,7 +14,7 @@
         'price-desc' => __('Price: high to low'),
         'carat-desc' => __('Carat: largest first'),
     ];
-    $activeCount = (int) ($activeType !== null) + (int) $untreatedOnly;
+    $activeCount = (int) ($activeCategory !== null) + (int) $untreatedOnly + (int) ($activeType !== null);
 @endphp
 
 <div class="toolbar">
@@ -24,18 +26,32 @@
     </button>
 
     <p class="toolbar__count" aria-live="polite">
-        <strong>{{ $total }}</strong> <span>{{ trans_choice('gemstone|gemstones', $total) }}</span>
+        <strong data-live-count>{{ $total }}</strong> <span>{{ trans_choice('listing|listings', $total) }}</span>
     </p>
 
     <div class="toolbar__right">
-        {{-- Native select keeps sorting functional without JavaScript. --}}
+        @if ($live)
+            {{-- Bound to the component: re-sorting never reloads the page. --}}
+            <div class="sortform">
+                <label class="sr-only" for="sortBy">{{ __('Sort by') }}</label>
+                <select id="sortBy" wire:model.live="sort">
+                    @foreach ($sorts as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @else
         <form method="GET" action="{{ route('shop') }}" class="sortform">
+            @if ($activeCategory)
+                <input type="hidden" name="category" value="{{ $activeCategory->slug }}">
+            @endif
             @if ($activeType)
                 <input type="hidden" name="type" value="{{ $activeType }}">
             @endif
             @if ($untreatedOnly)
                 <input type="hidden" name="untreated" value="1">
             @endif
+
             <label class="sr-only" for="sortBy">{{ __('Sort by') }}</label>
             <select id="sortBy" name="sort" onchange="this.form.submit()">
                 @foreach ($sorts as $value => $label)
@@ -44,14 +60,6 @@
             </select>
             <noscript><button class="btn btn--sm" type="submit">{{ __('Sort') }}</button></noscript>
         </form>
-
-        <div class="seg" role="group" aria-label="{{ __('Layout') }}">
-            <button type="button" data-view="grid" aria-pressed="true" aria-label="{{ __('Grid view') }}">
-                <x-verum.icon name="grid" />
-            </button>
-            <button type="button" data-view="list" aria-pressed="false" aria-label="{{ __('List view') }}">
-                <x-verum.icon name="list" />
-            </button>
-        </div>
+        @endif
     </div>
 </div>

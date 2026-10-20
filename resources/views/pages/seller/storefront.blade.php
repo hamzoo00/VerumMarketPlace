@@ -1,12 +1,8 @@
-<x-layouts::account-area
+<x-layouts::seller
+    :account="$account"
     :title="__('Storefront')"
     :heading="__('Your storefront')"
     :lede="__('How buyers see your house.')"
-    :nav="$sellerNav"
-    :account-name="$account->name"
-    :account-initials="$account->initials()"
-    :account-meta="__('Verified seller')"
-    logout-route="seller.logout"
 >
     <x-verum.account.panel :title="__('Public page')" icon="shield">
         @if ($storefront)
@@ -30,4 +26,4 @@
             />
         @endif
     </x-verum.account.panel>
-</x-layouts::account-area>
+</x-layouts::seller>
