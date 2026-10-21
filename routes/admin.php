@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminApplicationController;
 use App\Http\Controllers\Admin\AdminCaseController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminModerationController;
 use App\Http\Controllers\Admin\AdminSessionController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,12 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
 
     Route::middleware(['auth:admin', 'admin.active'])->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Flagged messages: suspected attempts to leave the platform.
+        Route::get(Seg::get('account.moderation'), [AdminModerationController::class, 'index'])
+            ->name('moderation');
+        Route::post(Seg::get('account.moderation').'/{message}', [AdminModerationController::class, 'review'])
+            ->name('moderation.review');
 
         // Disputes and audits, in one queue.
         Route::get(Seg::get('account.cases'), [AdminCaseController::class, 'index'])->name('cases');

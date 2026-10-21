@@ -10,6 +10,8 @@
         ['label' => __('Overview'), 'icon' => 'grid', 'route' => 'admin.dashboard'],
         ['label' => __('Applications'), 'icon' => 'file', 'route' => 'admin.applications'],
         ['label' => __('Cases'), 'icon' => 'shield', 'route' => 'admin.cases'],
+        ['label' => __('Messages'), 'icon' => 'chat', 'route' => 'chat.index'],
+        ['label' => __('Moderation'), 'icon' => 'eye', 'route' => 'admin.moderation'],
         ['label' => __('Sellers'), 'icon' => 'gem', 'route' => 'admin.sellers'],
         ['label' => __('Buyers'), 'icon' => 'user', 'route' => 'admin.buyers'],
     ];

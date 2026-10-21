@@ -41,6 +41,10 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
 
+    // The inbox is shared by all three audiences; these keep each area's
+    // own nav honest without duplicating the controller.
+    Route::get(Seg::get('account.messages'), fn () => redirect()->route('chat.index'))->name('messages');
+
     // Disputes and audits the buyer has raised.
     Route::get(Seg::get('account.cases'), [BuyerCaseController::class, 'index'])->name('cases');
     Route::get(Seg::get('account.cases').'/{case}', [BuyerCaseController::class, 'show'])->name('cases.show');
@@ -103,6 +107,8 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
             ->name('branding.store');
         Route::delete(Seg::get('account.storefront').'/branding', [SellerBrandingController::class, 'destroy'])
             ->name('branding.destroy');
+
+        Route::get(Seg::get('account.messages'), fn () => redirect()->route('chat.index'))->name('messages');
 
         // Cases raised about this seller; read-only, the admin settles them.
         Route::get(Seg::get('account.cases'), [SellerCaseController::class, 'index'])->name('cases');

@@ -11,6 +11,7 @@
                     <th scope="col">{{ __('Email') }}</th>
                     <th scope="col">{{ __('Application') }}</th>
                     <th scope="col">{{ __('Storefront') }}</th>
+                    <th scope="col">{{ __('Flags') }}</th>
                     <th scope="col">{{ __('Joined') }}</th>
                 </tr>
             </thead>
@@ -33,10 +34,25 @@
                                 —
                             @endif
                         </td>
+                        <td>
+                            @php($upheld = $flags[$account->storefront?->id] ?? 0)
+
+                            @if ($upheld > 0)
+                                {{-- Upheld only: pending flags include the
+                                     false positives this system tolerates. --}}
+                                <a
+                                    class="chip chip--warn"
+                                    href="{{ route('admin.moderation', ['state' => 'upheld']) }}"
+                                    wire:navigate
+                                >{{ $upheld }}</a>
+                            @else
+                                —
+                            @endif
+                        </td>
                         <td>{{ $account->created_at?->format('d/m/Y') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5">{{ __('No seller accounts yet.') }}</td></tr>
+                    <tr><td colspan="6">{{ __('No seller accounts yet.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

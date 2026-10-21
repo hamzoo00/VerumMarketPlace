@@ -41,6 +41,16 @@
             </button>
         </div>
 
+        @auth('buyer')
+            {{-- Opens or finds the thread for this listing. --}}
+            <form method="POST" action="{{ route('listings.chat.start', $listing) }}" class="buyacts__ask">
+                @csrf
+                <button class="btn btn--ghost btn--block" type="submit">
+                    <x-verum.icon name="chat" />{{ __('Message the seller') }}
+                </button>
+            </form>
+        @endauth
+
         <x-verum.listing.offer-form :$listing />
 
         @if (! $quote->isConfigured())

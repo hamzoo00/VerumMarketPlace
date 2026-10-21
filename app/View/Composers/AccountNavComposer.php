@@ -22,6 +22,7 @@ class AccountNavComposer
                 ['bids', __('My bids'), 'gavel'],
                 ['offers', __('My offers'), 'scale'],
                 ['cases', __('Disputes'), 'shield'],
+                ['messages', __('Messages'), 'chat'],
                 ['orders', __('Orders'), 'box'],
                 ['settings', __('Settings'), 'user'],
             ], 'buyer'),

@@ -19,7 +19,7 @@ return [
             ['key' => 'dashboard', 'label' => 'Selling dashboard', 'icon' => 'grid', 'built' => true],
             ['key' => 'listings', 'label' => 'Manage inventory', 'icon' => 'gem', 'built' => true],
             ['key' => 'listings.create', 'label' => 'Sell an item', 'icon' => 'plus', 'built' => true],
-            ['key' => 'messages', 'label' => 'Store messages', 'icon' => 'chat', 'built' => false],
+            ['key' => 'messages', 'label' => 'Store messages', 'icon' => 'chat', 'built' => true],
             ['key' => 'checkouts', 'label' => 'Pending checkouts', 'icon' => 'bag', 'built' => false],
             ['key' => 'orders', 'label' => 'Sales', 'icon' => 'box', 'built' => true],
             ['key' => 'shipping', 'label' => 'Shipping', 'icon' => 'globe', 'built' => true],

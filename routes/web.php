@@ -7,6 +7,7 @@ use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
 use App\Http\Controllers\Buyer\BuyerReviewController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
@@ -59,6 +60,26 @@ Route::middleware(['auth:buyer'])->group(function () {
         ->middleware('throttle:5,1')
         ->name('sellers.dispute');
 });
+
+/*
+ * Messaging.
+ *
+ * One set of routes for all three audiences: the controller resolves who
+ * is asking from the session and checks membership against the thread,
+ * so a buyer, a seller and an admin reach the same inbox safely.
+ */
+Route::middleware(['auth.any'])->prefix(Seg::get('account.messages'))->name('chat.')->group(function () {
+    Route::get('/', [ConversationController::class, 'index'])->name('index');
+    Route::get('{conversation}', [ConversationController::class, 'show'])->name('show');
+    Route::post('{conversation}', [ConversationController::class, 'store'])
+        ->middleware('throttle:'.config('verum_chat.limits.per_minute').',1')
+        ->name('store');
+});
+
+// Only a buyer opens a thread, and only from a listing.
+Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.messages'), [ConversationController::class, 'start'])
+    ->middleware(['auth:buyer', 'throttle:20,1'])
+    ->name('listings.chat.start');
 
 // Making an offer needs a signed-in buyer; the action re-checks every rule.
 Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.offers'), [BuyerOfferController::class, 'store'])

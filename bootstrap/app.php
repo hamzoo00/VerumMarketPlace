@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateAnyAccount;
 use App\Http\Middleware\AuthenticateArea;
 use App\Http\Middleware\EnsureAdminIsActive;
 use App\Http\Middleware\EnsureSellerIsApproved;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.active' => EnsureAdminIsActive::class,
             'auth.area' => AuthenticateArea::class,
             'guest.account' => RedirectIfAuthenticatedAccount::class,
+            'auth.any' => AuthenticateAnyAccount::class,
         ]);
 
         // Buyers and sellers are separate guards, so an unauthenticated

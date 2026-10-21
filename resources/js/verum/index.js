@@ -1,5 +1,7 @@
 import { initBranding } from './branding.js';
 import { initCart } from './cart.js';
+import { initChatComposer } from './chat-compose.js';
+import { initChatLive } from './live-chat.js';
 import { initCategories } from './categories.js';
 import { initCategoryPicker } from './category-picker.js';
 import { onceGlobal } from './dom.js';
@@ -47,6 +49,8 @@ export function boot() {
     initSellerLive();
     initListingLive();
     initOfferLive();
+    initChatLive();
+    initChatComposer();
     initOfferForms();
     initFilters();
     initReveal();

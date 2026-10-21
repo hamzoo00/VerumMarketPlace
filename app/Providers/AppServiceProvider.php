@@ -37,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
         // Private buyer/seller areas get their own navigation.
         View::composer('pages.buyer.*', AccountNavComposer::class);
         View::composer('pages.seller.*', AccountNavComposer::class);
+        // The chat shell picks a layout per audience, so it needs the
+        // buyer nav too — the inbox is not under pages.buyer.
+        View::composer('components.verum.chat.shell', AccountNavComposer::class);
     }
 
     /**
