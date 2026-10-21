@@ -29,7 +29,8 @@
         </script>
     @endpush
 
-    <div class="wrap pdp" id="pdp">
+    {{-- Named so live-listing.js can tell this listing's broadcasts apart. --}}
+    <div class="wrap pdp" id="pdp" data-live-listing="{{ $listing->slug }}">
         <nav class="crumbs" aria-label="{{ __('Breadcrumb') }}">
             <a href="{{ route('home') }}" wire:navigate>{{ __('Home') }}</a>
             <span aria-hidden="true">/</span>
@@ -54,6 +55,8 @@
                         {{ $listing->price()?->format() }}
                         <small>{{ $listing->currency }}</small>
                     </p>
+
+                    <x-verum.listing.buy-actions :$listing />
                 @endif
 
                 @if ($listing->description)
@@ -62,9 +65,14 @@
 
                 <x-verum.listing.specs :$listing />
 
+                <x-verum.listing.shipping :$listing />
+
                 @if ($listing->seller)
                     <x-verum.seller.chip :seller="$listing->seller" />
                 @endif
+
+                <x-verum.listing.review-form :$listing />
+                <x-verum.listing.audit-form :$listing />
             </div>
         </div>
     </div>

@@ -1,3 +1,10 @@
+@php
+    // From the session only: the URL names the storefront, so it must not
+    // be what decides whether the viewer may edit it.
+    $isOwner = auth('seller')->check()
+        && auth('seller')->user()?->storefront?->id === $seller->id;
+@endphp
+
 <x-layouts::public
     :title="$seller->name"
     :description="Str::limit($seller->about, 155)"
@@ -20,7 +27,14 @@
         </script>
     @endpush
 
-    <header class="sfront wrap" style="--gem:var(--gem-{{ $seller->accent }}, currentColor)">
+    @if ($seller->bannerUrl())
+        <div class="sbanner" role="img" aria-label="{{ __(':name store banner', ['name' => $seller->name]) }}">
+            <img src="{{ $seller->bannerUrl() }}" alt="" loading="eager" decoding="async">
+        </div>
+    @endif
+
+    <header @class(['sfront', 'wrap', 'sfront--bannered' => $seller->bannerUrl() !== null])
+        style="--gem:var(--gem-{{ $seller->accent }}, currentColor)">
         <nav class="crumbs" aria-label="{{ __('Breadcrumb') }}">
             <a href="{{ route('home') }}" wire:navigate>{{ __('Home') }}</a>
             <span aria-hidden="true">/</span>
@@ -38,21 +52,30 @@
                     <span class="vbadge"><x-verum.icon name="shield" />{{ __('Verified :date', ['date' => $seller->verified_on?->format('d/m/Y')]) }}</span>
                 </p>
             </div>
-            <a class="btn btn--ruby" href="{{ route('contact') }}" wire:navigate>
-                <x-verum.icon name="mail" />{{ __('Contact Verum') }}
-            </a>
+            @if ($isOwner)
+                {{-- The owner reaches their branding from the page it changes. --}}
+                <a class="btn btn--ghost" href="{{ route('seller.storefront') }}" wire:navigate>
+                    <x-verum.icon name="spark" />{{ __('Edit store') }}
+                </a>
+            @else
+                <a class="btn btn--ruby" href="{{ route('contact') }}" wire:navigate>
+                    <x-verum.icon name="mail" />{{ __('Contact Verum') }}
+                </a>
+            @endif
         </div>
 
         <p class="sfront__about">{{ $seller->about }}</p>
 
         <ul class="sfront__stats">
             <li><b>{{ number_format($seller->rating, 1) }} ★</b><span>{{ trans_choice(':count review|:count reviews', $seller->reviews_count) }}</span></li>
-            <li><b>{{ $seller->stones->count() }}</b><span>{{ __('listings here') }}</span></li>
+            <li><b>{{ $listings->count() }}</b><span>{{ __('listings here') }}</span></li>
             <li><b>{{ $seller->sold_label }}</b><span>{{ __('stones sold') }}</span></li>
             <li><b>{{ __('Since :year', ['year' => $seller->since]) }}</b><span>{{ trans_choice(':count year|:count years', $seller->years_active) }}</span></li>
         </ul>
 
         <p class="sfront__ship"><x-verum.icon name="box" />{{ $seller->ships }}</p>
+
+        <x-verum.seller.dispute-form :$seller />
     </header>
 
     <section class="sec" aria-labelledby="sellerStonesTitle">
@@ -64,15 +87,15 @@
                 title-id="sellerStonesTitle"
             />
 
-            @if ($seller->stones->isEmpty())
+            @if ($listings->isEmpty())
                 <div class="empty">
                     <x-verum.icon name="gem" class="empty__ic" />
                     <h3>{{ __('No listings right now.') }}</h3>
                 </div>
             @else
                 <div class="cards cards--3">
-                    @foreach ($seller->stones as $index => $stone)
-                        <x-verum.stone.card :$stone :$index />
+                    @foreach ($listings as $index => $listing)
+                        <x-verum.listing.card :$listing :$index />
                     @endforeach
                 </div>
             @endif

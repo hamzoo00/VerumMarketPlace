@@ -19,6 +19,18 @@
             <div class="scard__plate plate">
                 <x-verum.listing.photo :$listing />
 
+                {{-- The heart drives wishlist.js, which also builds the
+                     saved drawer from these cards. --}}
+                <button
+                    class="wishbtn"
+                    type="button"
+                    data-wish="{{ $listing->slug }}"
+                    aria-pressed="false"
+                    aria-label="{{ __('Save :title', ['title' => $listing->title]) }}"
+                >
+                    <x-verum.icon name="heart" />
+                </button>
+
                 <div class="scard__tags">
                     @if ($isAuction)
                         <span class="tag tag--live"><i class="dot-live"></i>{{ __('Auction') }}</span>

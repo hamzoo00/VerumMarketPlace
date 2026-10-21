@@ -121,7 +121,13 @@
    ============================================================= */
 .sfront {
   position: relative;
-  padding-top: calc(var(--tick) + var(--hdr));
+  padding-top: calc(var(--tick) + var(--hdr) + clamp(20px, 3vw, 40px));
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+
+/* The crumbs need room under the fixed header, not just clearance. */
+.sfront .crumbs {
+  margin-bottom: clamp(18px, 2.5vw, 30px);
 }
 
 .sfront__cover {
@@ -172,11 +178,58 @@
   margin-top: -60px;
 }
 
-.sfront__id {
+/* The identity row: crest, the name/location stack, then the action.
+   The ported markup uses .sfront__id as that stack — not as the row it
+   was in the demo — so these rules describe what is actually rendered. */
+.sfront__row {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 24px;
+  align-items: center;
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+.sfront__id {
+  flex: 1 1 260px;
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.sfront__loc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  color: var(--mute);
+  font-size: .9rem;
+}
+
+.sfront__loc .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.sfront__about {
+  max-width: 68ch;
+  margin-top: clamp(18px, 2.5vw, 28px);
+  color: var(--mute);
+  line-height: 1.65;
+}
+
+.sfront__ship {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  color: var(--mute);
+  font-size: .88rem;
+}
+
+.sfront__ship .ic {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--ruby-hi);
 }
 
 .sfront__t {
@@ -250,8 +303,8 @@
 
 .sfront__stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin-top: 34px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-top: clamp(24px, 3vw, 34px);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -265,9 +318,9 @@
   border-left: 1px solid var(--line);
 }
 
-.sfront__stats strong {
+.sfront__stats b {
   display: block;
-  font: 400 clamp(1.8rem, 3vw, 2.6rem)/1 var(--serif);
+  font: 400 clamp(1.5rem, 2.4vw, 2.1rem)/1 var(--serif);
 }
 
 .sfront__stats span {
@@ -521,4 +574,60 @@
   width: 15px;
   height: 15px;
   color: var(--ruby-hi);
+}
+
+/* =============================================================
+   Store banner
+   A seller's own image, behind the storefront header.
+   ============================================================= */
+.sbanner {
+  position: relative;
+  overflow: hidden;
+  height: clamp(140px, 22vw, 280px);
+  margin-top: calc(var(--tick) + var(--hdr));
+  background: var(--ink-2);
+}
+
+.sbanner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Fades into the page so the header sits on it cleanly. */
+.sbanner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 10, .35), var(--ink));
+}
+
+/* The banner already cleared the fixed header, so the header must not. */
+.sfront--bannered {
+  padding-top: clamp(20px, 3vw, 36px);
+}
+
+/* Lift the identity row over the banner's lower edge. */
+.sfront--bannered .sfront__row {
+  margin-top: clamp(-56px, -5vw, -28px);
+}
+
+/* An uploaded avatar fills the gem-shaped crest.
+   .crest::before is an opaque inset that sits over the image — it exists
+   to inset the initials against the gem rim, so with a photograph it has
+   to go, or the crest renders as a blank octagon. */
+.crest--photo {
+  background: var(--ink-2);
+}
+
+.crest--photo::before {
+  display: none;
+}
+
+.crest--photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

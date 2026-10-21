@@ -1,3 +1,4 @@
+import { initBranding } from './branding.js';
 import { initCart } from './cart.js';
 import { initCategories } from './categories.js';
 import { initCategoryPicker } from './category-picker.js';
@@ -7,14 +8,19 @@ import { initFilters } from './filters.js';
 import { initGalleries } from './gallery.js';
 import { initHeader } from './header.js';
 import { initLayers } from './layers.js';
+import { initListingLive } from './live-listing.js';
+import { initOfferLive } from './live-offers.js';
 import { initLive } from './live.js';
+import { initSellerLive } from './live-seller.js';
 import { initMarquees } from './marquee.js';
 import { initMenus } from './menu.js';
 import { initPhoneFields } from './phone.js';
+import { initOfferForms } from './offers.js';
 import { initPricing } from './pricing.js';
 import { initReveal } from './reveal.js';
 import { initScroll } from './scroll.js';
 import { initSearch } from './search.js';
+import { initShipping } from './shipping.js';
 import { initSpecialties } from './specialties.js';
 import { initToasts } from './toast.js';
 import { initUploads } from './upload.js';
@@ -38,6 +44,10 @@ export function boot() {
     initCountdowns();
     initGalleries();
     initLive();
+    initSellerLive();
+    initListingLive();
+    initOfferLive();
+    initOfferForms();
     initFilters();
     initReveal();
     initMarquees();
@@ -48,7 +58,9 @@ export function boot() {
     initMenus();
     initCategoryPicker();
     initUploads();
+    initBranding();
     initPricing();
+    initShipping();
 
     armLivewireRehydration();
 }

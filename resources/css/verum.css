@@ -19,6 +19,8 @@
 @import './verum/shop.css';
 @import './verum/auctions.css';
 @import './verum/product.css';
+@import './verum/buying.css';
+@import './verum/cases.css';
 @import './verum/verify.css';
 @import './verum/sellers.css';
 @import './verum/about.css';
@@ -29,6 +31,7 @@
 @import './verum/form-controls.css';
 @import './verum/account.css';
 @import './verum/admin.css';
+@import './verum/seller-tools.css';
 @import './verum/listing.css';
 @import './verum/feedback.css';
 @import './verum/responsive.css';

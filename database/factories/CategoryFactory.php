@@ -25,6 +25,20 @@ class CategoryFactory extends Factory
         ];
     }
 
+    /**
+     * Real rows always carry a materialised path, set by the seeder after
+     * insert. Factories must too, or anything reading `path` — breadcrumbs,
+     * the family lookup, branch filtering — sees a row that cannot exist.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Category $category): void {
+            if (($category->path ?? '') === '') {
+                $category->refreshPath();
+            }
+        });
+    }
+
     public function jewellery(): static
     {
         return $this->state(fn (): array => ['kind' => Category::KIND_JEWELLERY]);

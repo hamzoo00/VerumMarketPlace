@@ -49,6 +49,30 @@ new class extends Component
      */
     public const MAX_ROWS = 96;
 
+    /** The only orderings the UI offers, and the only ones accepted. */
+    public const SORTS = ['newest', 'price-asc', 'price-desc', 'carat-desc'];
+
+    /**
+     * URL properties are attacker- and typo-supplied, so anything the UI
+     * could not have produced is dropped on the way in. Without this a
+     * junk `?kind=moonrock` renders an empty shop at 200 instead of
+     * saying the URL is wrong.
+     */
+    public function mount(): void
+    {
+        if ($this->kind !== '' && ! array_key_exists($this->kind, Category::kinds())) {
+            abort(404);
+        }
+
+        if (! in_array($this->sort, self::SORTS, true)) {
+            $this->sort = 'newest';
+        }
+
+        if ($this->type !== '' && ! in_array($this->type, [Listing::TYPE_FIXED, Listing::TYPE_AUCTION], true)) {
+            $this->type = '';
+        }
+    }
+
     /** Choosing a branch invalidates a family from the other branch. */
     public function updatedKind(): void
     {

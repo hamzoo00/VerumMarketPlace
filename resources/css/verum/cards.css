@@ -681,3 +681,61 @@
     transform: translateY(-28px);
   }
 }
+
+/* =============================================================
+   Save to wishlist
+   The whole card is a stretched link (z-index 1), so the heart has to
+   sit above it or the click lands on the link instead.
+   ============================================================= */
+.wishbtn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--bone) 16%, transparent);
+  border-radius: 50%;
+  background: rgba(10, 10, 12, .5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--bone);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .25s, background .25s, color .25s, scale .25s var(--ease);
+}
+
+.scard:hover .wishbtn,
+.wishbtn:focus-visible,
+.wishbtn.is-on {
+  opacity: 1;
+}
+
+.wishbtn:hover {
+  background: rgba(10, 10, 12, .75);
+  scale: 1.07;
+}
+
+.wishbtn .ic {
+  width: 16px;
+  height: 16px;
+  transition: fill .25s, color .25s;
+}
+
+.wishbtn.is-on {
+  border-color: var(--ruby-hi);
+  color: var(--ruby-hi);
+}
+
+.wishbtn.is-on .ic {
+  fill: currentColor;
+}
+
+/* Touch has no hover, so the control must always be reachable. */
+@media (hover: none) {
+  .wishbtn {
+    opacity: 1;
+  }
+}

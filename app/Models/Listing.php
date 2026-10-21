@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\ListingObserver;
+use App\Support\ShippingQuote;
 use Database\Factories\ListingFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,6 +49,13 @@ class Listing extends Model implements HasMedia
     public const STATUS_ENDED = 'ended';
 
     public const STATUS_PAUSED = 'paused';
+
+    /** Postage: follow the seller's rates, free, or one flat price. */
+    public const SHIPPING_INHERIT = 'inherit';
+
+    public const SHIPPING_FREE = 'free';
+
+    public const SHIPPING_CUSTOM = 'custom';
 
     protected $guarded = [];
 
@@ -147,10 +155,34 @@ class Listing extends Model implements HasMedia
         );
     }
 
+    /**
+     * What posting this item would cost a buyer.
+     *
+     * The precedence between a listing's own setting and the seller's
+     * rates lives in ShippingQuote, so nothing else has to know it.
+     */
+    /** @param  string|null  $destination  Null shows every zone the seller posts to. */
+    public function shipping(?string $destination = null): ShippingQuote
+    {
+        return ShippingQuote::for($this, $destination);
+    }
+
     /** @return BelongsTo<Seller, $this> */
     public function seller(): BelongsTo
     {
         return $this->belongsTo(Seller::class);
+    }
+
+    /** @return HasMany<SellerReview, $this> */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(SellerReview::class);
+    }
+
+    /** @return HasMany<Offer, $this> */
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class);
     }
 
     /** @return HasMany<Bid, $this> */

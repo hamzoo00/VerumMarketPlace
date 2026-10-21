@@ -30,6 +30,19 @@ class Category extends Model
 
     protected $guarded = [];
 
+    /**
+     * The two branches of the tree, keyed by the value stored in `kind`.
+     *
+     * @return array<string, string>
+     */
+    public static function kinds(): array
+    {
+        return [
+            self::KIND_STONE => __('Loose stones'),
+            self::KIND_JEWELLERY => __('Jewellery'),
+        ];
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
@@ -143,9 +156,11 @@ class Category extends Model
      */
     public function ancestors(): Collection
     {
+        // A blank path explodes to [''], which would reach the query as an
+        // empty string and fail against a bigint column. Only real ids pass.
         $ids = array_filter(
             explode('/', (string) $this->path),
-            fn (string $id): bool => (int) $id !== $this->id,
+            fn (string $id): bool => $id !== '' && (int) $id !== $this->id,
         );
 
         if ($ids === []) {
