@@ -1,65 +1,84 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Models\Buyer;
+use App\Notifications\ResetPassword;
+use App\Support\RouteSegments;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
-use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Password;
 
-beforeEach(function () {
-    $this->skipUnlessFortifyHas(Features::resetPasswords());
+/*
+ * Password reset, through the real flow.
+ *
+ * Buyers and sellers each have their own broker and their own form,
+ * named `account.password.*` and carrying an {area}. Fortify's own
+ * `password.*` routes serve the `web` guard and are a separate thing.
+ * These tests exercise the buyer area; the seller area shares the
+ * controller and differs only in the guard.
+ */
+beforeEach(function (): void {
+    $this->area = RouteSegments::get('buyer');
 });
 
-test('reset password link screen can be rendered', function () {
-    $response = $this->get(route('password.request'));
-
-    $response->assertOk();
+it('shows the reset request screen', function (): void {
+    $this->get(route('account.password.request', ['area' => $this->area]))
+        ->assertOk();
 });
 
-test('reset password link can be requested', function () {
+it('emails a reset link to a buyer who has an account', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    $buyer = Buyer::factory()->create();
 
-    $this->post(route('password.request'), ['email' => $user->email]);
+    $this->post(route('account.password.email', ['area' => $this->area]), ['email' => $buyer->email])
+        ->assertSessionHasNoErrors();
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($buyer, ResetPassword::class);
 });
 
-test('reset password screen can be rendered', function () {
+it('says the same thing for an address with no account', function (): void {
     Notification::fake();
 
-    $user = User::factory()->create();
+    // The wording must not reveal which addresses are registered.
+    $this->post(route('account.password.email', ['area' => $this->area]), ['email' => 'nobody@example.com'])
+        ->assertSessionHas('status');
 
-    $this->post(route('password.request'), ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get(route('password.reset', $notification->token));
-
-        $response->assertOk();
-
-        return true;
-    });
+    Notification::assertNothingSent();
 });
 
-test('password can be reset with valid token', function () {
-    Notification::fake();
+it('renders the form the emailed link points at', function (): void {
+    $buyer = Buyer::factory()->create();
+    $token = Password::broker('buyers')->createToken($buyer);
 
-    $user = User::factory()->create();
+    $this->get(route('account.password.reset', [
+        'area' => $this->area,
+        'token' => $token,
+        'email' => $buyer->email,
+    ]))->assertOk();
+});
 
-    $this->post(route('password.request'), ['email' => $user->email]);
+it('resets the password with a valid token', function (): void {
+    $buyer = Buyer::factory()->create();
+    $token = Password::broker('buyers')->createToken($buyer);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post(route('password.update'), [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+    $this->post(route('account.password.update', ['area' => $this->area]), [
+        'token' => $token,
+        'email' => $buyer->email,
+        'password' => 'Reset-Pass1#',
+        'password_confirmation' => 'Reset-Pass1#',
+    ])->assertSessionHasNoErrors();
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login', absolute: false));
+    expect(Hash::check('Reset-Pass1#', $buyer->fresh()->password))->toBeTrue();
+});
 
-        return true;
-    });
+it('refuses a new password that breaks the policy', function (): void {
+    $buyer = Buyer::factory()->create();
+    $token = Password::broker('buyers')->createToken($buyer);
+
+    $this->post(route('account.password.update', ['area' => $this->area]), [
+        'token' => $token,
+        'email' => $buyer->email,
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ])->assertSessionHasErrors('password');
 });

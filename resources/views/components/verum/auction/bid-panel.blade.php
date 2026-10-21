@@ -42,14 +42,36 @@
         </p>
 
         @auth('buyer')
-            {{-- Bidding is wired to buyer accounts next; the rules engine
-                 and bids table are already in place behind this. --}}
-            <button class="btn btn--ruby btn--lg btn--block" type="button" disabled>
-                {{ __('Place bid from :amount', ['amount' => $minimum->format()]) }}
-            </button>
-            <p class="bidbox__note">
-                <x-verum.icon name="info" />{{ __('Bidding opens shortly.') }}
-            </p>
+            {{-- PlaceBid re-checks every rule with the row locked; this
+                 form only carries the amount. --}}
+            <form method="POST" action="{{ route('listings.bids.store', $listing) }}" class="bidform">
+                @csrf
+
+                <label class="sr-only" for="bidAmount">{{ __('Your bid') }}</label>
+
+                <div class="bidform__row">
+                    <x-verum.form.field
+                        name="amount"
+                        id="bidAmount"
+                        :label="__('Your bid')"
+                        prefix="$"
+                        type="number"
+                        step="0.01"
+                        :min="$minimum->amount()"
+                        :value="old('amount', $minimum->amount())"
+                        required
+                    />
+
+                    <button class="btn btn--ruby btn--lg" type="submit" @disabled(! $open)>
+                        {{ __('Place bid') }}
+                    </button>
+                </div>
+
+                <p class="bidbox__note">
+                    <x-verum.icon name="info" />
+                    {{ __('Minimum :amount. Bids are binding.', ['amount' => $minimum->format()]) }}
+                </p>
+            </form>
         @else
             <a class="btn btn--ruby btn--lg btn--block" href="{{ route('buyer.login') }}" wire:navigate>
                 {{ __('Sign in to bid') }}

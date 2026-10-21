@@ -34,7 +34,7 @@ class ResetPassword extends Notification implements ShouldQueue
         $app = config('app.name');
         $minutes = config('auth.passwords.'.($this->area === 'seller' ? 'seller_accounts' : 'buyers').'.expire', 60);
 
-        $url = route('password.reset', [
+        $url = route('account.password.reset', [
             'area' => config('verum_routes.'.$this->area),
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),

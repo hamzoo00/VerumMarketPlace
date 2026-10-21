@@ -29,12 +29,12 @@ it('will not let a seller into the buyer area', function (string $route): void {
 it('will not sign a buyer in through the seller form', function (): void {
     Buyer::factory()->create([
         'email' => 'both@example.com',
-        'password' => Hash::make('secret-password'),
+        'password' => Hash::make('Secret-Pass1#'),
     ]);
 
     $this->post(route('seller.login'), [
         'email' => 'both@example.com',
-        'password' => 'secret-password',
+        'password' => 'Secret-Pass1#',
     ])->assertSessionHasErrors('email');
 
     $this->assertGuest('seller');
@@ -43,12 +43,12 @@ it('will not sign a buyer in through the seller form', function (): void {
 it('will not sign a seller in through the buyer form', function (): void {
     SellerAccount::factory()->approved()->create([
         'email' => 'seller@example.com',
-        'password' => Hash::make('secret-password'),
+        'password' => Hash::make('Secret-Pass1#'),
     ]);
 
     $this->post(route('buyer.login'), [
         'email' => 'seller@example.com',
-        'password' => 'secret-password',
+        'password' => 'Secret-Pass1#',
     ])->assertSessionHasErrors('email');
 
     $this->assertGuest('buyer');

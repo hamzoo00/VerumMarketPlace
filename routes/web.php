@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AuctionController;
+use App\Http\Controllers\Buyer\BuyerBidController;
+use App\Http\Controllers\Buyer\BuyerCaseController;
+use App\Http\Controllers\Buyer\BuyerOfferController;
+use App\Http\Controllers\Buyer\BuyerReviewController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HelpController;
@@ -33,6 +37,33 @@ Route::get(Seg::get('auctions'), AuctionController::class)->name('auctions');
 
 // Seller-published listings. `stones` remains for the seeded demo detail pages.
 Route::get(Seg::get('listings').'/{listing:slug}', ListingController::class)->name('listings.show');
+
+// Bidding, reviewing and reporting all need a signed-in buyer. Each action
+// re-checks its own rules; the middleware only keeps guests out.
+Route::middleware(['auth:buyer'])->group(function () {
+    Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.bids_place'), [BuyerBidController::class, 'store'])
+        ->middleware('throttle:60,1')
+        ->name('listings.bids.store');
+
+    Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.reviews'), [BuyerReviewController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('listings.reviews.store');
+
+    // "Audit this listing" — open to any buyer, rate-limited because it
+    // is the one case anyone can raise.
+    Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.cases'), [BuyerCaseController::class, 'audit'])
+        ->middleware('throttle:5,1')
+        ->name('listings.audit');
+
+    Route::post(Seg::get('sellers').'/{seller}/'.Seg::get('account.cases'), [BuyerCaseController::class, 'dispute'])
+        ->middleware('throttle:5,1')
+        ->name('sellers.dispute');
+});
+
+// Making an offer needs a signed-in buyer; the action re-checks every rule.
+Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('account.offers'), [BuyerOfferController::class, 'store'])
+    ->middleware(['auth:buyer', 'throttle:20,1'])
+    ->name('listings.offers.store');
 
 Route::get(Seg::get('sellers'), [SellerController::class, 'index'])->name('sellers.index');
 Route::get(Seg::get('sellers').'/{seller:slug}', [SellerController::class, 'show'])->name('sellers.show');

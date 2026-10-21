@@ -1,0 +1,117 @@
+/* Verum — Commerce controls on a listing: buy actions and the offer
+   form. Split out of product.css, which was growing past the 1000-line
+   limit. */
+
+/* =============================================================
+   Buy actions
+   ============================================================= */
+.buyacts {
+  margin-top: 24px;
+}
+
+.buyacts__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buyacts__btns .btn {
+  flex: 1 1 200px;
+}
+
+.buyacts__note,
+.buyacts__warn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.buyacts__warn {
+  margin: 12px 0 0;
+}
+
+.buyacts__note .ic,
+.buyacts__warn .ic {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--ruby-hi);
+}
+
+.lship__zone {
+  margin: 14px 0 6px;
+}
+
+.lship__zone:first-of-type {
+  margin-top: 0;
+}
+
+/* =============================================================
+   Make an offer
+   ============================================================= */
+.makeoffer {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bone) 2%, transparent);
+}
+
+.makeoffer__state {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  color: var(--mute);
+  font-size: .88rem;
+}
+
+.makeoffer__state .ic {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--ruby-hi);
+}
+
+.makeoffer__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.makeoffer__row .field {
+  flex: 1 1 180px;
+}
+
+.makeoffer__hint {
+  margin: 10px 0 0;
+  color: var(--mute);
+  font-size: .78rem;
+}
+
+/* =============================================================
+   Bidding
+   ============================================================= */
+.bidform {
+  margin-top: 16px;
+}
+
+.bidform__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bidform__row .field {
+  flex: 1 1 170px;
+}
+
+.bidform__row .btn {
+  flex: 0 0 auto;
+}

@@ -35,7 +35,7 @@
                 <span>{{ __('Keep me signed in') }}</span>
             </label>
 
-            <a class="link" href="{{ route('password.request', ['area' => config('verum_routes.seller')]) }}" wire:navigate>
+            <a class="link" href="{{ route('account.password.request', ['area' => config('verum_routes.seller')]) }}" wire:navigate>
                 {{ __('Forgot your password?') }}
             </a>
         </div>

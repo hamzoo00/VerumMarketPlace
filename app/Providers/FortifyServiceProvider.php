@@ -7,6 +7,7 @@ use App\Actions\Fortify\ResetUserPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
@@ -29,6 +30,21 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->registerAccountPasswordRoutes();
+    }
+
+    /**
+     * Register the buyer/seller password routes.
+     *
+     * They are named `account.password.*`, not `password.*`: Fortify
+     * registers the bare names for its own `web`-guard reset, and
+     * whichever provider booted last won — so route('password.email')
+     * silently lost its {area} and the link went nowhere. Distinct names
+     * mean both flows coexist and neither can shadow the other.
+     */
+    private function registerAccountPasswordRoutes(): void
+    {
+        Route::middleware('web')->group(base_path('routes/password.php'));
     }
 
     /**

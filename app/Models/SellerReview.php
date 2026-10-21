@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\SellerReviewFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +24,7 @@ class SellerReview extends Model
     {
         return [
             'reviewed_on' => 'date',
+            'is_verified' => 'boolean',
         ];
     }
 
@@ -30,6 +32,32 @@ class SellerReview extends Model
     public function seller(): BelongsTo
     {
         return $this->belongsTo(Seller::class);
+    }
+
+    /**
+     * The buyer who wrote it, or null for a seeded demo review.
+     *
+     * @return BelongsTo<Buyer, $this>
+     */
+    public function buyer(): BelongsTo
+    {
+        return $this->belongsTo(Buyer::class);
+    }
+
+    /** @return BelongsTo<Listing, $this> */
+    public function listing(): BelongsTo
+    {
+        return $this->belongsTo(Listing::class);
+    }
+
+    /**
+     * Only a review tied to a real purchase carries weight.
+     *
+     * @param  Builder<SellerReview>  $query
+     */
+    public function scopeVerified(Builder $query): void
+    {
+        $query->where('is_verified', true);
     }
 
     public function initials(): string

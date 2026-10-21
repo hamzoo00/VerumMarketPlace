@@ -20,6 +20,8 @@ class AccountNavComposer
                 ['dashboard', __('Overview'), 'grid'],
                 ['saved', __('Saved stones'), 'heart'],
                 ['bids', __('My bids'), 'gavel'],
+                ['offers', __('My offers'), 'scale'],
+                ['cases', __('Disputes'), 'shield'],
                 ['orders', __('Orders'), 'box'],
                 ['settings', __('Settings'), 'user'],
             ], 'buyer'),

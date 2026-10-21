@@ -8,13 +8,19 @@ it('shows the seller login page to guests', function (): void {
 });
 
 it('creates an account and a pending application on apply', function (): void {
+    // The form collects an ISO country code, a dial code and phone, and
+    // what the seller deals in — see SellerAuthController::register().
     $this->post(route('seller.register'), [
         'name' => 'Aung Min',
         'email' => 'mogok@example.com',
-        'password' => 'secret-password',
-        'password_confirmation' => 'secret-password',
+        'password' => 'Secret-Pass1#',
+        'password_confirmation' => 'Secret-Pass1#',
         'business_name' => 'Mogok Valley Gems',
-        'country' => 'Myanmar',
+        'country' => 'MM',
+        'dial_code' => '+95',
+        'phone' => '9771234567',
+        'category' => 'stones',
+        'specialties' => ['ruby', 'sapphire'],
     ])->assertRedirect(route('seller.status'));
 
     $account = SellerAccount::where('email', 'mogok@example.com')->firstOrFail();

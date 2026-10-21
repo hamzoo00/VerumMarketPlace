@@ -27,7 +27,7 @@ class PasswordChanged extends Notification implements ShouldQueue
     public function toMail(AuthenticatableAccount $notifiable): MailMessage
     {
         $app = config('app.name');
-        $resetUrl = route('password.request', ['area' => $this->area]);
+        $resetUrl = route('account.password.request', ['area' => $this->area]);
 
         return (new MailMessage)
             ->subject(__('Your :app password was changed', ['app' => $app]))

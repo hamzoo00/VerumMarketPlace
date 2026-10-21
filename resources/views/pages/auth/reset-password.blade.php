@@ -1,10 +1,15 @@
+@php
+    // As above: Fortify's bare /reset-password has no {area}.
+    $area = $area ?? \App\Support\RouteSegments::get('buyer');
+@endphp
+
 <x-layouts::account
     :title="__('Choose a new password')"
     :kicker="$area === 'seller' ? __('Seller account') : __('Buyer account')"
     :heading="__('Choose a new password')"
     :lede="__('Pick something you have not used here before.')"
 >
-    <form method="POST" action="{{ route('password.update', ['area' => $area]) }}" class="cform" data-validate>
+    <form method="POST" action="{{ route('account.password.update', ['area' => $area]) }}" class="cform" data-validate>
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
 

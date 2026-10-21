@@ -10,12 +10,12 @@ it('shows the buyer login page to guests', function (): void {
 it('signs a buyer in and lands them on their dashboard', function (): void {
     $buyer = Buyer::factory()->create([
         'email' => 'buyer@example.com',
-        'password' => Hash::make('secret-password'),
+        'password' => Hash::make('Secret-Pass1#'),
     ]);
 
     $this->post(route('buyer.login'), [
         'email' => 'buyer@example.com',
-        'password' => 'secret-password',
+        'password' => 'Secret-Pass1#',
     ])->assertRedirect(route('buyer.dashboard'));
 
     $this->assertAuthenticatedAs($buyer, 'buyer');
@@ -36,8 +36,8 @@ it('registers a buyer without any approval step', function (): void {
     $this->post(route('buyer.register'), [
         'name' => 'Ada Lovelace',
         'email' => 'ada@example.com',
-        'password' => 'secret-password',
-        'password_confirmation' => 'secret-password',
+        'password' => 'Secret-Pass1#',
+        'password_confirmation' => 'Secret-Pass1#',
     ])->assertRedirect(route('buyer.dashboard'));
 
     $this->assertAuthenticated('buyer');
@@ -50,8 +50,8 @@ it('will not register a duplicate buyer email', function (): void {
     $this->post(route('buyer.register'), [
         'name' => 'Someone',
         'email' => 'taken@example.com',
-        'password' => 'secret-password',
-        'password_confirmation' => 'secret-password',
+        'password' => 'Secret-Pass1#',
+        'password_confirmation' => 'Secret-Pass1#',
     ])->assertSessionHasErrors('email');
 });
 

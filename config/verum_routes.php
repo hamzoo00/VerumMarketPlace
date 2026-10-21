@@ -72,6 +72,12 @@ return [
         'storefront' => env('ROUTE_STOREFRONT', 'storefront'),
         'status' => env('ROUTE_STATUS', 'status'),
         'applications' => env('ROUTE_APPLICATIONS', 'applications'),
+        'shipping' => env('ROUTE_SHIPPING', 'shipping'),
+        'offers' => env('ROUTE_OFFERS', 'offers'),
+        'coupons' => env('ROUTE_COUPONS', 'coupons'),
+        'cases' => env('ROUTE_CASES', 'cases'),
+        'reviews' => env('ROUTE_REVIEWS', 'reviews'),
+        'bids_place' => env('ROUTE_BID', 'bid'),
     ],
 
 ];

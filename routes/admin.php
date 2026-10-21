@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminApplicationController;
+use App\Http\Controllers\Admin\AdminCaseController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSessionController;
 use App\Support\RouteSegments as Seg;
@@ -25,6 +26,14 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
 
     Route::middleware(['auth:admin', 'admin.active'])->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Disputes and audits, in one queue.
+        Route::get(Seg::get('account.cases'), [AdminCaseController::class, 'index'])->name('cases');
+        Route::get(Seg::get('account.cases').'/{case}', [AdminCaseController::class, 'show'])->name('cases.show');
+        Route::post(Seg::get('account.cases').'/{case}/review', [AdminCaseController::class, 'review'])
+            ->name('cases.review');
+        Route::post(Seg::get('account.cases').'/{case}/resolve', [AdminCaseController::class, 'resolve'])
+            ->name('cases.resolve');
 
         Route::get(Seg::get('account.applications'), [AdminApplicationController::class, 'index'])
             ->name('applications');

@@ -1,14 +1,19 @@
 <?php
 
 use App\Http\Controllers\Auth\BuyerAuthController;
-use App\Http\Controllers\Auth\PasswordChangeController;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\SellerAuthController;
+use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
+use App\Http\Controllers\Buyer\BuyerOfferController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
+use App\Http\Controllers\Seller\SellerBrandingController;
+use App\Http\Controllers\Seller\SellerCaseController;
+use App\Http\Controllers\Seller\SellerCouponController;
 use App\Http\Controllers\Seller\SellerDashboardController;
 use App\Http\Controllers\Seller\SellerListingController;
 use App\Http\Controllers\Seller\SellerListingMediaController;
+use App\Http\Controllers\Seller\SellerOfferController;
+use App\Http\Controllers\Seller\SellerShippingController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +40,15 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::get(Seg::get('account.orders'), [BuyerDashboardController::class, 'orders'])->name('orders');
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
+
+    // Disputes and audits the buyer has raised.
+    Route::get(Seg::get('account.cases'), [BuyerCaseController::class, 'index'])->name('cases');
+    Route::get(Seg::get('account.cases').'/{case}', [BuyerCaseController::class, 'show'])->name('cases.show');
+
+    // Offers the buyer has made or been sent.
+    Route::get(Seg::get('account.offers'), [BuyerOfferController::class, 'index'])->name('offers');
+    Route::post(Seg::get('account.offers').'/{offer}', [BuyerOfferController::class, 'respond'])
+        ->name('offers.respond');
 
     Route::post(Seg::get('auth.logout'), [BuyerAuthController::class, 'logout'])->name('logout');
 });
@@ -84,6 +98,32 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
 
         // JSON used by the category browser.
         Route::get('categories/{kind}', [SellerListingController::class, 'categories'])->name('categories');
+        // Store branding: avatar and banner, one file each.
+        Route::post(Seg::get('account.storefront').'/branding', [SellerBrandingController::class, 'store'])
+            ->name('branding.store');
+        Route::delete(Seg::get('account.storefront').'/branding', [SellerBrandingController::class, 'destroy'])
+            ->name('branding.destroy');
+
+        // Cases raised about this seller; read-only, the admin settles them.
+        Route::get(Seg::get('account.cases'), [SellerCaseController::class, 'index'])->name('cases');
+
+        // Offers waiting on the seller.
+        Route::get(Seg::get('account.offers'), [SellerOfferController::class, 'index'])->name('offers');
+        Route::post(Seg::get('account.offers').'/{offer}', [SellerOfferController::class, 'respond'])
+            ->name('offers.respond');
+
+        // Discount codes.
+        Route::get(Seg::get('account.coupons'), [SellerCouponController::class, 'index'])->name('coupons');
+        Route::post(Seg::get('account.coupons'), [SellerCouponController::class, 'store'])->name('coupons.store');
+        Route::put(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'update'])
+            ->name('coupons.update');
+        Route::delete(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'destroy'])
+            ->name('coupons.destroy');
+
+        // Postage: seller-level defaults and the rate table.
+        Route::get(Seg::get('account.shipping'), [SellerShippingController::class, 'edit'])->name('shipping');
+        Route::put(Seg::get('account.shipping'), [SellerShippingController::class, 'update'])->name('shipping.update');
+
         Route::get(Seg::get('account.orders'), [SellerDashboardController::class, 'orders'])->name('orders');
         Route::get(Seg::get('account.storefront'), [SellerDashboardController::class, 'storefront'])->name('storefront');
         Route::get(Seg::get('account.settings'), [SellerDashboardController::class, 'settings'])->name('settings');
@@ -99,23 +139,8 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
 | sends, then a cooldown.
 */
 
-Route::whereIn('area', [$buyer, $seller])->group(function () {
-    Route::middleware('guest.account')->group(function () {
-        Route::get('{area}/'.Seg::get('auth.forgot_password'), [PasswordResetController::class, 'request'])
-            ->name('password.request');
-
-        Route::post('{area}/'.Seg::get('auth.forgot_password'), [PasswordResetController::class, 'email'])
-            ->name('password.email');
-
-        Route::get('{area}/'.Seg::get('auth.reset_password').'/{token}', [PasswordResetController::class, 'reset'])
-            ->name('password.reset');
-
-        Route::post('{area}/'.Seg::get('auth.reset_password'), [PasswordResetController::class, 'update'])
-            ->name('password.update');
-    });
-
-    // Changing a password requires being signed in as that account type.
-    Route::post('{area}/'.Seg::get('auth.password'), [PasswordChangeController::class, 'update'])
-        ->middleware('auth.area')
-        ->name('password.change');
-});
+/*
+ * The password routes live in routes/password.php, required from
+ * FortifyServiceProvider so they register after Fortify's and keep the
+ * `password.*` names. See the note there.
+ */

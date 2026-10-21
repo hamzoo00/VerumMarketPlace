@@ -1,0 +1,192 @@
+/* Verum — Disputes, audits and buyer reviews. */
+
+/* =============================================================
+   Case rows
+   ============================================================= */
+.caselist {
+  display: grid;
+  gap: 12px;
+}
+
+.caserow {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bone) 2%, transparent);
+}
+
+.caserow.is-open {
+  border-color: color-mix(in srgb, var(--ruby-hi) 32%, var(--line-2));
+}
+
+.caserow__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.caserow__ref {
+  margin-right: auto;
+  font-size: .82rem;
+  color: var(--bone);
+}
+
+.caserow__reason {
+  margin: 0;
+  font: 400 1.05rem var(--serif);
+}
+
+.caserow__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 0;
+}
+
+.caserow__meta div {
+  display: grid;
+  gap: 2px;
+}
+
+.caserow__meta dt {
+  color: var(--mute);
+  font: 500 .56rem var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.caserow__meta dd {
+  margin: 0;
+  font-size: .86rem;
+}
+
+.caserow__outcome {
+  padding: 10px 12px;
+  border-left: 2px solid var(--ok);
+  background: color-mix(in srgb, var(--ok) 7%, transparent);
+}
+
+.caserow__outcome p {
+  margin: 4px 0 0;
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.casebody {
+  white-space: pre-line;
+  line-height: 1.65;
+}
+
+.casereview {
+  margin-bottom: 16px;
+}
+
+/* =============================================================
+   Report a listing / raise a dispute
+   ============================================================= */
+.auditbox {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.auditbox summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  color: var(--mute);
+  font-size: .84rem;
+  list-style: none;
+}
+
+.auditbox summary::-webkit-details-marker {
+  display: none;
+}
+
+.auditbox summary:hover {
+  color: var(--bone);
+}
+
+.auditbox summary .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.auditbox__form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.auditbox__note {
+  margin: 12px 0;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+/* =============================================================
+   Leaving a review
+   ============================================================= */
+.revform {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.revform form {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  justify-items: start;
+}
+
+/* Reversed in the markup so a CSS sibling selector can light up the
+   stars to the left of the hovered one. */
+.revform__stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+  border: 0;
+  padding: 0;
+}
+
+.revform__stars input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.revform__stars label {
+  cursor: pointer;
+  color: var(--line-3);
+  transition: color .18s, scale .18s;
+}
+
+.revform__stars label .ic {
+  width: 26px;
+  height: 26px;
+}
+
+.revform__stars input:checked ~ label,
+.revform__stars label:hover,
+.revform__stars label:hover ~ label {
+  color: var(--gold-hi);
+}
+
+.revform__stars input:checked ~ label .ic {
+  fill: currentColor;
+}
+
+.revform__stars input:focus-visible + label {
+  outline: 2px solid var(--ruby-hi);
+  outline-offset: 2px;
+}

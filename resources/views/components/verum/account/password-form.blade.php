@@ -11,7 +11,7 @@
 
     <x-verum.form.errors />
 
-    <form method="POST" action="{{ route('password.change', ['area' => config('verum_routes.'.$area)]) }}" class="cform" data-validate>
+    <form method="POST" action="{{ route('account.password.change', ['area' => config('verum_routes.'.$area)]) }}" class="cform" data-validate>
         @csrf
 
         <x-verum.form.field

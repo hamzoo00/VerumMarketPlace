@@ -1,5 +1,10 @@
 @php
-    $isSeller = $area === 'seller';
+    // Fortify's own /forgot-password renders this view with no {area};
+    // the buyer flow is the sensible default there.
+    $area = $area ?? \App\Support\RouteSegments::get('buyer');
+    $isSeller = $area === \App\Support\RouteSegments::get('seller');
+    // PasswordResetController passes this; Fortify's own route does not.
+    $throttle = $throttle ?? ['max' => \App\Support\AuthEmailThrottle::reset('web|')->maxAttempts()];
 @endphp
 
 <x-layouts::account
@@ -10,7 +15,7 @@
 >
     <x-verum.auth.switcher :active="$area" />
 
-    <form method="POST" action="{{ route('password.email', ['area' => $area]) }}" class="cform" data-validate>
+    <form method="POST" action="{{ route('account.password.email', ['area' => $area]) }}" class="cform" data-validate>
         @csrf
 
         <x-verum.form.field

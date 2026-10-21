@@ -53,6 +53,25 @@ return Application::configure(basePath: dirname(__DIR__))
             $buyer = RouteSegments::get('buyer');
             $seller = RouteSegments::get('seller');
 
+            // A buyer-only action can live on a public path — bidding and
+            // reviewing sit under /item/... — so the route's own guard
+            // decides first. Falling back to the path alone would send a
+            // buyer to Fortify's /login, where they cannot sign in.
+            $guard = collect($request->route()?->gatherMiddleware() ?? [])
+                ->map(fn (mixed $rule): string => is_string($rule) ? $rule : '')
+                ->first(fn (string $rule): bool => str_starts_with($rule, 'auth:'));
+
+            $named = match ($guard) {
+                'auth:admin' => 'admin.login',
+                'auth:seller' => 'seller.login',
+                'auth:buyer' => 'buyer.login',
+                default => null,
+            };
+
+            if ($named !== null) {
+                return route($named);
+            }
+
             return match (true) {
                 $request->is($admin, "{$admin}/*", 'api/admin/*') => route('admin.login'),
                 $request->is($seller, "{$seller}/*", 'api/seller/*') => route('seller.login'),
