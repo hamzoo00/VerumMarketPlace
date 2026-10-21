@@ -139,3 +139,30 @@
   font-size: .74rem;
   color: var(--mute);
 }
+
+/* A unit inside a money field.
+   The prefix is hidden until the field is in use, because the resting
+   state shows the floating label in that same spot. */
+.field--prefixed .field__prefix {
+  position: absolute;
+  left: 17px;
+  top: 19px;
+  z-index: 1;
+  color: var(--mute);
+  font: 500 .95rem var(--mono);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.field--prefixed:has(input:focus) .field__prefix,
+.field--prefixed:has(input:not(:placeholder-shown)) .field__prefix {
+  opacity: 1;
+}
+
+/* Only pad once the prefix is visible, so the placeholder state is
+   unchanged and the label still lands where it always did. */
+.field--prefixed:has(input:focus) input,
+.field--prefixed:has(input:not(:placeholder-shown)) input {
+  padding-left: 32px;
+}

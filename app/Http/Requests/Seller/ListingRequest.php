@@ -37,6 +37,25 @@ class ListingRequest extends FormRequest
 
             'listing_type' => ['required', Rule::in(array_keys(Listing::typeLabels()))],
             'quantity' => ['required', 'integer', 'min:1', 'max:999'],
+
+            'accepts_offers' => ['boolean'],
+            'auto_accept' => ['nullable', 'numeric', 'min:0', 'max:999999'],
+            'auto_decline' => ['nullable', 'numeric', 'min:0', 'max:999999', 'lte:auto_accept'],
+
+            'shipping_mode' => ['required', Rule::in([
+                Listing::SHIPPING_INHERIT,
+                Listing::SHIPPING_FREE,
+                Listing::SHIPPING_CUSTOM,
+            ])],
+            // Required only when the seller chose a flat price, so the
+            // other two modes are not blocked by an empty box.
+            'shipping_price' => [
+                'nullable',
+                'required_if:shipping_mode,'.Listing::SHIPPING_CUSTOM,
+                'numeric',
+                'min:0',
+                'max:'.(config('verum_shipping.limits.max_price_cents') / 100),
+            ],
             'currency' => ['required', 'string', 'size:3'],
 
             // Decimal input; converted to integer cents before saving.

@@ -32,7 +32,7 @@
         <dl class="house__stats">
             <div>
                 <dt>{{ __('Listings') }}</dt>
-                <dd>{{ $seller->stones_count ?? $seller->listings_count }}</dd>
+                <dd>{{ $seller->listings_published_count ?? $seller->listings()->published()->count() }}</dd>
             </div>
             <div>
                 <dt>{{ __('Sold') }}</dt>

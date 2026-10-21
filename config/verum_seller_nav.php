@@ -22,17 +22,19 @@ return [
             ['key' => 'messages', 'label' => 'Store messages', 'icon' => 'chat', 'built' => false],
             ['key' => 'checkouts', 'label' => 'Pending checkouts', 'icon' => 'bag', 'built' => false],
             ['key' => 'orders', 'label' => 'Sales', 'icon' => 'box', 'built' => true],
-            ['key' => 'offers', 'label' => 'Offers', 'icon' => 'scale', 'built' => false],
+            ['key' => 'shipping', 'label' => 'Shipping', 'icon' => 'globe', 'built' => true],
+            ['key' => 'offers', 'label' => 'Offers', 'icon' => 'scale', 'built' => true],
         ],
     ],
 
     'growth' => [
         'label' => 'Growth',
         'items' => [
-            ['key' => 'coupons', 'label' => 'Coupon campaigns', 'icon' => 'spark', 'built' => false],
+            ['key' => 'coupons', 'label' => 'Coupon campaigns', 'icon' => 'spark', 'built' => true],
             ['key' => 'events', 'label' => 'Live events', 'icon' => 'flame', 'built' => false],
             ['key' => 'templates', 'label' => 'Templates', 'icon' => 'file', 'built' => false],
             ['key' => 'feedback', 'label' => 'Store feedback', 'icon' => 'star', 'built' => false],
+            ['key' => 'cases', 'label' => 'Disputes', 'icon' => 'shield', 'built' => true],
         ],
     ],
 

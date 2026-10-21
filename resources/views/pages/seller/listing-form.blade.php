@@ -65,6 +65,8 @@
         @endif
 
         <x-verum.seller.listing.pricing :$listing />
+        <x-verum.seller.listing.offers :$listing />
+        <x-verum.seller.listing.shipping :$listing />
         <x-verum.seller.listing.attributes :$listing />
         <x-verum.seller.listing.certification :$listing />
 

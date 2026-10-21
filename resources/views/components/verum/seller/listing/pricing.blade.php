@@ -36,6 +36,7 @@
     <div class="pricing__set" data-pricing-set="fixed" @if ($isAuction) hidden @endif>
         <x-verum.form.field
             name="price"
+            prefix="$"
             type="number"
             step="0.01"
             :label="__('Price')"
@@ -48,6 +49,7 @@
         <div class="cform__grid">
             <x-verum.form.field
                 name="start_price"
+                prefix="$"
                 type="number"
                 step="0.01"
                 :label="__('Starting price')"
@@ -56,6 +58,7 @@
 
             <x-verum.form.field
                 name="reserve_price"
+                prefix="$"
                 type="number"
                 step="0.01"
                 :label="__('Reserve (optional)')"
@@ -65,6 +68,7 @@
 
             <x-verum.form.field
                 name="bid_increment"
+                prefix="$"
                 type="number"
                 step="0.01"
                 :label="__('Bid increment')"

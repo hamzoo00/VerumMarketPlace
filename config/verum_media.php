@@ -37,4 +37,24 @@ return [
         'extensions' => ['mp4', 'webm', 'mov'],
     ],
 
+    /*
+    | A seller's own branding. These load on every storefront view, so the
+    | caps are tighter than a listing photograph's.
+    */
+    'avatar' => [
+        'collection' => 'avatar',
+        'max_kb' => (int) env('MEDIA_AVATAR_MAX_KB', 10240),
+        'max_files' => 1,
+        'mimes' => ['image/jpeg', 'image/png', 'image/webp'],
+        'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+    ],
+
+    'banner' => [
+        'collection' => 'banner',
+        'max_kb' => (int) env('MEDIA_BANNER_MAX_KB', 10240),
+        'max_files' => 1,
+        'mimes' => ['image/jpeg', 'image/png', 'image/webp'],
+        'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+    ],
+
 ];

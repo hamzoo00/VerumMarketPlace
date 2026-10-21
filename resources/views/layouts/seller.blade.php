@@ -13,13 +13,28 @@
 <x-layouts::public :$title robots="noindex, nofollow">
     <div class="wrap acct-area">
         <aside class="acct-side" aria-label="{{ __('Seller navigation') }}">
-            <div class="acct-side__who">
-                <span class="crest crest--sm"><span class="crest__i">{{ $account->initials() }}</span></span>
-                <div>
-                    <b>{{ $account->storefront?->name ?? $account->name }}</b>
-                    <small>{{ __('Seller account') }}</small>
+            {{--
+                A link to the public page when the storefront exists, so a
+                seller can see what buyers see. Uses the crest component,
+                which prefers their uploaded avatar.
+            --}}
+            @if ($account->storefront)
+                <a class="acct-side__who" href="{{ route('sellers.show', $account->storefront) }}" wire:navigate>
+                    <x-verum.seller.crest :seller="$account->storefront" size="sm" />
+                    <div>
+                        <b>{{ $account->storefront->name }}</b>
+                        <small>{{ __('View public page') }}</small>
+                    </div>
+                </a>
+            @else
+                <div class="acct-side__who">
+                    <span class="crest crest--sm"><span class="crest__i">{{ $account->initials() }}</span></span>
+                    <div>
+                        <b>{{ $account->name }}</b>
+                        <small>{{ __('Seller account') }}</small>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             @foreach (\App\Support\SellerNavigation::groups() as $group)
                 <nav class="acct-nav" aria-label="{{ $group['label'] }}">

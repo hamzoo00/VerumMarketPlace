@@ -51,6 +51,8 @@ class SaveListing
     private function attributes(array $data): array
     {
         $isAuction = ($data['listing_type'] ?? null) === Listing::TYPE_AUCTION;
+        $shippingMode = $data['shipping_mode'] ?? Listing::SHIPPING_INHERIT;
+        $acceptsOffers = (bool) ($data['accepts_offers'] ?? false);
 
         return [
             'category_id' => $data['category_id'],
@@ -60,6 +62,19 @@ class SaveListing
             'listing_type' => $data['listing_type'],
             'currency' => $data['currency'] ?? 'USD',
             'quantity' => $data['quantity'] ?? 1,
+
+            // Offers: the thresholds only mean anything when offers are on,
+            // so they are cleared with the switch.
+            'accepts_offers' => $acceptsOffers,
+            'auto_accept_cents' => $acceptsOffers ? $this->cents($data['auto_accept'] ?? null) : null,
+            'auto_decline_cents' => $acceptsOffers ? $this->cents($data['auto_decline'] ?? null) : null,
+
+            'shipping_mode' => $shippingMode,
+            // Only a flat price has a figure; the other modes must not
+            // leave a stale one behind, exactly as the price columns do.
+            'shipping_price_cents' => $shippingMode === Listing::SHIPPING_CUSTOM
+                ? ($this->cents($data['shipping_price'] ?? null) ?? 0)
+                : null,
 
             // Only the columns that apply to this type are written; the
             // others are cleared so a type change cannot leave stale prices.

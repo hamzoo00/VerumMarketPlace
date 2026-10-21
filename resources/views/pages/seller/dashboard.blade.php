@@ -4,20 +4,40 @@
     :heading="__('Welcome back, :name', ['name' => $account->name])"
     :lede="__('Your listings, lots and orders.')"
 >
-    <ul class="astats">
-        <x-verum.account.stat :label="__('Live listings')" value="0" />
-        <x-verum.account.stat :label="__('Active lots')" value="0" />
-        <x-verum.account.stat :label="__('Orders to ship')" value="0" />
-        <x-verum.account.stat :label="__('This month')" value="—" />
+    {{--
+        Counted from `listings` by SellerStats, and re-read over the socket
+        whenever this seller's inventory changes — see live-seller.js.
+    --}}
+    <ul class="astats" @if ($storefront) data-seller-live="{{ $storefront->id }}" @endif>
+        <x-verum.account.stat :label="__('Live listings')" :value="$stats->live" />
+        <x-verum.account.stat :label="__('Active lots')" :value="$stats->activeLots" />
+        <x-verum.account.stat :label="__('Orders to ship')" :value="$stats->ordersToShip" />
+        <x-verum.account.stat :label="__('Drafts')" :value="$stats->drafts" />
     </ul>
 
     <div class="apanels">
         <x-verum.account.panel :title="__('Your listings')" icon="gem" :hint="__('Stones currently on the marketplace')">
-            <x-verum.account.empty
-                icon="gem"
-                :title="__('No listings yet')"
-                :body="__('Listing a stone arrives with the seller tools.')"
-            />
+            @if ($recent->isEmpty())
+                <x-verum.account.empty
+                    icon="gem"
+                    :title="__('No listings yet')"
+                    :body="__('Start with “Sell an item” and it will appear here.')"
+                />
+            @else
+                <ul class="minilist">
+                    @foreach ($recent as $listing)
+                        <li>
+                            <a href="{{ route('seller.listings.edit', $listing) }}" wire:navigate>{{ $listing->title }}</a>
+                            <span>{{ $listing->category?->name }}</span>
+                            <x-verum.seller.listing-status :status="$listing->status" />
+                        </li>
+                    @endforeach
+                </ul>
+
+                <a class="btn btn--ghost btn--sm" href="{{ route('seller.listings') }}" wire:navigate>
+                    {{ __('Manage inventory') }}
+                </a>
+            @endif
         </x-verum.account.panel>
 
         <x-verum.account.panel :title="__('Orders to fulfil')" icon="box" :hint="__('Paid orders waiting to ship')">

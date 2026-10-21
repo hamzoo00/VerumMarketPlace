@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Models\Listing;
+use App\Support\SellerStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -16,8 +18,19 @@ class SellerDashboardController extends Controller
 {
     public function index(Request $request): View
     {
+        $account = $request->user('seller');
+        $storefront = $account?->storefront;
+
         return view('pages.seller.dashboard', [
-            'account' => $request->user('seller'),
+            'account' => $account,
+            'storefront' => $storefront,
+            'stats' => SellerStats::for($storefront),
+            'recent' => $storefront === null ? collect() : Listing::query()
+                ->where('seller_id', $storefront->id)
+                ->with('category')
+                ->latest('updated_at')
+                ->take(5)
+                ->get(),
         ]);
     }
 
@@ -45,6 +58,7 @@ class SellerDashboardController extends Controller
         return view('pages.seller.storefront', [
             'account' => $account,
             'storefront' => $account->storefront,
+            'stats' => SellerStats::for($account->storefront),
         ]);
     }
 
