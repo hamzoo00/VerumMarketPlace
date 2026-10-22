@@ -42,6 +42,8 @@
                 <x-verum.icon name="shield" />
             </a>
 
+            <x-verum.currency-picker />
+
             <button class="ibtn" type="button" data-open-wish aria-label="{{ __('Saved stones') }}" data-tip="{{ __('Saved stones') }}">
                 <x-verum.icon name="heart" />
                 <span class="badge" data-wish-count hidden>0</span>

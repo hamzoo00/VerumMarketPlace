@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\CouponFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +20,9 @@ use Illuminate\Support\Carbon;
  */
 class Coupon extends Model
 {
+    /** @use HasFactory<CouponFactory> */
+    use HasFactory;
+
     public const TYPE_PERCENT = 'percent';
 
     public const TYPE_FIXED = 'fixed';

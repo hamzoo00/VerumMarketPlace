@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Listing;
+use App\Models\Order;
 use App\Models\Seller;
 
 /**
@@ -40,8 +41,10 @@ final readonly class SellerStats
                 ->where('listing_type', Listing::TYPE_AUCTION)
                 ->where('auction_ends_at', '>', now())
                 ->count(),
-            // No orders table yet; the tile exists so the shape is visible.
-            ordersToShip: 0,
+            ordersToShip: Order::query()
+                ->where('seller_id', $seller->id)
+                ->toShip()
+                ->count(),
             total: $base()->count(),
         );
     }

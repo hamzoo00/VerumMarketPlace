@@ -36,10 +36,11 @@
     {{-- Re-read over the socket when either side posts; see live-chat.js --}}
     <div class="thread__view" data-chat="{{ $conversation->id }}">
         <div class="bubbles" data-chat-log>
-            @foreach ($messages as $message)
+            @foreach ($messages as $index => $message)
                 <x-verum.chat.bubble
                     :$message
                     :$viewer
+                    :grouped="$message->followsSameSpeakerAs($messages[$index - 1] ?? null)"
                     :show-receipt="$receiptId !== null && $message->id === $receiptId"
                 />
             @endforeach

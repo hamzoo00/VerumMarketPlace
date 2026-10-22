@@ -32,8 +32,14 @@ final readonly class MessageModeration
         $flags = [];
         $reasons = [];
 
+        $scannable = self::withoutReferences($body);
+
         foreach (config('verum_chat.moderation.rules') as $key => $rule) {
-            if (preg_match($rule['pattern'], $body) !== 1) {
+            // A rule may opt out of reference-stripping: "GIA" is only a
+            // false positive for the phone rule, not for the others.
+            $subject = ($rule['raw'] ?? false) === true ? $body : $scannable;
+
+            if (preg_match($rule['pattern'], $subject) !== 1) {
                 continue;
             }
 
@@ -43,6 +49,30 @@ final readonly class MessageModeration
         }
 
         return new self($score, $flags, $reasons);
+    }
+
+    /**
+     * Blanks out certificate and report references before scanning.
+     *
+     * This is a gem marketplace, so long digit runs are everywhere and
+     * most of them are evidence, not contact details: `VR-2026-002448`
+     * on every listing here, and a ten-digit GIA number on any stone
+     * worth certifying. Both look exactly like a phone number.
+     *
+     * Removing them first is what lets the phone rule be strict enough
+     * to catch an unbroken `03315084546` without turning every
+     * certificate quote into a flag. Scoring the stripped text rather
+     * than narrowing the pattern keeps the two concerns separate.
+     */
+    private static function withoutReferences(string $body): string
+    {
+        $patterns = config('verum_chat.moderation.references', []);
+
+        foreach ($patterns as $pattern) {
+            $body = (string) preg_replace($pattern, ' ', $body);
+        }
+
+        return $body;
     }
 
     /** Worth telling the sender about. */

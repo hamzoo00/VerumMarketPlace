@@ -52,12 +52,12 @@
                         <div class="scard__bid">
                             <span class="lbl">{{ __('Current bid') }}</span>
                             <strong data-cur="{{ $stone->slug }}">
-                                {{ \App\Models\Money::fromCents($lot->current_bid_cents)->format() }}
+                                {{ \App\Models\Money::fromCents($lot->current_bid_cents)->withLocal() }}
                             </strong>
                         </div>
                         <x-verum.countdown :ends-at="$lot->ends_at" :slug="$stone->slug" />
                     @else
-                        <strong class="scard__price">{{ $stone->price()?->format() }}</strong>
+                        <strong class="scard__price">{{ $stone->price()?->withLocal() }}</strong>
                         <button
                             class="scard__add"
                             type="button"

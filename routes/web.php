@@ -5,10 +5,12 @@ use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\Buyer\BuyerBidController;
 use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
+use App\Http\Controllers\Buyer\BuyerOrderController;
 use App\Http\Controllers\Buyer\BuyerReviewController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
@@ -59,6 +61,21 @@ Route::middleware(['auth:buyer'])->group(function () {
     Route::post(Seg::get('sellers').'/{seller}/'.Seg::get('account.cases'), [BuyerCaseController::class, 'dispute'])
         ->middleware('throttle:5,1')
         ->name('sellers.dispute');
+
+    /*
+     * Buying one listing.
+     *
+     * Per listing rather than through a basket: a gem is one of a kind,
+     * and postage and dispatch are one seller's promise. The form is
+     * server-rendered so the price a buyer sees is the price the server
+     * computed, not one assembled in the browser.
+     */
+    Route::get(Seg::get('listings').'/{listing:slug}/'.Seg::get('checkout'), [BuyerOrderController::class, 'create'])
+        ->name('listings.checkout');
+
+    Route::post(Seg::get('listings').'/{listing:slug}/'.Seg::get('checkout'), [BuyerOrderController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('listings.checkout.store');
 });
 
 /*
@@ -98,6 +115,8 @@ Route::get(Seg::get('help'), HelpController::class)->name('help');
 
 // JSON endpoint for the command-palette search.
 Route::get(Seg::get('search'), SearchController::class)->name('search');
+
+Route::post(Seg::get('currency'), CurrencyController::class)->name('currency.switch');
 
 Route::get(Seg::get('cart'), [CartController::class, 'index'])->name('cart');
 Route::get(Seg::get('checkout'), [CartController::class, 'checkout'])->name('checkout');

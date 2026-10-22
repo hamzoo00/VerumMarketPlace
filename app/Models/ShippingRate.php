@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\ShippingRateFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -18,6 +20,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ShippingRate extends Model
 {
+    /** @use HasFactory<ShippingRateFactory> */
+    use HasFactory;
+
     public const DESTINATION_DOMESTIC = 'domestic';
 
     public const DESTINATION_INTERNATIONAL = 'international';

@@ -48,7 +48,7 @@
                                     <span class="mute">{{ __('Lot removed') }}</span>
                                 @endif
                             </th>
-                            <td data-label="{{ __('Your bid') }}" class="mono">{{ $bid->amount()->format() }}</td>
+                            <td data-label="{{ __('Your bid') }}" class="mono">{{ $bid->amount()->withLocal() }}</td>
                             <td data-label="{{ __('Standing') }}">
                                 <span @class(['chip', 'chip--live' => $bid->outbid_at === null])>
                                     {{ $bid->outbid_at === null ? __('Leading') : __('Outbid') }}

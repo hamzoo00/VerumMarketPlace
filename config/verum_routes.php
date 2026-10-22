@@ -33,6 +33,7 @@ return [
     'cart' => env('ROUTE_CART', 'cart'),
     'checkout' => env('ROUTE_CHECKOUT', 'checkout'),
     'search' => env('ROUTE_SEARCH', 'search'),
+    'currency' => env('ROUTE_CURRENCY', 'currency'),
 
     /*
     | Account areas

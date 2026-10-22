@@ -13,7 +13,7 @@
     <div class="bidbox__row">
         <div>
             <span class="lbl">{{ $ended ? __('Final bid') : __('Current bid') }}</span>
-            <strong class="bidbox__cur" data-cur="{{ $lot->stone->slug }}">{{ $current->format() }}</strong>
+            <strong class="bidbox__cur" data-cur="{{ $lot->stone->slug }}">{{ $current->withLocal() }}</strong>
             <small>{{ trans_choice(':count bid|:count bids', $lot->bids_count) }}</small>
         </div>
         <div class="bidbox__clock">

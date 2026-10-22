@@ -32,7 +32,10 @@
         </a>
     @else
         <div class="buyacts__btns">
-            <a class="btn btn--ruby btn--lg" href="{{ route('checkout') }}" data-buy-now="{{ $listing->slug }}">
+            {{-- Straight to a server-rendered checkout for this one
+                 stone: the price a buyer sees is the price the server
+                 computed, not one assembled in the browser. --}}
+            <a class="btn btn--ruby btn--lg" href="{{ route('listings.checkout', $listing) }}" wire:navigate>
                 <x-verum.icon name="bag" />{{ __('Buy it now') }}
             </a>
 

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Offers;
 
+use App\Actions\Orders\OrderFromWin;
 use App\Events\OfferChanged;
 use App\Models\Offer;
 use App\Support\OfferRules;
@@ -16,9 +17,22 @@ use Illuminate\Validation\ValidationException;
  */
 class RespondToOffer
 {
+    public function __construct(private readonly OrderFromWin $orderFromWin) {}
+
+    /**
+     * Accepting is a sale, so it creates the order.
+     *
+     * Without this the record shows a negotiation that ended and nothing
+     * that happened — and the buyer has no address to supply, no postage
+     * to pay and nothing to review.
+     */
     public function accept(Offer $offer): Offer
     {
-        return $this->settle($offer, Offer::STATUS_ACCEPTED);
+        $accepted = $this->settle($offer, Offer::STATUS_ACCEPTED);
+
+        $this->orderFromWin->forOffer($accepted);
+
+        return $accepted;
     }
 
     public function decline(Offer $offer): Offer

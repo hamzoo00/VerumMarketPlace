@@ -507,3 +507,179 @@
 .srail.is-light button.is-on {
   color: var(--ruby);
 }
+
+/* =============================================================
+   Currency picker
+   Shares the account popover's glass treatment; the list is long,
+   so it scrolls inside a fixed height rather than growing the panel.
+   ============================================================= */
+.cursel {
+  position: relative;
+}
+
+.cursel__btn {
+  gap: 6px;
+  width: auto;
+  padding-inline: 10px;
+}
+
+.cursel__code {
+  font: 500 .72rem/1 var(--mono);
+  letter-spacing: .06em;
+  color: var(--bone);
+}
+
+.cursel__pop {
+  position: absolute;
+  right: -8px;
+  top: calc(100% + 12px);
+  z-index: 5;
+  width: 320px;
+  padding: 20px;
+  background: rgba(16, 36, 58, .9);
+  -webkit-backdrop-filter: blur(24px) saturate(1.15);
+  backdrop-filter: blur(24px) saturate(1.15);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .25s, transform .35s var(--ease);
+}
+
+.cursel__pop.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.cursel__hi {
+  font: 400 1.25rem/1.1 var(--serif);
+}
+
+.cursel__note {
+  margin: 6px 0 14px;
+  color: var(--mute);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.cursel__filter {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  border: 1px solid var(--line-2);
+  color: var(--bone);
+  font: 400 .84rem/1 var(--sans);
+}
+
+.cursel__filter:focus-visible {
+  outline: none;
+  border-color: var(--ruby);
+}
+
+.cursel__list {
+  max-height: 280px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+}
+
+.cursel__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 10px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
+  color: var(--bone);
+  font: 400 .84rem/1.2 var(--sans);
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.cursel__row:hover,
+.cursel__row:focus-visible {
+  background: color-mix(in srgb, var(--ruby) 12%, transparent);
+  color: var(--bone);
+  outline: none;
+}
+
+.cursel__row.is-on {
+  color: var(--gold-hi);
+}
+
+.cursel__row.is-on .cursel__cur {
+  border-color: var(--gold);
+  color: var(--gold-hi);
+}
+
+.cursel__cur {
+  flex: none;
+  padding: 3px 6px;
+  border: 1px solid var(--line-2);
+  color: var(--mute);
+  font: 500 .66rem/1 var(--mono);
+  letter-spacing: .06em;
+}
+
+.cursel__empty {
+  margin: 12px 0 0;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.cursel__rate {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--mute);
+  font: 400 .72rem/1.4 var(--mono);
+}
+
+/* The header hides icon buttons below this width; the picker follows,
+   and the mobile menu carries the choice instead. */
+@media (max-width: 860px) {
+  .cursel__pop {
+    width: min(320px, calc(100vw - 32px));
+  }
+}
+
+/* The mobile menu's copy of the currency choice: a native select, since
+   the header's icon-button picker is hidden below 640px. */
+.mnav__cur {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.mnav__cur .lbl {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.mnav__currow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mnav__select {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  border: 1px solid var(--line-2);
+  color: var(--bone);
+  font: 400 .88rem/1 var(--sans);
+}
+
+.mnav__select:focus-visible {
+  outline: none;
+  border-color: var(--ruby);
+}

@@ -52,8 +52,12 @@
                     <x-verum.auction.bid-panel :$listing :$open />
                 @else
                     <p class="buy__price" data-reveal>
-                        {{ $listing->price()?->format() }}
-                        <small>{{ $listing->currency }}</small>
+                        {{ $listing->price()?->withLocal() }}
+                        {{-- The code is already in the figure once a
+                             visitor's currency is shown beside it. --}}
+                        @unless ($listing->price()?->local())
+                            <small>{{ $listing->currency }}</small>
+                        @endunless
                     </p>
 
                     <x-verum.listing.buy-actions :$listing />

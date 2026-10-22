@@ -67,11 +67,11 @@
                     @if ($isAuction)
                         <div class="scard__bid">
                             <span class="lbl">{{ $listing->bids_count > 0 ? __('Current bid') : __('Opening bid') }}</span>
-                            <strong>{{ $listing->currentBid()?->format() }}</strong>
+                            <strong>{{ $listing->currentBid()?->withLocal() }}</strong>
                         </div>
                         <x-verum.countdown :ends-at="$listing->auction_ends_at" :slug="$listing->slug" />
                     @else
-                        <strong class="scard__price">{{ $listing->price()?->format() }}</strong>
+                        <strong class="scard__price">{{ $listing->price()?->withLocal() }}</strong>
                     @endif
                 </div>
 

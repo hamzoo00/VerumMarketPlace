@@ -18,7 +18,7 @@
     <div class="offerrow__item">
         @if ($listing)
             <a class="link" href="{{ route('listings.show', $listing) }}" wire:navigate>{{ $listing->title }}</a>
-            <small>{{ __('Asking :price', ['price' => $listing->price()?->format()]) }}</small>
+            <small>{{ __('Asking :price', ['price' => $listing->price()?->withLocal()]) }}</small>
         @else
             <span class="mute">{{ __('Listing removed') }}</span>
         @endif
@@ -29,7 +29,7 @@
         <small>{{ $mine ? __('You offered') : __('They offered') }}</small>
     </div>
 
-    <strong class="offerrow__amount">{{ $offer->amount()->format() }}</strong>
+    <strong class="offerrow__amount">{{ $offer->amount()->withLocal() }}</strong>
 
     <div class="offerrow__state">
         <span @class(['chip', 'chip--ok' => $offer->status === \App\Models\Offer::STATUS_ACCEPTED, 'chip--live' => $live])>

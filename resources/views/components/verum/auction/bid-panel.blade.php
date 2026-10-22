@@ -17,7 +17,7 @@
             <span class="lbl">
                 {{ $listing->bids_count > 0 ? __('Current bid') : __('Opening bid') }}
             </span>
-            <strong class="bidbox__cur">{{ $listing->currentBid()?->format() }}</strong>
+            <strong class="bidbox__cur">{{ $listing->currentBid()?->withLocal() }}</strong>
             <small>{{ trans_choice(':count bid|:count bids', $listing->bids_count) }}</small>
         </div>
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
+use App\Http\Controllers\Buyer\BuyerOrderController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
 use App\Http\Controllers\Seller\SellerBrandingController;
 use App\Http\Controllers\Seller\SellerCaseController;
@@ -13,7 +14,9 @@ use App\Http\Controllers\Seller\SellerDashboardController;
 use App\Http\Controllers\Seller\SellerListingController;
 use App\Http\Controllers\Seller\SellerListingMediaController;
 use App\Http\Controllers\Seller\SellerOfferController;
+use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerShippingController;
+use App\Models\Order;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +40,8 @@ Route::middleware('guest.account')->group(function () use ($buyer) {
 Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function () {
     Route::get(Seg::get('account.dashboard'), [BuyerDashboardController::class, 'index'])->name('dashboard');
     Route::get(Seg::get('account.saved'), [BuyerDashboardController::class, 'saved'])->name('saved');
-    Route::get(Seg::get('account.orders'), [BuyerDashboardController::class, 'orders'])->name('orders');
+    Route::get(Seg::get('account.orders'), [BuyerOrderController::class, 'index'])->name('orders');
+    Route::get(Seg::get('account.orders').'/{order}', [BuyerOrderController::class, 'show'])->name('orders.show');
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
 
@@ -130,7 +134,15 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         Route::get(Seg::get('account.shipping'), [SellerShippingController::class, 'edit'])->name('shipping');
         Route::put(Seg::get('account.shipping'), [SellerShippingController::class, 'update'])->name('shipping.update');
 
-        Route::get(Seg::get('account.orders'), [SellerDashboardController::class, 'orders'])->name('orders');
+        Route::get(Seg::get('account.orders'), [SellerOrderController::class, 'index'])->name('orders');
+
+        // "Pending checkouts" is the same list, pre-filtered: an order
+        // placed but not yet paid for. One controller, one definition.
+        Route::get('checkouts', fn () => redirect()->route('seller.orders', [
+            'status' => Order::STATUS_AWAITING_PAYMENT,
+        ]))->name('checkouts');
+        Route::get(Seg::get('account.orders').'/{order}', [SellerOrderController::class, 'show'])->name('orders.show');
+        Route::put(Seg::get('account.orders').'/{order}', [SellerOrderController::class, 'update'])->name('orders.update');
         Route::get(Seg::get('account.storefront'), [SellerDashboardController::class, 'storefront'])->name('storefront');
         Route::get(Seg::get('account.settings'), [SellerDashboardController::class, 'settings'])->name('settings');
     });

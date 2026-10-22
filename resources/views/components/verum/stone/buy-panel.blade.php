@@ -16,7 +16,7 @@
 
     @if (! $lot)
         <p class="buy__price" data-reveal>
-            {{ $stone->price()?->format() }}
+            {{ $stone->price()?->withLocal() }}
             <small>{{ __(':currency · insured shipping quoted at checkout', ['currency' => $stone->currency]) }}</small>
         </p>
     @endif

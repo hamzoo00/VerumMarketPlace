@@ -8,6 +8,7 @@ import { onceGlobal } from './dom.js';
 import { initCountdowns } from './countdown.js';
 import { initFilters } from './filters.js';
 import { initGalleries } from './gallery.js';
+import { initCurrencyPicker } from './currency.js';
 import { initHeader } from './header.js';
 import { initLayers } from './layers.js';
 import { initListingLive } from './live-listing.js';
@@ -38,6 +39,7 @@ import { initWishlist } from './wishlist.js';
 export function boot() {
     initToasts();
     initHeader();
+    initCurrencyPicker();
     initLayers();
     initCategories();
     initSearch();

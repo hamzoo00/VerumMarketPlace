@@ -30,6 +30,9 @@ class Message extends Model implements HasMedia
 
     public const FROM_ADMIN = 'admin';
 
+    /** A run from one sender inside this many minutes is grouped. */
+    public const GROUP_WINDOW_MINUTES = 5;
+
     public const REVIEW_PENDING = 'pending';
 
     public const REVIEW_CLEARED = 'cleared';
@@ -110,6 +113,25 @@ class Message extends Model implements HasMedia
     public function isFromAdmin(): bool
     {
         return $this->sender_type === self::FROM_ADMIN;
+    }
+
+    /**
+     * Is this a continuation of the previous message?
+     *
+     * A run from one person within a few minutes is one utterance, so
+     * only the first of the run carries a name and a time — repeating
+     * them on every line makes three short replies read as three
+     * separate conversations.
+     */
+    public function followsSameSpeakerAs(?self $previous): bool
+    {
+        if ($previous === null || $this->created_at === null || $previous->created_at === null) {
+            return false;
+        }
+
+        return $previous->sender_type === $this->sender_type
+            && (int) $previous->sender_id === (int) $this->sender_id
+            && $previous->created_at->diffInMinutes($this->created_at) < self::GROUP_WINDOW_MINUTES;
     }
 
     /** Reasons this was flagged, for the admin queue. */

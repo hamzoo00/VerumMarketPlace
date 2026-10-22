@@ -5,6 +5,7 @@ use App\Http\Middleware\AuthenticateArea;
 use App\Http\Middleware\EnsureAdminIsActive;
 use App\Http\Middleware\EnsureSellerIsApproved;
 use App\Http\Middleware\RedirectIfAuthenticatedAccount;
+use App\Support\DisplayCurrency;
 use App\Support\RouteSegments;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +23,19 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        /*
+         * The display-currency cookie is not encrypted.
+         *
+         * It holds a public ISO country code the visitor chose
+         * themselves, so there is nothing to protect, and leaving it
+         * readable means the value is the same on the way in as on the
+         * way out. Encrypting it would also make it unreadable to
+         * anything but PHP, for no gain.
+         */
+        $middleware->encryptCookies(except: [
+            DisplayCurrency::COOKIE_DEFAULT,
+        ]);
+
         $middleware->alias([
             'seller.approved' => EnsureSellerIsApproved::class,
             'admin.active' => EnsureAdminIsActive::class,

@@ -4,6 +4,9 @@
     // Only the newest of your own messages carries a receipt; one on
     // every bubble is noise, and the latest is what you want to know.
     'showReceipt' => false,
+    // Part of a run from the same sender, so the name and time are
+    // already above it.
+    'grouped' => false,
 ])
 
 @php
@@ -17,7 +20,9 @@
     'bubble--mine' => $mine,
     'bubble--staff' => $fromAdmin,
     'bubble--flagged' => $message->is_flagged,
+    'bubble--grouped' => $grouped,
 ])>
+    @unless ($grouped)
     <header class="bubble__head">
         <span class="bubble__who">
             @if ($fromAdmin)
@@ -33,6 +38,7 @@
             {{ $message->created_at?->format('j M, H:i') }}
         </time>
     </header>
+    @endunless
 
     @if (filled($message->body))
         <p class="bubble__body">{{ $message->body }}</p>

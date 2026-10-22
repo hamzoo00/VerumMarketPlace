@@ -45,7 +45,7 @@
                     @foreach ($recentBids as $bid)
                         <li>
                             <a href="{{ route('listings.show', $bid->listing) }}" wire:navigate>{{ $bid->listing?->title }}</a>
-                            <span>{{ $bid->amount()->format() }}</span>
+                            <span>{{ $bid->amount()->withLocal() }}</span>
                             <span @class(['chip', 'chip--live' => $bid->outbid_at === null])>
                                 {{ $bid->outbid_at === null ? __('Leading') : __('Outbid') }}
                             </span>

@@ -21,7 +21,6 @@
 @import './verum/product.css';
 @import './verum/buying.css';
 @import './verum/cases.css';
-@import './verum/chat.css';
 @import './verum/verify.css';
 @import './verum/sellers.css';
 @import './verum/about.css';
@@ -31,6 +30,7 @@
 @import './verum/help.css';
 @import './verum/form-controls.css';
 @import './verum/account.css';
+@import './verum/orders.css';
 @import './verum/admin.css';
 @import './verum/seller-tools.css';
 @import './verum/listing.css';

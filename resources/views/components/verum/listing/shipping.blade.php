@@ -30,7 +30,7 @@
                         <span class="lship__svc">{{ $rate->serviceLabel() }}</span>
                         <span class="lship__when">{{ $rate->transitLabel() }}</span>
                         <span class="lship__cost">
-                            {{ $rate->isFree() ? __('Free') : $rate->price($listing->currency)->format() }}
+                            {{ $rate->isFree() ? __('Free') : $rate->price($listing->currency)->withLocal() }}
                         </span>
 
                         @if ($rate->tracked || $rate->insured)
@@ -52,7 +52,7 @@
 
         @if ($quote->freeOver)
             <p class="lship__meta">
-                {{ __('Free postage on orders over :amount.', ['amount' => $quote->freeOver->format()]) }}
+                {{ __('Free postage on orders over :amount.', ['amount' => $quote->freeOver->withLocal()]) }}
             </p>
         @endif
 

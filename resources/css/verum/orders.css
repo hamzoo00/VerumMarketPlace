@@ -1,0 +1,341 @@
+/* Verum — orders: the buyer's purchases and the seller's sales. */
+
+/* =============================================================
+   Order list
+   ============================================================= */
+.olist {
+  display: grid;
+  gap: 14px;
+}
+
+.ocard {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--plate);
+}
+
+.ocard__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ocard__ref {
+  color: var(--bone);
+  font: 500 .86rem var(--mono);
+  letter-spacing: .06em;
+}
+
+.ocard__ref:hover {
+  color: var(--ruby-hi);
+}
+
+.ocard__head time {
+  margin-left: auto;
+  color: var(--mute);
+  font: .72rem var(--mono);
+}
+
+.ocard__who {
+  margin: 0;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.ocard__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.ocard__foot b {
+  font: 400 1.1rem var(--serif);
+}
+
+/* =============================================================
+   Order lines
+   ============================================================= */
+.olines {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 12px;
+  font-size: .88rem;
+}
+
+.oline__what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.oline__qty {
+  color: var(--mute);
+  font: .78rem var(--mono);
+}
+
+.oline__price {
+  font: .9rem var(--mono);
+}
+
+/* =============================================================
+   Totals
+   ============================================================= */
+.osum {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.osum__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: .86rem;
+}
+
+.osum__row dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mute);
+}
+
+.osum__row dd {
+  margin: 0;
+  font-family: var(--mono);
+}
+
+.osum__row--off dd {
+  color: var(--ok);
+}
+
+.osum__row--total {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.osum__row--total dt {
+  color: var(--bone);
+}
+
+.osum__row--total dd {
+  font: 400 1.15rem var(--serif);
+}
+
+/* =============================================================
+   Order detail
+   ============================================================= */
+.ogrid,
+.cogrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.ogrid__side {
+  display: grid;
+  gap: 18px;
+}
+
+.oaddr {
+  margin: 0;
+  color: var(--bone);
+  font-size: .88rem;
+  font-style: normal;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.onote {
+  display: flex;
+  gap: 9px;
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--line-2);
+  color: var(--mute);
+  font-size: .85rem;
+}
+
+.onote .ic {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+/* Each step carries its own time: a dispute asks when, not whether. */
+.otrack {
+  display: grid;
+  gap: 2px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.otrack li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0 7px 18px;
+  position: relative;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.otrack li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+}
+
+.otrack li.is-done {
+  color: var(--bone);
+}
+
+.otrack li.is-done::before {
+  background: var(--ok);
+  border-color: var(--ok);
+}
+
+.otrack time {
+  color: var(--mute);
+  font: .7rem var(--mono);
+}
+
+.otrack__num {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-size: .82rem;
+}
+
+.otrack__num .ic {
+  width: 15px;
+  height: 15px;
+}
+
+.ocancel {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.ocancel .link {
+  color: var(--mute);
+}
+
+.ocancel .link:hover {
+  color: var(--ruby-hi);
+}
+
+.ocancel small {
+  display: block;
+  margin-top: 4px;
+  font-size: .74rem;
+}
+
+/* =============================================================
+   Checkout
+   ============================================================= */
+.copreview {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.copreview__shot {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+
+.copreview__what {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.copreview__what b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.copreview__price {
+  font: .95rem var(--mono);
+}
+
+.copreview__ship {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--mute);
+  font-size: .82rem;
+}
+
+.copreview__ship .ic {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.cform__fine {
+  margin: 12px 0 0;
+  color: var(--mute);
+  font-size: .78rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .ogrid,
+  .cogrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .oline {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .oline__qty {
+    display: none;
+  }
+}
