@@ -3,6 +3,10 @@ import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
+// Compose passes VITE_PORT in and publishes the same number, so the bind,
+// the mapping and the advertised origin cannot drift apart.
+const port = Number(process.env.VITE_PORT) || 15173;
+
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
@@ -24,10 +28,10 @@ export default defineConfig({
     server: {
         cors: true,
         host: '0.0.0.0',
-        port: 5173,
+        port,
         strictPort: true,
         // Advertise a browser-reachable origin, not the container bind address.
-        origin: 'http://localhost:5173',
+        origin: `http://localhost:${port}`,
         hmr: {
             host: 'localhost',
             protocol: 'ws',

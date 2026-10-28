@@ -9,6 +9,33 @@ cd "$(dirname "$0")"
 DC="docker compose"
 EXEC="$DC exec -T app"
 
+# Under mirrored WSL networking a host port can read as taken for a few
+# seconds after it is released, or while Windows lends it to an outgoing
+# connection. Compose leaves that container "created", so a retry starts
+# only what is missing. Any other failure is reported at once.
+compose_up() {
+    local log attempt
+    log="$(mktemp)"
+    trap 'rm -f "$log"' RETURN
+    for attempt in 1 2 3 4 5; do
+        if $DC up -d "$@" 2>&1 | tee "$log"; then
+            return 0
+        fi
+        grep -q 'address already in use' "$log" || return 1
+        echo "A host port is busy; retrying in $((attempt * 2))s ($attempt/5)." >&2
+        sleep $((attempt * 2))
+    done
+    echo "Still busy. See \"address already in use\" in CLAUDE.md to find the holder." >&2
+    return 1
+}
+
+# A host port from .env, or the compose default when it is not set.
+env_port() {
+    local value
+    value="$(grep -E "^$1=" .env 2>/dev/null | tail -1 | cut -d= -f2 | tr -d '"' || true)"
+    echo "${value:-$2}"
+}
+
 usage() {
     cat <<'EOF'
 Verum task runner — PHP runs inside Docker, never on the host.
@@ -38,7 +65,7 @@ EOF
 cmd="${1:-help}"; shift || true
 
 case "$cmd" in
-    up)        $DC up -d ;;
+    up)        compose_up "$@" ;;
     down)      $DC down ;;
     restart)   $DC restart "$@" ;;
     ps)        $DC ps ;;
@@ -71,27 +98,28 @@ case "$cmd" in
         ;;
     setup)
         $DC build
-        $DC up -d
+        compose_up
         $DC run --rm --no-deps app composer install
         chmod +x vendor/bin/* 2>/dev/null || true
         $EXEC php artisan key:generate
         $EXEC php artisan migrate --force
         $EXEC php artisan storage:link || true
-        echo "Ready: http://localhost:8000 | Mail: http://localhost:8025 | Horizon: http://localhost:8000/horizon"
+        echo "Ready: http://localhost:$(env_port APP_PORT 8000) | Mail: http://localhost:$(env_port MAILPIT_UI_PORT 8025) | Horizon: http://localhost:$(env_port APP_PORT 8000)/horizon"
         ;;
     urls)
-        cat <<'EOF'
-App          http://localhost:8000
-Shop         http://localhost:8000/shop
-Auctions     http://localhost:8000/auctions
-Sellers      http://localhost:8000/sellers
-Verify       http://localhost:8000/verify/VR-2026-002448
-Horizon      http://localhost:8000/horizon
-Mailpit      http://localhost:8025
-Meilisearch  http://localhost:7700
-Vite (HMR)   http://localhost:5173
-Postgres     localhost:5433  (bundled container)
-Redis        localhost:6380
+        app="http://localhost:$(env_port APP_PORT 8000)"
+        cat <<EOF
+App          $app
+Shop         $app/shop
+Auctions     $app/auctions
+Sellers      $app/sellers
+Verify       $app/verify/VR-2026-002448
+Horizon      $app/horizon
+Mailpit      http://localhost:$(env_port MAILPIT_UI_PORT 8025)
+Meilisearch  http://localhost:$(env_port MEILI_HOST_PORT 7700)
+Reverb       ws://localhost:$(env_port REVERB_HOST_PORT 8080)
+Vite (HMR)   http://localhost:$(env_port VITE_PORT 15173)
+Postgres     localhost:$(env_port DB_HOST_PORT 5433)  (bundled container)
 EOF
         ;;
     health)
