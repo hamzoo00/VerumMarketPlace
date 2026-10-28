@@ -30,6 +30,25 @@
             </form>
         @endif
 
+        @if (\App\Support\PremiumStatus::canRequestFeature($listing->seller) && $listing->isPublished())
+            @if ($listing->isFeatured())
+                <span class="amenu__item amenu__item--quiet" role="menuitem" aria-disabled="true">
+                    <x-verum.icon name="spark" />{{ __('Featured') }}
+                </span>
+            @elseif ($listing->hasRequestedFeature())
+                <span class="amenu__item amenu__item--quiet" role="menuitem" aria-disabled="true">
+                    <x-verum.icon name="clock" />{{ __('Feature requested') }}
+                </span>
+            @else
+                <form method="POST" action="{{ route('seller.listings.feature', $listing) }}" role="none">
+                    @csrf
+                    <button class="amenu__item" type="submit" role="menuitem">
+                        <x-verum.icon name="spark" />{{ __('Ask to feature') }}
+                    </button>
+                </form>
+            @endif
+        @endif
+
         <hr class="amenu__sep">
 
         <form

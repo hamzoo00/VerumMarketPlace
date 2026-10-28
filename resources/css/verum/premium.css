@@ -1,0 +1,186 @@
+/* Verum — the premium side: review queues, premium sellers, certificates. */
+
+/* =============================================================
+   Review queues (approvals and feature requests)
+   ============================================================= */
+.revlist {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.revrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--plate);
+}
+
+/* A seller row has no photograph, so it drops the first column. */
+.revrow--seller {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.revrow__shot {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+
+.revrow__what {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.revrow__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--bone);
+  font-weight: 500;
+}
+
+.revrow__title:hover {
+  color: var(--ruby-hi);
+}
+
+.revrow__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--mute);
+  font-size: .82rem;
+}
+
+.revrow__note {
+  margin: 0;
+  padding: 7px 10px;
+  border-left: 2px solid var(--line-2);
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.revrow__when {
+  color: var(--mute);
+  font: .7rem var(--mono);
+}
+
+.revrow__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Reason and duration sit inline with their button, so the decision and
+   its justification are one action rather than two screens. */
+.revrow__reject,
+.revrow__feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.revrow__reason,
+.revrow__days {
+  padding: 7px 10px;
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  color: var(--bone);
+  font: 400 .8rem var(--sans);
+}
+
+.revrow__reason {
+  width: 180px;
+}
+
+.revrow__days {
+  width: 82px;
+}
+
+.revrow__reason:focus-visible,
+.revrow__days:focus-visible {
+  outline: none;
+  border-color: var(--ruby);
+}
+
+/* =============================================================
+   Chips
+   ============================================================= */
+.chip--gold {
+  border-color: var(--gold);
+  color: var(--gold-hi);
+}
+
+.chip--bad {
+  border-color: color-mix(in srgb, var(--ruby) 60%, var(--line-2));
+  color: var(--ruby-hi);
+}
+
+/* =============================================================
+   Settings form
+   ============================================================= */
+.setform {
+  display: grid;
+  gap: 18px;
+  max-width: 720px;
+}
+
+.setform .chk {
+  margin: 12px 0;
+}
+
+/* =============================================================
+   Certificate preview
+   ============================================================= */
+.certpreview {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  margin-top: 18px;
+}
+
+/* On a listing page the card is centred under the delivery block. */
+.buy__cert {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+/* A disabled menu row: present so the state is visible, not clickable. */
+.amenu__item--quiet {
+  color: var(--mute);
+  cursor: default;
+}
+
+@media (max-width: 860px) {
+  .revrow,
+  .revrow--seller {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .revrow__shot {
+    width: 100%;
+    height: 140px;
+  }
+
+  .revrow__acts {
+    justify-content: flex-start;
+  }
+
+  .certpreview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -71,6 +71,14 @@
 
                 <x-verum.listing.shipping :$listing />
 
+                @if (\App\Support\PremiumStatus::isCertified($listing->seller))
+                    {{-- One certificate per seller, read against this
+                         stone's own disclosed details. --}}
+                    <div class="buy__cert" data-reveal>
+                        <x-verum.premium.certificate :$listing />
+                    </div>
+                @endif
+
                 @if ($listing->seller)
                     <x-verum.seller.chip :seller="$listing->seller" />
                 @endif

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\AuctionLot;
 use App\Models\GemType;
+use App\Models\Listing;
 use App\Models\SellerReview;
 use App\Models\Stone;
+use App\Support\PlatformSettings;
 use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
@@ -31,6 +33,17 @@ class HomeController extends Controller
                 ->with(['gemType', 'seller'])
                 ->orderByDesc('position')
                 ->take(8)
+                ->get(),
+            /*
+             * Paid feature slots, capped by the admin's setting. Kept
+             * apart from "Just listed" above, which is simply the newest
+             * stones and is not for sale.
+             */
+            'featuredListings' => Listing::query()
+                ->featured()
+                ->with(['seller', 'category', 'media'])
+                ->orderByDesc('featured_at')
+                ->take(PlatformSettings::featuredSlots())
                 ->get(),
             'closingLots' => AuctionLot::live()
                 ->with(['stone.gemType', 'stone.seller'])

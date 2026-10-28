@@ -3,8 +3,11 @@
 use App\Http\Controllers\Admin\AdminApplicationController;
 use App\Http\Controllers\Admin\AdminCaseController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminListingReviewController;
 use App\Http\Controllers\Admin\AdminModerationController;
+use App\Http\Controllers\Admin\AdminPremiumController;
 use App\Http\Controllers\Admin\AdminSessionController;
+use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +63,24 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
             ->name('applications.unblock');
         Route::delete(Seg::get('account.applications').'/{application}', [AdminApplicationController::class, 'destroy'])
             ->name('applications.destroy');
+
+        /*
+         * The premium side: what it costs, what gets approved, and who
+         * is certified. Each queue is its own page because an admin
+         * works one at a time.
+         */
+        Route::get('settings', [AdminSettingsController::class, 'edit'])->name('settings');
+        Route::put('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+
+        Route::get('approvals', [AdminListingReviewController::class, 'approvals'])->name('approvals');
+        Route::get('features', [AdminListingReviewController::class, 'features'])->name('features');
+        Route::put('listings/{listing}/review', [AdminListingReviewController::class, 'decide'])
+            ->name('listings.review');
+
+        Route::get('premium', [AdminPremiumController::class, 'index'])->name('premium');
+        Route::put('premium/{seller}', [AdminPremiumController::class, 'update'])->name('premium.update');
+        Route::get('premium/{seller}/certificate', [AdminPremiumController::class, 'preview'])
+            ->name('premium.certificate');
 
         Route::get('buyers', [AdminDashboardController::class, 'buyers'])->name('buyers');
         Route::get('sellers', [AdminDashboardController::class, 'sellers'])->name('sellers');

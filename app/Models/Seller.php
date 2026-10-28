@@ -14,6 +14,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property Carbon|null $verified_on
+ * @property Carbon|null $premium_since
+ * @property Carbon|null $premium_until
+ * @property Carbon|null $certified_at
  * @property list<string>|null $specialties
  */
 class Seller extends Model implements HasMedia
@@ -32,7 +35,16 @@ class Seller extends Model implements HasMedia
             'specialties' => 'array',
             'verified_on' => 'date',
             'rating' => 'float',
+            'premium_since' => 'datetime',
+            'premium_until' => 'datetime',
+            'certified_at' => 'datetime',
         ];
+    }
+
+    /** @return BelongsTo<Admin, $this> */
+    public function certifier(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'certified_by');
     }
 
     public function getRouteKeyName(): string

@@ -8,6 +8,7 @@ use App\Models\Listing;
 use App\Models\Order;
 use App\Models\Seller;
 use App\Support\CouponQuote;
+use App\Support\PlatformSettings;
 use App\Support\ShippingQuote;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -78,6 +79,17 @@ class PlaceOrder
             $discount = $coupon === null ? 0 : $coupon['cents'];
             $total = max(0, $unit + $shipping['cents'] - $discount);
 
+            /*
+             * Commission, computed on the item after any discount and
+             * **excluding postage**: the seller pays the carrier out of
+             * that, so taking a cut would be charging them to hand money
+             * on. The rate is stored beside the amount, because a seller
+             * asking "why is this figure" a month later needs the rate
+             * that applied then, not today's.
+             */
+            $rate = PlatformSettings::commissionRate();
+            $commission = (int) round(max(0, $unit - $discount) * $rate / 100);
+
             $order = Order::create([
                 'reference' => Order::newReference(),
                 'buyer_id' => $buyer->id,
@@ -89,6 +101,8 @@ class PlaceOrder
                 'shipping_cents' => $shipping['cents'],
                 'discount_cents' => $discount,
                 'total_cents' => $total,
+                'commission_cents' => $commission,
+                'commission_rate' => $rate,
                 'coupon_id' => $coupon['id'] ?? null,
                 'coupon_code' => $coupon['code'] ?? null,
                 'shipping_service' => $shipping['service'],

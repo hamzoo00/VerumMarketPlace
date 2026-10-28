@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Actions\Listings\SaveListing;
+use App\Actions\Premium\DecideListingReview;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\ListingRequest;
 use App\Models\Category;
@@ -93,6 +94,25 @@ class SellerListingController extends Controller
         $this->saveListing->update($listing, $request->validated());
 
         return back()->with('status', __('Listing updated.'));
+    }
+
+    /**
+     * Ask an admin to feature this listing.
+     *
+     * Premium-only, re-checked in DecideListingReview: a hidden button
+     * is not a control.
+     */
+    public function requestFeature(Request $request, Listing $listing, DecideListingReview $decide): RedirectResponse
+    {
+        $this->authoriseOwnership($request, $listing);
+
+        try {
+            $decide->requestFeature($listing);
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('status', __('Feature request sent for review.'));
     }
 
     public function publish(Request $request, Listing $listing): RedirectResponse

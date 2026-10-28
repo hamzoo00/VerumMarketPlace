@@ -94,6 +94,10 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         Route::post(Seg::get('account.listings'), [SellerListingController::class, 'store'])->name('listings.store');
         Route::get(Seg::get('account.listings').'/{listing}/edit', [SellerListingController::class, 'edit'])->name('listings.edit');
         Route::put(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'update'])->name('listings.update');
+        // A premium seller asks for a slot; an admin grants it.
+        Route::post(Seg::get('account.listings').'/{listing}/feature', [SellerListingController::class, 'requestFeature'])
+            ->name('listings.feature');
+
         Route::post(Seg::get('account.listings').'/{listing}/publish', [SellerListingController::class, 'publish'])->name('listings.publish');
         Route::delete(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'destroy'])->name('listings.destroy');
 

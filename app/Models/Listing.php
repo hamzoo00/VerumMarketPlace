@@ -26,6 +26,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @property Carbon|null $auction_ends_at
  * @property Carbon|null $published_at
+ * @property Carbon|null $approval_requested_at
+ * @property Carbon|null $approved_at
+ * @property Carbon|null $feature_requested_at
+ * @property Carbon|null $featured_at
+ * @property Carbon|null $featured_until
  */
 #[ObservedBy(ListingObserver::class)]
 class Listing extends Model implements HasMedia
@@ -51,6 +56,23 @@ class Listing extends Model implements HasMedia
     public const STATUS_PAUSED = 'paused';
 
     /** Postage: follow the seller's rates, free, or one flat price. */
+    /*
+     * Approval and featuring are each a small state machine an admin
+     * drives, rather than a boolean — "who approved this, and when" is
+     * a question a seller asks, and a flag cannot answer it.
+     */
+    public const APPROVAL_PENDING = 'pending';
+
+    public const APPROVAL_APPROVED = 'approved';
+
+    public const APPROVAL_REJECTED = 'rejected';
+
+    public const FEATURE_REQUESTED = 'requested';
+
+    public const FEATURE_ACTIVE = 'active';
+
+    public const FEATURE_DECLINED = 'declined';
+
     public const SHIPPING_INHERIT = 'inherit';
 
     public const SHIPPING_FREE = 'free';
@@ -68,6 +90,11 @@ class Listing extends Model implements HasMedia
             'report_date' => 'date',
             'auction_ends_at' => 'datetime',
             'published_at' => 'datetime',
+            'approval_requested_at' => 'datetime',
+            'approved_at' => 'datetime',
+            'feature_requested_at' => 'datetime',
+            'featured_at' => 'datetime',
+            'featured_until' => 'datetime',
         ];
     }
 
@@ -197,10 +224,82 @@ class Listing extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
-    /** @param  Builder<self>  $query */
+    /**
+     * Publicly visible: active, published, and not awaiting approval.
+     *
+     * The approval check lives *here* rather than in each page, because
+     * every public query already goes through this scope — adding it per
+     * controller would leave whichever one was forgotten leaking drafts.
+     *
+     * `approval_state` null means the listing predates the rule, so it
+     * stays visible: switching approval on must not blank the catalogue.
+     *
+     * @param  Builder<self>  $query
+     */
     public function scopePublished(Builder $query): void
     {
-        $query->where('status', self::STATUS_ACTIVE)->whereNotNull('published_at');
+        $query->where('status', self::STATUS_ACTIVE)
+            ->whereNotNull('published_at')
+            ->where(fn (Builder $inner) => $inner
+                ->whereNull('approval_state')
+                ->orWhere('approval_state', self::APPROVAL_APPROVED));
+    }
+
+    /**
+     * Featured, and still within its run.
+     *
+     * An expiry in the past ends the slot with no sweep, like a lapsed
+     * offer.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeFeatured(Builder $query): void
+    {
+        $query->published()
+            ->where('feature_state', self::FEATURE_ACTIVE)
+            ->whereNotNull('featured_at')
+            ->where(fn (Builder $inner) => $inner
+                ->whereNull('featured_until')
+                ->orWhere('featured_until', '>', now()));
+    }
+
+    /**
+     * Waiting on an admin.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeAwaitingApproval(Builder $query): void
+    {
+        $query->where('approval_state', self::APPROVAL_PENDING);
+    }
+
+    /** @param  Builder<self>  $query */
+    public function scopeAwaitingFeature(Builder $query): void
+    {
+        $query->where('feature_state', self::FEATURE_REQUESTED);
+    }
+
+    public function isAwaitingApproval(): bool
+    {
+        return $this->approval_state === self::APPROVAL_PENDING;
+    }
+
+    public function wasRejected(): bool
+    {
+        return $this->approval_state === self::APPROVAL_REJECTED;
+    }
+
+    /** Live in a feature slot right now. */
+    public function isFeatured(): bool
+    {
+        return $this->feature_state === self::FEATURE_ACTIVE
+            && $this->featured_at !== null
+            && ($this->featured_until === null || $this->featured_until->isFuture());
+    }
+
+    public function hasRequestedFeature(): bool
+    {
+        return $this->feature_state === self::FEATURE_REQUESTED;
     }
 
     /** @param  Builder<self>  $query */

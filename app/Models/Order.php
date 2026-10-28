@@ -101,6 +101,26 @@ class Order extends Model
         return new Money((int) $this->total_cents, $this->currency);
     }
 
+    /** The platform's cut, as recorded when the sale happened. */
+    public function commission(): Money
+    {
+        return new Money((int) $this->commission_cents, $this->currency);
+    }
+
+    /**
+     * What reaches the seller: the total less the platform's cut.
+     *
+     * Derived rather than stored, because it is exactly those two
+     * figures and a third column could only ever disagree with them.
+     */
+    public function sellerReceives(): Money
+    {
+        return new Money(
+            max(0, (int) $this->total_cents - (int) $this->commission_cents),
+            $this->currency,
+        );
+    }
+
     /**
      * Statuses a seller may still act on.
      *

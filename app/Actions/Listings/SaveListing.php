@@ -4,6 +4,7 @@ namespace App\Actions\Listings;
 
 use App\Models\Listing;
 use App\Models\Seller;
+use App\Support\PlatformSettings;
 use Illuminate\Support\Str;
 
 /**
@@ -34,11 +35,29 @@ class SaveListing
     }
 
     /** Draft → live. Auctions keep their own end time. */
+    /**
+     * Put a listing live, or into the approval queue.
+     *
+     * When the platform requires approval the row still becomes active
+     * and published — it simply does not satisfy `scopePublished()`
+     * until an admin approves it. Keeping one "published" concept means
+     * the seller's own pages, the socket and the queue all read the same
+     * row rather than a parallel state.
+     *
+     * A listing already approved is not sent round again: an edit after
+     * approval is a judgement call, and silently re-queueing every save
+     * would strand sellers who fixed a typo.
+     */
     public function publish(Listing $listing): Listing
     {
+        $needsApproval = PlatformSettings::approvalRequired()
+            && $listing->approval_state !== Listing::APPROVAL_APPROVED;
+
         $listing->update([
             'status' => Listing::STATUS_ACTIVE,
             'published_at' => $listing->published_at ?? now(),
+            'approval_state' => $needsApproval ? Listing::APPROVAL_PENDING : $listing->approval_state,
+            'approval_requested_at' => $needsApproval ? now() : $listing->approval_requested_at,
         ]);
 
         return $listing->refresh();

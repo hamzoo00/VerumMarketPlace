@@ -7,6 +7,8 @@
     <x-verum.promise-band />
     <x-verum.home.trust />
     <x-verum.home.categories :$gemTypes />
+    <x-verum.home.featured-listings :listings="$featuredListings" />
+
     <x-verum.home.featured :stones="$featured" />
     <x-verum.home.auctions :lots="$closingLots" />
     <x-verum.home.reviews :$reviews />

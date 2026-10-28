@@ -73,6 +73,21 @@
                             <td data-label="{{ __('Price') }}">{{ $listing->price()?->format() ?? '—' }}</td>
                             <td data-label="{{ __('Status') }}">
                                 <x-verum.seller.listing-status :status="$listing->status" />
+
+                                {{-- A seller must know why their stone is
+                                     not public yet, and what to fix. --}}
+                                @if ($listing->isAwaitingApproval())
+                                    <span class="chip chip--warn">{{ __('Awaiting approval') }}</span>
+                                @elseif ($listing->wasRejected())
+                                    <span class="chip chip--bad">{{ __('Rejected') }}</span>
+                                    @if ($listing->approval_note)
+                                        <small class="mute">{{ $listing->approval_note }}</small>
+                                    @endif
+                                @endif
+
+                                @if ($listing->isFeatured())
+                                    <span class="chip chip--gold">{{ __('Featured') }}</span>
+                                @endif
                             </td>
                             <td class="atable__actions">
                                 <x-verum.seller.listing-actions :$listing />
