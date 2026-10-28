@@ -21,6 +21,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StoneController;
 use App\Http\Controllers\VerifyController;
 use App\Support\RouteSegments as Seg;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,11 +87,19 @@ Route::middleware(['auth:buyer'])->group(function () {
  * so a buyer, a seller and an admin reach the same inbox safely.
  */
 Route::middleware(['auth.any'])->prefix(Seg::get('account.messages'))->name('chat.')->group(function () {
-    Route::get('/', [ConversationController::class, 'index'])->name('index');
-    Route::get('{conversation}', [ConversationController::class, 'show'])->name('show');
-    Route::post('{conversation}', [ConversationController::class, 'store'])
-        ->middleware('throttle:'.config('verum_chat.limits.per_minute').',1')
-        ->name('store');
+    /*
+     * The shared entry, kept for anyone arriving at /messages directly.
+     * It only forwards: each area owns its own inbox routes so the page
+     * renders in that area's shell, which precedence alone got wrong —
+     * a seller holding an admin session was shown the staff panel.
+     */
+    Route::get('/', function (Request $request) {
+        return redirect()->route(match (true) {
+            $request->user('seller') !== null => 'seller.messages',
+            $request->user('buyer') !== null => 'buyer.messages',
+            default => 'admin.messages',
+        });
+    })->name('index');
 });
 
 // Only a buyer opens a thread, and only from a listing.

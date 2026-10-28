@@ -24,14 +24,16 @@ it('groups a run of messages from one sender', function (): void {
     $send->handle($conversation, Message::FROM_SELLER, $seller->id, 'hello');
 
     $html = $this->actingAs($buyer, 'buyer')
-        ->get(route('chat.show', $conversation))
+        ->get(route('buyer.messages.show', $conversation))
         ->assertOk()
         ->getContent();
 
     // The second of the run is grouped; the speaker change is not.
     expect(substr_count($html, 'bubble--grouped'))->toBe(1)
-        // The pane is bounded rather than filling the page.
-        ->and($html)->toContain('thread__view');
+        // Two panes: the inbox travels with the open conversation, so
+        // choosing a thread changes a pane rather than a page.
+        ->and($html)->toContain('class="chat"')
+        ->and($html)->toContain('data-thread-list');
 });
 
 it('does not group across a speaker change or a long gap', function (): void {

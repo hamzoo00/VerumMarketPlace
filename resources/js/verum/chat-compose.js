@@ -62,12 +62,65 @@ function syncWarning(body, warning) {
 function syncFiles(input, label) {
     const names = [...(input.files ?? [])].map((file) => file.name);
 
-    if (names.length > 0) {
-        label.textContent = names.join(', ');
-    }
+    label.textContent = names.join(', ');
+    label.hidden = names.length === 0;
+}
+
+/**
+ * Grow the box with the message.
+ *
+ * One line to start, up to the cap set in CSS — a fixed three-line box
+ * is mostly empty for "yes, still available".
+ */
+function autoGrow(body) {
+    body.style.height = 'auto';
+    body.style.height = `${body.scrollHeight}px`;
+}
+
+/** Enter sends; Shift+Enter is a new line, as every chat behaves. */
+function sendOnEnter(form, body) {
+    on(body, 'keydown', (event) => {
+        if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+
+        event.preventDefault();
+
+        if (body.value.trim() !== '') form.requestSubmit();
+    });
+}
+
+/**
+ * Filter the rendered thread rows.
+ *
+ * A convenience over what is already on the page: the server still
+ * owns ordering and paging, so this never changes what was fetched.
+ */
+function initThreadFilter() {
+    const box = $('[data-thread-filter]');
+    const list = $('[data-thread-list]');
+    if (!box || !list || box.dataset.filterReady === 'true') return;
+
+    box.dataset.filterReady = 'true';
+
+    const rows = [...list.querySelectorAll('[data-thread-row]')];
+    const none = $('[data-thread-none]');
+
+    on(box, 'input', () => {
+        const term = box.value.trim().toLowerCase();
+        let shown = 0;
+
+        rows.forEach((row) => {
+            const hit = term === '' || (row.dataset.label ?? '').includes(term);
+            row.hidden = !hit;
+            if (hit) shown += 1;
+        });
+
+        if (none) none.hidden = shown > 0;
+    });
 }
 
 export function initChatComposer() {
+    initThreadFilter();
+
     const form = $('[data-chat-form]');
     if (!form || form.dataset.chatReady === 'true') return;
 
@@ -75,6 +128,12 @@ export function initChatComposer() {
 
     const body = $('[data-chat-body]', form);
     const warning = $('[data-chat-warning]', form);
+
+    if (body) {
+        autoGrow(body);
+        on(body, 'input', () => autoGrow(body));
+        sendOnEnter(form, body);
+    }
 
     if (body && warning) {
         on(body, 'input', () => syncWarning(body, warning));

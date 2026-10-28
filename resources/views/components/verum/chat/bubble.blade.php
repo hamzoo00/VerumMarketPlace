@@ -10,8 +10,11 @@
 ])
 
 @php
+    use App\Models\Message;
+
     $mine = $message->sender_type === $viewer;
     $fromAdmin = $message->isFromAdmin();
+    $shots = $message->attachments();
 @endphp
 
 {{-- One message. Body is escaped by Blade; attachments are images only. --}}
@@ -21,32 +24,33 @@
     'bubble--staff' => $fromAdmin,
     'bubble--flagged' => $message->is_flagged,
     'bubble--grouped' => $grouped,
+    'bubble--shots' => $shots !== [] && ! filled($message->body),
 ])>
     @unless ($grouped)
-    <header class="bubble__head">
-        <span class="bubble__who">
-            @if ($fromAdmin)
-                {{ __(':app team', ['app' => config('app.name')]) }}
-            @elseif ($mine)
-                {{ __('You') }}
-            @else
-                {{ $message->conversation?->counterpartName($viewer) }}
-            @endif
-        </span>
+        <header class="bubble__head">
+            <span class="bubble__who">
+                @if ($fromAdmin)
+                    {{ __(':app team', ['app' => config('app.name')]) }}
+                @elseif ($mine)
+                    {{ __('You') }}
+                @else
+                    {{ $message->conversation?->counterpartName($viewer) }}
+                @endif
+            </span>
 
-        <time class="bubble__at" datetime="{{ $message->created_at?->toIso8601String() }}">
-            {{ $message->created_at?->format('j M, H:i') }}
-        </time>
-    </header>
+            <time class="bubble__at" datetime="{{ $message->created_at?->toIso8601String() }}">
+                {{ $message->created_at?->format('H:i') }}
+            </time>
+        </header>
     @endunless
 
     @if (filled($message->body))
         <p class="bubble__body">{{ $message->body }}</p>
     @endif
 
-    @if ($message->attachments() !== [])
-        <div class="bubble__shots">
-            @foreach ($message->attachments() as $shot)
+    @if ($shots !== [])
+        <div @class(['bubble__shots', 'bubble__shots--many' => count($shots) > 1])>
+            @foreach ($shots as $shot)
                 <a href="{{ $shot['url'] }}" target="_blank" rel="noopener noreferrer">
                     <img src="{{ $shot['thumb'] }}" alt="{{ __('Attached image') }}" loading="lazy" decoding="async">
                 </a>
@@ -72,7 +76,7 @@
     @if ($message->is_flagged)
         {{-- The sender sees why; the other side sees nothing, so a flag
              is never a way to accuse someone publicly. --}}
-        @if ($mine || $viewer === \App\Models\Message::FROM_ADMIN)
+        @if ($mine || $viewer === Message::FROM_ADMIN)
             <p class="bubble__flag">
                 <x-verum.icon name="shield" />
                 {{ __('Flagged: :reasons', ['reasons' => $message->flagLabels()]) }}

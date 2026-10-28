@@ -1,4 +1,6 @@
 @php
+    use App\Models\Message;
+
     $files = config('verum_chat.attachments');
 
     /*
@@ -10,97 +12,125 @@
         ? $messages->getCollection()
             ->last(fn ($message): bool => $message->sender_type === $viewer)?->id
         : null;
+
+    $counterpart = $viewer === Message::FROM_ADMIN
+        ? $conversation->buyer?->name.' · '.$conversation->seller?->name
+        : $conversation->counterpartName($viewer);
 @endphp
 
 <x-verum.chat.shell
     :$viewer
     :$account
-    :title="$conversation->counterpartName($viewer)"
-    :heading="$viewer === \App\Models\Message::FROM_ADMIN
-        ? $conversation->buyer?->name.' and '.$conversation->seller?->name
-        : $conversation->counterpartName($viewer)"
-    :lede="$conversation->subject"
+    :title="$counterpart"
+    :heading="__('Messages')"
 >
-    <a class="link chat__back" href="{{ route('chat.index') }}" wire:navigate>
-        {{ __('← All messages') }}
-    </a>
-
-    @if ($conversation->listing)
-        <x-verum.account.panel :title="__('About this listing')" icon="gem">
-            <a class="link" href="{{ route('listings.show', $conversation->listing) }}" wire:navigate>
-                {{ $conversation->listing->title }}
-            </a>
-        </x-verum.account.panel>
-    @endif
-
     {{-- Re-read over the socket when either side posts; see live-chat.js --}}
-    <div class="thread__view" data-chat="{{ $conversation->id }}">
-        <div class="bubbles" data-chat-log>
-            @foreach ($messages as $index => $message)
-                <x-verum.chat.bubble
-                    :$message
-                    :$viewer
-                    :grouped="$message->followsSameSpeakerAs($messages[$index - 1] ?? null)"
-                    :show-receipt="$receiptId !== null && $message->id === $receiptId"
-                />
-            @endforeach
-        </div>
+    <div class="thread" data-chat="{{ $conversation->id }}">
+        <x-verum.chat.thread-list :$conversations :$viewer :$routes :$active />
 
-        @if ($messages->hasPages())
-            <div class="pager">{{ $messages->links() }}</div>
-        @endif
+        <section class="thread__pane">
+            <header class="thread__head">
+                {{-- Only shown where the list is hidden, so a narrow
+                     screen still has a way back. --}}
+                <a class="thread__back" href="{{ route($routes['index']) }}" wire:navigate aria-label="{{ __('All messages') }}">
+                    <x-verum.icon name="arrow-l" />
+                </a>
 
-        <form
-            class="composer"
-            method="POST"
-            action="{{ route('chat.store', $conversation) }}"
-            enctype="multipart/form-data"
-            data-chat-form
-        >
-            @csrf
+                <x-verum.chat.avatar :$conversation :$viewer />
 
-            <label class="sr-only" for="chatBody">{{ __('Your message') }}</label>
-            <textarea
-                id="chatBody"
-                class="composer__text"
-                name="body"
-                rows="3"
-                maxlength="{{ config('verum_chat.limits.body_max') }}"
-                placeholder="{{ __('Write a message…') }}"
-                data-chat-body
-            >{{ old('body') }}</textarea>
+                <div class="thread__who">
+                    <h2>{{ $counterpart }}</h2>
 
-            {{-- Filled by moderation.js as the sender types, so the
-                 reminder arrives before they commit to sending. --}}
-            <p class="composer__warn" data-chat-warning hidden></p>
+                    @if ($conversation->listing)
+                        <a class="thread__about" href="{{ route('listings.show', $conversation->listing) }}" wire:navigate>
+                            <x-verum.icon name="gem" />{{ $conversation->listing->title }}
+                        </a>
+                    @elseif ($conversation->subject)
+                        <p class="thread__about">{{ $conversation->subject }}</p>
+                    @endif
+                </div>
 
-            <div class="composer__foot">
-                <label class="btn btn--ghost btn--sm">
-                    <input
-                        type="file"
-                        class="sr-only"
-                        name="attachments[]"
-                        accept="{{ implode(',', $files['mimes']) }}"
-                        multiple
-                        data-chat-files
-                    >
-                    <x-verum.icon name="upload" />{{ __('Add images') }}
-                </label>
+                @if ($conversation->is_flagged && $viewer === Message::FROM_ADMIN)
+                    <span class="chip chip--warn">{{ __('Flagged') }}</span>
+                @endif
+            </header>
 
-                <span class="composer__hint" data-chat-filenames>
-                    {{ __('Up to :n images, :mb MB each', [
+            <div class="bubbles" data-chat-log>
+                @if ($messages->hasPages())
+                    <div class="bubbles__more">{{ $messages->links() }}</div>
+                @endif
+
+                @foreach ($messages as $index => $message)
+                    @php($previous = $messages[$index - 1] ?? null)
+
+                    @if ($message->opensNewDay($previous))
+                        {{-- Anchors a thread read back: "09:14" alone
+                             could be this morning or last March. --}}
+                        <p class="bubbles__day"><span>{{ $message->dayLabel() }}</span></p>
+                    @endif
+
+                    <x-verum.chat.bubble
+                        :$message
+                        :$viewer
+                        :grouped="! $message->opensNewDay($previous) && $message->followsSameSpeakerAs($previous)"
+                        :show-receipt="$receiptId !== null && $message->id === $receiptId"
+                    />
+                @endforeach
+            </div>
+
+            <form
+                class="composer"
+                method="POST"
+                action="{{ route($routes['store'], $conversation) }}"
+                enctype="multipart/form-data"
+                data-chat-form
+            >
+                @csrf
+
+                {{-- Filled by chat-compose.js as the sender types, so the
+                     reminder arrives before they commit to sending. --}}
+                <p class="composer__warn" data-chat-warning hidden></p>
+
+                <div class="composer__row">
+                    <label class="composer__clip" data-tip="{{ __('Add images') }}">
+                        <input
+                            type="file"
+                            class="sr-only"
+                            name="attachments[]"
+                            accept="{{ implode(',', $files['mimes']) }}"
+                            multiple
+                            data-chat-files
+                        >
+                        <x-verum.icon name="upload" />
+                        <span class="sr-only">{{ __('Add images') }}</span>
+                    </label>
+
+                    <label class="sr-only" for="chatBody">{{ __('Your message') }}</label>
+                    <textarea
+                        id="chatBody"
+                        class="composer__text"
+                        name="body"
+                        rows="1"
+                        maxlength="{{ config('verum_chat.limits.body_max') }}"
+                        placeholder="{{ __('Write a message…') }}"
+                        data-chat-body
+                    >{{ old('body') }}</textarea>
+
+                    <button class="composer__send" type="submit" aria-label="{{ __('Send') }}" data-tip="{{ __('Send') }}">
+                        <x-verum.icon name="send" />
+                    </button>
+                </div>
+
+                <p class="composer__files" data-chat-filenames hidden></p>
+
+                <p class="composer__hint">
+                    {{ __('Up to :n images, :mb MB each · :app keeps the record', [
                         'n' => $files['max_per_message'],
                         'mb' => round($files['max_kb'] / 1024),
+                        'app' => config('app.name'),
                     ]) }}
-                </span>
-
-                <button class="btn btn--ruby btn--sm" type="submit">{{ __('Send') }}</button>
-            </div>
-        </form>
-
-        <p class="composer__policy">
-            <x-verum.icon name="shield" />
-            {{ __('Keep payments and contact on :app. Off-platform deals are not protected, and we review attempts to move them.', ['app' => config('app.name')]) }}
-        </p>
+                </p>
+            </form>
+        </section>
     </div>
 </x-verum.chat.shell>

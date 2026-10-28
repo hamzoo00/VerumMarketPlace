@@ -92,6 +92,23 @@ class Conversation extends Model
         };
     }
 
+    /**
+     * Initials for the avatar when there is no photograph.
+     *
+     * Only a seller has an uploaded avatar; a buyer and an admin are
+     * drawn from their initials, so the inbox reads the same either way.
+     */
+    public function counterpartInitials(string $viewer): string
+    {
+        $name = $this->counterpartName($viewer);
+
+        return collect(preg_split('/\s+/', trim($name)) ?: [])
+            ->filter()
+            ->take(2)
+            ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->implode('') ?: '?';
+    }
+
     /** What the other side is called, from this side's point of view. */
     public function counterpartName(string $viewer): string
     {

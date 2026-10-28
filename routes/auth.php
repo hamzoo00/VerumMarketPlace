@@ -6,6 +6,7 @@ use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
 use App\Http\Controllers\Buyer\BuyerOrderController;
+use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
 use App\Http\Controllers\Seller\SellerBrandingController;
 use App\Http\Controllers\Seller\SellerCaseController;
@@ -47,7 +48,24 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
 
     // The inbox is shared by all three audiences; these keep each area's
     // own nav honest without duplicating the controller.
-    Route::get(Seg::get('account.messages'), fn () => redirect()->route('chat.index'))->name('messages');
+    /*
+     * The buyer's own inbox, declared as such. Redirecting to the
+     * shared /messages let whichever guard ranked highest decide the
+     * shell, so a buyer who also held an admin session saw the staff
+     * panel instead of their account area.
+     */
+    Route::get(Seg::get('account.messages'), [ConversationController::class, 'index'])
+        ->defaults('audience', 'buyer')
+        ->name('messages');
+
+    Route::get(Seg::get('account.messages').'/{conversation}', [ConversationController::class, 'show'])
+        ->defaults('audience', 'buyer')
+        ->name('messages.show');
+
+    Route::post(Seg::get('account.messages').'/{conversation}', [ConversationController::class, 'store'])
+        ->defaults('audience', 'buyer')
+        ->middleware('throttle:'.config('verum_chat.limits.per_minute').',1')
+        ->name('messages.store');
 
     // Disputes and audits the buyer has raised.
     Route::get(Seg::get('account.cases'), [BuyerCaseController::class, 'index'])->name('cases');
@@ -116,7 +134,18 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         Route::delete(Seg::get('account.storefront').'/branding', [SellerBrandingController::class, 'destroy'])
             ->name('branding.destroy');
 
-        Route::get(Seg::get('account.messages'), fn () => redirect()->route('chat.index'))->name('messages');
+        Route::get(Seg::get('account.messages'), [ConversationController::class, 'index'])
+            ->defaults('audience', 'seller')
+            ->name('messages');
+
+        Route::get(Seg::get('account.messages').'/{conversation}', [ConversationController::class, 'show'])
+            ->defaults('audience', 'seller')
+            ->name('messages.show');
+
+        Route::post(Seg::get('account.messages').'/{conversation}', [ConversationController::class, 'store'])
+            ->defaults('audience', 'seller')
+            ->middleware('throttle:'.config('verum_chat.limits.per_minute').',1')
+            ->name('messages.store');
 
         // Cases raised about this seller; read-only, the admin settles them.
         Route::get(Seg::get('account.cases'), [SellerCaseController::class, 'index'])->name('cases');

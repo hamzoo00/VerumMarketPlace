@@ -66,7 +66,7 @@
                     {{ $order->seller?->name }}
                 </a>
 
-                <a class="btn btn--ghost btn--sm" href="{{ route('chat.index') }}" wire:navigate>
+                <a class="btn btn--ghost btn--sm" href="{{ route('buyer.messages') }}" wire:navigate>
                     <x-verum.icon name="chat" />{{ __('Message the seller') }}
                 </a>
             </x-verum.account.panel>

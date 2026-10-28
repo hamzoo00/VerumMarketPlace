@@ -75,20 +75,20 @@ it('never flags an admin', function (): void {
 });
 
 it('lets both parties and an admin read the thread', function (): void {
-    $this->actingAs($this->buyer, 'buyer')->get(route('chat.show', $this->conversation))->assertOk();
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation))->assertOk();
-    $this->actingAs(Admin::factory()->create(), 'admin')->get(route('chat.show', $this->conversation))->assertOk();
+    $this->actingAs($this->buyer, 'buyer')->get(route('buyer.messages.show', $this->conversation))->assertOk();
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation))->assertOk();
+    $this->actingAs(Admin::factory()->create(), 'admin')->get(route('admin.messages.show', $this->conversation))->assertOk();
 });
 
 it('keeps an outsider out of a thread', function (): void {
     $outsider = Buyer::factory()->create();
 
     $this->actingAs($outsider, 'buyer')
-        ->get(route('chat.show', $this->conversation))
+        ->get(route('buyer.messages.show', $this->conversation))
         ->assertForbidden();
 
     $this->actingAs($outsider, 'buyer')
-        ->post(route('chat.store', $this->conversation), ['body' => 'let me in'])
+        ->post(route('buyer.messages.store', $this->conversation), ['body' => 'let me in'])
         ->assertForbidden();
 
     expect($this->conversation->messages()->count())->toBe(0);
@@ -99,7 +99,7 @@ it('keeps another seller out of a thread', function (): void {
     Seller::factory()->create(['seller_account_id' => $other->id]);
 
     $this->actingAs($other, 'seller')
-        ->get(route('chat.show', $this->conversation))
+        ->get(route('seller.messages.show', $this->conversation))
         ->assertForbidden();
 });
 
@@ -110,7 +110,7 @@ it('sends a guest to the buyer sign-in page', function (): void {
 it('marks a thread read when its owner opens it', function (): void {
     $this->send->handle($this->conversation, Message::FROM_SELLER, $this->seller->id, 'Yes, still here.');
 
-    $this->actingAs($this->buyer, 'buyer')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->buyer, 'buyer')->get(route('buyer.messages.show', $this->conversation));
 
     expect($this->conversation->fresh()->buyer_unread)->toBe(0);
 });
@@ -119,7 +119,7 @@ it('accepts an image and refuses anything else', function (): void {
     Storage::fake(config('verum_media.disk'));
 
     $this->actingAs($this->buyer, 'buyer')
-        ->post(route('chat.store', $this->conversation), [
+        ->post(route('buyer.messages.store', $this->conversation), [
             'body' => 'Here it is in daylight',
             'attachments' => [UploadedFile::fake()->image('stone.jpg', 800, 600)],
         ])
@@ -128,7 +128,7 @@ it('accepts an image and refuses anything else', function (): void {
     expect(Message::latest('id')->first()->attachments())->toHaveCount(1);
 
     $this->actingAs($this->buyer, 'buyer')
-        ->post(route('chat.store', $this->conversation), [
+        ->post(route('buyer.messages.store', $this->conversation), [
             'body' => 'And the paperwork',
             'attachments' => [UploadedFile::fake()->create('report.pdf', 40, 'application/pdf')],
         ])
@@ -137,6 +137,6 @@ it('accepts an image and refuses anything else', function (): void {
 
 it('requires something to send', function (): void {
     $this->actingAs($this->buyer, 'buyer')
-        ->post(route('chat.store', $this->conversation), ['body' => ''])
+        ->post(route('buyer.messages.store', $this->conversation), ['body' => ''])
         ->assertSessionHasErrors('body');
 });

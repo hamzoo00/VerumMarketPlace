@@ -10,14 +10,14 @@
         ['label' => __('Overview'), 'icon' => 'grid', 'route' => 'admin.dashboard'],
         ['label' => __('Applications'), 'icon' => 'file', 'route' => 'admin.applications'],
         ['label' => __('Cases'), 'icon' => 'shield', 'route' => 'admin.cases'],
-        ['label' => __('Messages'), 'icon' => 'chat', 'route' => 'chat.index'],
+        ['label' => __('Messages'), 'icon' => 'chat', 'route' => 'admin.messages'],
+        ['label' => __('Moderation'), 'icon' => 'eye', 'route' => 'admin.moderation'],
         ['label' => __('Approvals'), 'icon' => 'check', 'route' => 'admin.approvals'],
         ['label' => __('Featured'), 'icon' => 'spark', 'route' => 'admin.features'],
         ['label' => __('Premium'), 'icon' => 'badge', 'route' => 'admin.premium'],
-        ['label' => __('Settings'), 'icon' => 'sliders', 'route' => 'admin.settings'],
-        ['label' => __('Moderation'), 'icon' => 'eye', 'route' => 'admin.moderation'],
         ['label' => __('Sellers'), 'icon' => 'gem', 'route' => 'admin.sellers'],
         ['label' => __('Buyers'), 'icon' => 'user', 'route' => 'admin.buyers'],
+        ['label' => __('Settings'), 'icon' => 'sliders', 'route' => 'admin.settings'],
     ];
     $current = request()->route()?->getName();
 @endphp

@@ -39,6 +39,18 @@ async function refresh() {
     if (wasAtBottom) {
         next.scrollTop = next.scrollHeight;
     }
+
+    // The inbox beside it changes too: a new message moves its thread up
+    // and rewrites the preview and the unread badge. Its own scroll
+    // position is kept, or the list jumps under the reader.
+    const list = $('[data-thread-list]');
+    const freshList = fresh.querySelector('[data-thread-list]');
+
+    if (list && freshList) {
+        const offset = list.scrollTop;
+        list.replaceWith(freshList);
+        freshList.scrollTop = offset;
+    }
 }
 
 async function connect() {
@@ -56,9 +68,16 @@ export function initChatLive() {
     const id = host.dataset.chat;
     if (!id) return;
 
-    // Open on the newest message, as a chat should.
+    // Open on the newest message, as a chat should. Instant rather than
+    // smooth: the page should arrive at the bottom, not travel there.
     const log = $('[data-chat-log]');
-    if (log) log.scrollTop = log.scrollHeight;
+
+    if (log) {
+        const behaviour = log.style.scrollBehavior;
+        log.style.scrollBehavior = 'auto';
+        log.scrollTop = log.scrollHeight;
+        log.style.scrollBehavior = behaviour;
+    }
 
     onceGlobal('live-chat', async () => {
         const echo = await connect();

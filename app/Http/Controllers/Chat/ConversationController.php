@@ -10,7 +10,7 @@ use App\Http\Requests\Chat\MessageRequest;
 use App\Models\Conversation;
 use App\Models\Listing;
 use App\Models\Message;
-use App\Support\MessageModeration;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,16 +36,33 @@ class ConversationController extends Controller
         [$type, $id] = $this->party($request);
 
         return view('pages.chat.index', [
-            'conversations' => Conversation::query()
-                ->forParty($type, $id)
-                ->with(['buyer', 'seller', 'listing'])
-                // An admin sees flagged threads first; that is their queue.
-                ->when($type === Message::FROM_ADMIN, fn ($query) => $query->orderByDesc('is_flagged'))
-                ->orderByDesc('last_message_at')
-                ->paginate(20),
+            'conversations' => $this->threadsFor($type, $id),
             'viewer' => $type,
             'account' => $request->user($type === Message::FROM_ADMIN ? 'admin' : $type),
+            // Links stay inside the reader's own area; see Message::routesFor().
+            'routes' => Message::routesFor($type),
+            'active' => null,
         ]);
+    }
+
+    /**
+     * The inbox, newest first.
+     *
+     * Shared by the list and the thread page, which renders both panes:
+     * one query definition means the sidebar beside an open conversation
+     * is ordered and filtered exactly like the list it came from.
+     *
+     * @return LengthAwarePaginator<int, Conversation>
+     */
+    private function threadsFor(string $type, int $id): LengthAwarePaginator
+    {
+        return Conversation::query()
+            ->forParty($type, $id)
+            ->with(['buyer', 'seller', 'listing'])
+            // An admin sees flagged threads first; that is their queue.
+            ->when($type === Message::FROM_ADMIN, fn ($query) => $query->orderByDesc('is_flagged'))
+            ->orderByDesc('last_message_at')
+            ->paginate(20);
     }
 
     public function show(Request $request, Conversation $conversation): View
@@ -58,8 +75,13 @@ class ConversationController extends Controller
         return view('pages.chat.show', [
             'conversation' => $conversation->load(['buyer', 'seller', 'listing']),
             'messages' => $conversation->messages()->with('media')->oldest()->paginate(50),
+            // The list travels with the thread, so the page is one
+            // messenger rather than two screens and a back link.
+            'conversations' => $this->threadsFor($type, $id),
             'viewer' => $type,
             'account' => $request->user($type === Message::FROM_ADMIN ? 'admin' : $type),
+            'routes' => Message::routesFor($type),
+            'active' => $conversation->id,
         ]);
     }
 
@@ -79,15 +101,16 @@ class ConversationController extends Controller
             array_values($request->file('attachments') ?? []),
         );
 
-        // The sender is told what was noticed, and why. The message still
-        // went, so this is a nudge rather than a punishment.
-        $warning = MessageModeration::inspect($body)->warning();
-
-        if ($message->is_flagged || $warning !== null) {
-            return back()->with('warning', $warning);
-        }
-
-        return back()->with('status', __('Sent.'));
+        /*
+         * No toast either way.
+         *
+         * The composer already warns live as the sender types, and the
+         * bubble itself carries the flag once it lands — a toast on top
+         * of both told the same person the same thing a third time, over
+         * the page header. The flag is recorded regardless; it reaches
+         * the admin queue, which is what it is for.
+         */
+        return back();
     }
 
     /** Opens (or finds) the thread for a listing and goes to it. */
@@ -99,7 +122,7 @@ class ConversationController extends Controller
         abort_if($listing->seller === null, Response::HTTP_NOT_FOUND);
 
         return redirect()->route(
-            'chat.show',
+            'buyer.messages.show',
             $this->startConversation->handle($buyer, $listing->seller, $listing),
         );
     }
@@ -107,26 +130,71 @@ class ConversationController extends Controller
     /**
      * Who is asking, from the session only.
      *
+     * The **route** names the audience where it knows it — `/seller/...`
+     * is the seller's inbox even for someone who also holds an admin
+     * session in the same browser. Without that, precedence alone
+     * decided, and a seller clicking "Store messages" was shown the
+     * admin shell: their own thread wrapped in staff navigation, with
+     * Moderation one click away.
+     *
+     * Falling back to precedence keeps the shared `/messages` entry
+     * working for whoever is signed in.
+     *
      * @return array{0: string, 1: int}
      */
     private function party(Request $request): array
     {
+        $declared = $request->route()?->defaults['audience'] ?? null;
+
+        return match ($declared) {
+            Message::FROM_ADMIN => $this->asAdmin($request),
+            Message::FROM_SELLER => $this->asSeller($request),
+            Message::FROM_BUYER => $this->asBuyer($request),
+            default => $this->byPrecedence($request),
+        };
+    }
+
+    /** @return array{0: string, 1: int} */
+    private function byPrecedence(Request $request): array
+    {
+        if ($request->user('admin') !== null) {
+            return $this->asAdmin($request);
+        }
+
+        if ($request->user('seller') !== null) {
+            return $this->asSeller($request);
+        }
+
+        return $this->asBuyer($request);
+    }
+
+    /** @return array{0: string, 1: int} */
+    private function asAdmin(Request $request): array
+    {
         $admin = $request->user('admin');
 
-        if ($admin !== null) {
-            return [Message::FROM_ADMIN, (int) $admin->id];
-        }
+        abort_if($admin === null, Response::HTTP_FORBIDDEN);
 
+        return [Message::FROM_ADMIN, (int) $admin->id];
+    }
+
+    /** @return array{0: string, 1: int} */
+    private function asSeller(Request $request): array
+    {
         $seller = $request->user('seller');
 
-        if ($seller !== null) {
-            $storefront = $seller->storefront;
+        abort_if($seller === null, Response::HTTP_FORBIDDEN);
 
-            abort_if($storefront === null, Response::HTTP_FORBIDDEN, __('Your storefront is not set up yet.'));
+        $storefront = $seller->storefront;
 
-            return [Message::FROM_SELLER, (int) $storefront->id];
-        }
+        abort_if($storefront === null, Response::HTTP_FORBIDDEN, __('Your storefront is not set up yet.'));
 
+        return [Message::FROM_SELLER, (int) $storefront->id];
+    }
+
+    /** @return array{0: string, 1: int} */
+    private function asBuyer(Request $request): array
+    {
         $buyer = $request->user('buyer');
 
         abort_if($buyer === null, Response::HTTP_FORBIDDEN);

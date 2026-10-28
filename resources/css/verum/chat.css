@@ -1,123 +1,360 @@
-/* Verum — In-app messaging: inbox, thread and the moderation queue. */
+/* Verum — In-app messaging: the two-pane messenger and the moderation queue. */
 
 /* =============================================================
-   Inbox
+   Shell
+
+   One grid: the inbox beside the open conversation, so choosing a
+   thread changes a pane rather than a page. The height is pinned to
+   the viewport so the list and the log scroll independently and the
+   composer never drifts off the bottom.
    ============================================================= */
-.threads {
+.thread {
   display: grid;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+  gap: 0;
+  height: min(72vh, 760px);
+  min-height: 460px;
+  margin-top: 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ink-2) 55%, transparent);
   overflow: hidden;
 }
 
-.thread {
+/* =============================================================
+   Inbox pane
+   ============================================================= */
+.inbox {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.inbox__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 10px;
+}
+
+.inbox__title {
+  margin: 0;
+  font: 400 1.15rem/1 var(--serif);
+}
+
+.inbox__count {
+  padding: 2px 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  color: var(--mute);
+  font: .68rem var(--mono);
+}
+
+.inbox__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 10px;
+  padding: 0 11px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ink) 60%, transparent);
+  transition: border-color .2s;
+}
+
+.inbox__search:focus-within {
+  border-color: var(--ruby-hi);
+}
+
+.inbox__search .ic {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--mute);
+}
+
+.inbox__search input {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  background: none;
+  color: var(--bone);
+  font: 400 .84rem var(--sans);
+}
+
+.inbox__search input:focus {
+  outline: none;
+}
+
+.inbox__list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px 8px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+
+.inbox__empty,
+.inbox__none {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 18px 16px;
+  color: var(--mute);
+  font-size: .85rem;
+}
+
+.inbox__pager {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* =============================================================
+   Thread card
+   ============================================================= */
+.tcard {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 4px 16px;
-  padding: 14px 16px;
-  background: var(--ink);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 10px;
   transition: background .18s;
 }
 
-.thread:hover {
-  background: var(--ink-2);
+.tcard:hover {
+  background: color-mix(in srgb, var(--bone) 4%, transparent);
 }
 
-.thread.is-unread .thread__who {
-  color: var(--bone);
-  font-weight: 500;
+/* The open thread, marked on the edge so the row itself stays calm. */
+.tcard.is-on {
+  background: color-mix(in srgb, var(--ruby) 13%, transparent);
+  box-shadow: inset 2px 0 0 var(--ruby);
 }
 
-.thread.is-flagged {
-  border-left: 2px solid var(--gold);
+.tcard__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
 }
 
-.thread__who {
-  color: var(--mute);
-  font-size: .92rem;
+.tcard__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.thread__subject {
-  grid-column: 1;
-  color: var(--ruby-hi);
-  font-size: .78rem;
-}
-
-.thread__preview {
-  grid-column: 1;
+.tcard__who {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--mute);
-  font-size: .84rem;
+  font-size: .88rem;
 }
 
-.thread__meta {
-  grid-row: 1 / span 3;
-  grid-column: 2;
+.tcard.is-unread .tcard__who {
+  color: var(--bone);
+  font-weight: 500;
+}
+
+.tcard__at {
+  flex: none;
+  color: var(--mute);
+  font: .66rem var(--mono);
+}
+
+.tcard__about {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ruby-hi);
+  font-size: .74rem;
+}
+
+.tcard__about .ic {
+  flex: none;
+  width: 11px;
+  height: 11px;
+}
+
+.tcard__line {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--mute);
-  font: .72rem var(--mono);
 }
 
-.thread__badge {
+.tcard__preview {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.tcard.is-unread .tcard__preview {
+  color: color-mix(in srgb, var(--bone) 70%, transparent);
+}
+
+.tcard__badge {
+  flex: none;
   display: grid;
   place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
   background: var(--ruby);
   color: #fff;
-  font: 500 .68rem var(--mono);
+  font: 500 .64rem var(--mono);
+}
+
+.tcard__flag {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  color: var(--gold);
+}
+
+/* Initials where there is no photograph, so rows keep one height. */
+.tavatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ruby) 14%, transparent);
+  color: var(--bone);
+  font: 500 .76rem var(--mono);
+  letter-spacing: .04em;
 }
 
 /* =============================================================
-   Thread
+   Conversation pane
    ============================================================= */
-.chat__back {
-  display: inline-block;
-  margin-bottom: 14px;
-  font-size: .84rem;
-}
-
-/*
- * The conversation pane.
- *
- * Capped and centred rather than left to fill the column: a thread read
- * edge to edge on a wide screen puts the sender's name a long way from
- * their words, and an own-message bubble ends up marooned on the right
- * with nothing beside it. This class had no rules at all, which is
- * exactly what that looked like.
- */
-.thread__view {
+.thread__pane {
   display: flex;
   flex-direction: column;
-  /* One readable measure, the same discipline as body copy. */
-  max-width: 78ch;
-  margin-inline: auto;
-  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
+.thread__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.thread__who {
+  min-width: 0;
+}
+
+.thread__who h2 {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 400 1.02rem/1.2 var(--serif);
+}
+
+.thread__about {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ruby-hi);
+  font-size: .76rem;
+}
+
+.thread__about .ic {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.thread__head .chip {
+  margin-left: auto;
+}
+
+/* Only needed where the inbox is hidden; see the narrow breakpoint. */
+.thread__back {
+  display: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  color: var(--mute);
+}
+
+.thread__back:hover {
+  color: var(--bone);
+}
+
+.thread__pane--blank {
+  display: grid;
+  place-items: center;
+}
+
+.threadblank {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 320px;
+  padding: 24px;
+  text-align: center;
+}
+
+.threadblank .ic {
+  width: 30px;
+  height: 30px;
+  color: color-mix(in srgb, var(--bone) 24%, transparent);
+}
+
+.threadblank h2 {
+  margin: 0;
+  font: 400 1.2rem/1 var(--serif);
+}
+
+.threadblank p {
+  margin: 0;
+  color: var(--mute);
+  font-size: .86rem;
+  line-height: 1.6;
+}
+
+/* =============================================================
+   Message log
+   ============================================================= */
 .bubbles {
+  flex: 1;
   display: grid;
   align-content: start;
   gap: 4px;
-  /* A fixed floor stops a two-message thread collapsing to a sliver
-     while a long one still scrolls inside its own pane. */
-  min-height: 44vh;
-  max-height: 58vh;
+  min-height: 0;
+  padding: 18px 20px;
   overflow-y: auto;
-  padding: 18px;
-  border: 1px solid var(--line-2);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--bone) 2%, transparent);
   scrollbar-width: thin;
   scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -126,23 +363,54 @@
   }
 }
 
+.bubbles__more {
+  justify-self: center;
+  margin-bottom: 8px;
+}
+
+/* A date rule, so a thread read back is anchored in time. */
+.bubbles__day {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 10px;
+  color: var(--mute);
+  font: .68rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.bubbles__day::before,
+.bubbles__day::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
 .bubble {
-  max-width: 82%;
+  max-width: min(74%, 560px);
   padding: 9px 13px 10px;
   border: 1px solid var(--line-2);
-  border-radius: 12px;
+  border-radius: 14px 14px 14px 4px;
   background: var(--ink-2);
+  animation: bubble-in .26s var(--ease) both;
 }
 
-/*
- * Consecutive messages from one person are grouped: the gap between
- * bubbles is small, and a change of speaker opens it up. Without this a
- * burst of three short lines reads as three separate conversations.
- */
-.bubble + .bubble {
-  margin-top: 0;
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
+  }
 }
 
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* A change of speaker opens the gap; a run stays tight. */
 .bubble:not(.bubble--mine) + .bubble--mine,
 .bubble--mine + .bubble:not(.bubble--mine),
 .bubble--staff + .bubble,
@@ -150,18 +418,34 @@
   margin-top: 12px;
 }
 
-/* Own messages sit right, as every chat does. */
 .bubble--mine {
   justify-self: end;
-  border-color: color-mix(in srgb, var(--ruby-hi) 30%, var(--line-2));
-  background: color-mix(in srgb, var(--ruby) 10%, var(--ink-2));
+  border-radius: 14px 14px 4px;
+  border-color: color-mix(in srgb, var(--ruby-hi) 32%, var(--line-2));
+  background: color-mix(in srgb, var(--ruby) 14%, var(--ink-2));
 }
 
 .bubble--staff {
   justify-self: center;
   max-width: 88%;
+  border-radius: 14px;
   border-color: color-mix(in srgb, var(--ok) 36%, var(--line-2));
   background: color-mix(in srgb, var(--ok) 8%, var(--ink-2));
+}
+
+/* Inside a run the near corner squares off, so a group reads as one. */
+.bubble--grouped {
+  border-top-left-radius: 5px;
+}
+
+.bubble--mine.bubble--grouped {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 5px;
+}
+
+/* A picture with no words needs no padding around it. */
+.bubble--shots {
+  padding: 5px;
 }
 
 .bubble--flagged {
@@ -172,18 +456,18 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .bubble__who {
   color: var(--bone);
-  font: 500 .74rem var(--mono);
-  letter-spacing: .06em;
+  font: 500 .72rem var(--mono);
+  letter-spacing: .05em;
 }
 
 .bubble__at {
   color: var(--mute);
-  font: .68rem var(--mono);
+  font: .66rem var(--mono);
 }
 
 .bubble__body {
@@ -195,44 +479,40 @@
 }
 
 .bubble__shots {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.bubble--shots .bubble__shots {
+  margin-top: 0;
+}
+
+.bubble__shots--many {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .bubble__shots img {
-  width: 110px;
-  height: 110px;
+  display: block;
+  width: 100%;
+  max-height: 220px;
   object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--line-2);
+  border-radius: 9px;
+  transition: opacity .2s;
 }
 
-.bubble__flag {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: 8px 0 0;
-  color: var(--gold-hi);
-  font-size: .74rem;
+.bubble__shots a:hover img {
+  opacity: .88;
 }
 
-.bubble__flag .ic {
-  flex: none;
-  width: 14px;
-  height: 14px;
-}
-
-/* Read receipt: only under your own newest message, so it stays quiet. */
 .bubble__receipt {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 5px;
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: var(--mute);
-  font-size: .7rem;
+  font-size: .68rem;
 }
 
 .bubble__receipt .ic {
@@ -242,85 +522,160 @@
   color: var(--ok);
 }
 
-.bubble__receipt time {
-  color: inherit;
+.bubble__flag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0 0;
+  color: var(--gold-hi);
+  font-size: .72rem;
+}
+
+.bubble__flag .ic {
+  flex: none;
+  width: 13px;
+  height: 13px;
 }
 
 /* =============================================================
    Composer
+
+   One row: attach, write, send. The textarea grows with the message
+   (chat-compose.js) rather than carrying a fixed three-line box that
+   is mostly empty.
    ============================================================= */
 .composer {
-  margin-top: 14px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.composer__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 9px;
 }
 
 .composer__text {
   width: 100%;
-  padding: 11px 13px;
+  max-height: 160px;
+  padding: 10px 14px;
   border: 1px solid var(--line-2);
-  border-radius: 8px;
-  background: var(--ink-2);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ink) 65%, transparent);
   color: var(--bone);
   font: inherit;
   font-size: .9rem;
-  resize: vertical;
+  line-height: 1.5;
+  resize: none;
+  transition: border-color .2s, box-shadow .2s;
 }
 
 .composer__text:focus {
   outline: none;
   border-color: var(--ruby-hi);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ruby) 14%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ruby) 12%, transparent);
+}
+
+.composer__clip,
+.composer__send {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s, transform .15s;
+}
+
+.composer__clip:hover,
+.composer__send:hover {
+  color: var(--bone);
+  border-color: var(--ruby-hi);
+}
+
+.composer__send {
+  border-color: var(--ruby);
+  background: var(--ruby);
+  color: #fff;
+}
+
+.composer__send:hover {
+  background: var(--ruby-hi);
+  border-color: var(--ruby-hi);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.composer__clip .ic,
+.composer__send .ic {
+  width: 16px;
+  height: 16px;
 }
 
 .composer__warn {
   display: flex;
   gap: 8px;
-  margin: 8px 0 0;
-  padding: 9px 11px;
+  margin: 0 0 10px;
+  padding: 9px 12px;
   border-left: 2px solid var(--gold);
-  background: color-mix(in srgb, var(--gold) 8%, transparent);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
   color: var(--gold-hi);
-  font-size: .8rem;
+  font-size: .79rem;
+  line-height: 1.5;
 }
 
-.composer__foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.composer__foot .btn {
-  cursor: pointer;
+.composer__files {
+  margin: 8px 0 0;
+  color: var(--ruby-hi);
+  font-size: .75rem;
 }
 
 .composer__hint {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  margin: 8px 0 0;
   color: var(--mute);
-  font-size: .76rem;
+  font-size: .72rem;
+  text-align: center;
 }
 
-.composer__policy {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 14px;
-  color: var(--mute);
-  font-size: .76rem;
-}
+/* =============================================================
+   Narrow screens
 
-.composer__policy .ic {
-  flex: none;
-  width: 15px;
-  height: 15px;
-  margin-top: 1px;
-  color: var(--ruby-hi);
-}
+   One pane at a time: the list, or the conversation with a way back.
+   ============================================================= */
+@media (max-width: 880px) {
+  .thread {
+    grid-template-columns: minmax(0, 1fr);
+    height: calc(100vh - var(--hdr) - 140px);
+    min-height: 420px;
+  }
 
+  .thread .inbox {
+    display: none;
+  }
+
+  .thread--empty .inbox {
+    display: flex;
+    border-right: 0;
+  }
+
+  .thread--empty .thread__pane--blank {
+    display: none;
+  }
+
+  .thread__back {
+    display: grid;
+  }
+
+  .bubble {
+    max-width: 86%;
+  }
+}
 /* =============================================================
    Moderation queue
    ============================================================= */

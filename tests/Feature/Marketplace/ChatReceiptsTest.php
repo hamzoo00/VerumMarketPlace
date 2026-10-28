@@ -37,11 +37,11 @@ it('stamps the other side messages as read, never your own', function (): void {
 
     // The buyer opening their own thread must not mark their own message
     // read, or every message would read as read the moment it was sent.
-    $this->actingAs($this->buyer, 'buyer')->get(route('chat.show', $this->conversation))->assertOk();
+    $this->actingAs($this->buyer, 'buyer')->get(route('buyer.messages.show', $this->conversation))->assertOk();
 
     expect($fromBuyer->fresh()->read_at)->toBeNull();
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation))->assertOk();
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation))->assertOk();
 
     expect($fromBuyer->fresh()->read_at)->not->toBeNull();
 });
@@ -50,7 +50,7 @@ it('does not stamp read when an admin reads the thread', function (): void {
     $fromBuyer = $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'Is it available?');
 
     $this->actingAs(Admin::factory()->create(), 'admin')
-        ->get(route('chat.show', $this->conversation))
+        ->get(route('admin.messages.show', $this->conversation))
         ->assertOk();
 
     // A buyer must not be told "read" because staff looked.
@@ -60,7 +60,7 @@ it('does not stamp read when an admin reads the thread', function (): void {
 it('stamps later messages even once the unread count is zero', function (): void {
     $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'First');
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     // Zero the counter by hand, as a second tab would.
     $this->conversation->fresh()->update(['seller_unread' => 0]);
@@ -68,7 +68,7 @@ it('stamps later messages even once the unread count is zero', function (): void
     $later = $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'Still there?');
     $this->conversation->fresh()->update(['seller_unread' => 0]);
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     expect($later->fresh()->read_at)->not->toBeNull();
 });
@@ -78,7 +78,7 @@ it('tells the sender over the socket that the thread was read', function (): voi
 
     $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'Is it available?');
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     Event::assertDispatched(MessagesRead::class);
 });
@@ -86,12 +86,12 @@ it('tells the sender over the socket that the thread was read', function (): voi
 it('does not announce a read when nothing changed', function (): void {
     $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'Is it available?');
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     Event::fake([MessagesRead::class]);
 
     // Opening it again reads nothing new, so the sender hears nothing.
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     Event::assertNotDispatched(MessagesRead::class);
 });
@@ -100,7 +100,7 @@ it('shows a receipt to the sender once the other side has read', function (): vo
     $this->send->handle($this->conversation, Message::FROM_BUYER, $this->buyer->id, 'Is it available?');
 
     $this->actingAs($this->buyer, 'buyer')
-        ->get(route('chat.show', $this->conversation))
+        ->get(route('buyer.messages.show', $this->conversation))
         ->assertOk()
         ->assertSee('Sent')
         ->assertDontSee('Read ');
@@ -113,12 +113,12 @@ it('shows a receipt to the sender once the other side has read', function (): vo
      */
     auth()->guard('buyer')->logout();
 
-    $this->actingAs($this->account, 'seller')->get(route('chat.show', $this->conversation));
+    $this->actingAs($this->account, 'seller')->get(route('seller.messages.show', $this->conversation));
 
     auth()->guard('seller')->logout();
 
     $this->actingAs($this->buyer, 'buyer')
-        ->get(route('chat.show', $this->conversation))
+        ->get(route('buyer.messages.show', $this->conversation))
         ->assertOk()
         ->assertSee('Read ');
 });

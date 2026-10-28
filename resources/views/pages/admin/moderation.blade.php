@@ -69,7 +69,7 @@
                     <blockquote class="flagrow__body">{{ $message->body }}</blockquote>
 
                     <div class="flagrow__acts">
-                        <a class="btn btn--ghost btn--sm" href="{{ route('chat.show', $message->conversation_id) }}">
+                        <a class="btn btn--ghost btn--sm" href="{{ route('admin.messages.show', $message->conversation_id) }}">
                             {{ __('Read the thread') }}
                         </a>
 

@@ -30,6 +30,30 @@ class Message extends Model implements HasMedia
 
     public const FROM_ADMIN = 'admin';
 
+    /**
+     * Where each audience's inbox lives.
+     *
+     * A thread is read inside the reader's own area, so every link must
+     * stay there — a seller following a link into `/admin/...` would be
+     * shown the staff shell around their own conversation.
+     *
+     * @return array{index: string, show: string, store: string}
+     */
+    public static function routesFor(string $viewer): array
+    {
+        $prefix = match ($viewer) {
+            self::FROM_ADMIN => 'admin.messages',
+            self::FROM_SELLER => 'seller.messages',
+            default => 'buyer.messages',
+        };
+
+        return [
+            'index' => $prefix,
+            'show' => $prefix.'.show',
+            'store' => $prefix.'.store',
+        ];
+    }
+
     /** A run from one sender inside this many minutes is grouped. */
     public const GROUP_WINDOW_MINUTES = 5;
 
@@ -108,6 +132,39 @@ class Message extends Model implements HasMedia
                 ])
                 ->all()
         );
+    }
+
+    /**
+     * Does this message open a new day?
+     *
+     * A long thread read back needs a date to anchor it; without one
+     * "09:14" could be this morning or last March.
+     */
+    public function opensNewDay(?self $previous): bool
+    {
+        if ($this->created_at === null) {
+            return false;
+        }
+
+        return $previous?->created_at === null
+            || ! $previous->created_at->isSameDay($this->created_at);
+    }
+
+    /** "Today", "Yesterday", or the date. */
+    public function dayLabel(): string
+    {
+        $at = $this->created_at;
+
+        if ($at === null) {
+            return '';
+        }
+
+        return match (true) {
+            $at->isToday() => __('Today'),
+            $at->isYesterday() => __('Yesterday'),
+            $at->isCurrentYear() => $at->format('j M'),
+            default => $at->format('j M Y'),
+        };
     }
 
     public function isFromAdmin(): bool

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminModerationController;
 use App\Http\Controllers\Admin\AdminPremiumController;
 use App\Http\Controllers\Admin\AdminSessionController;
 use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Chat\ConversationController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -81,6 +82,24 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
         Route::put('premium/{seller}', [AdminPremiumController::class, 'update'])->name('premium.update');
         Route::get('premium/{seller}/certificate', [AdminPremiumController::class, 'preview'])
             ->name('premium.certificate');
+
+        /*
+         * Staff read threads in the staff shell. Declared, not inferred:
+         * the audience must not depend on which guards happen to be
+         * signed in to the same browser.
+         */
+        Route::get('messages', [ConversationController::class, 'index'])
+            ->defaults('audience', 'admin')
+            ->name('messages');
+
+        Route::get('messages/{conversation}', [ConversationController::class, 'show'])
+            ->defaults('audience', 'admin')
+            ->name('messages.show');
+
+        Route::post('messages/{conversation}', [ConversationController::class, 'store'])
+            ->defaults('audience', 'admin')
+            ->middleware('throttle:'.config('verum_chat.limits.per_minute').',1')
+            ->name('messages.store');
 
         Route::get('buyers', [AdminDashboardController::class, 'buyers'])->name('buyers');
         Route::get('sellers', [AdminDashboardController::class, 'sellers'])->name('sellers');
