@@ -12,11 +12,16 @@ import { initCurrencyPicker } from './currency.js';
 import { initHeader } from './header.js';
 import { initLayers } from './layers.js';
 import { initListingLive } from './live-listing.js';
+import { initLiveForms } from './live-forms.js';
+import { initLiveRegions } from './live-regions.js';
+import { initLiveSettings } from './live-settings.js';
 import { initOfferLive } from './live-offers.js';
 import { initLive } from './live.js';
 import { initSellerLive } from './live-seller.js';
 import { initMarquees } from './marquee.js';
 import { initMenus } from './menu.js';
+import { initNoticeDialog } from './notice-dialog.js';
+import { initNotifications } from './notifications.js';
 import { initPhoneFields } from './phone.js';
 import { initOfferForms } from './offers.js';
 import { initPricing } from './pricing.js';
@@ -67,8 +72,28 @@ export function boot() {
     initBranding();
     initPricing();
     initShipping();
+    initLiveRegions();
+    initLiveSettings();
+    initLiveForms();
+    initNoticeDialog();
+    initNotifications();
 
     armLivewireRehydration();
+    armLiveRegionRehydration();
+}
+
+/**
+ * A live region is replaced wholesale, so whatever it holds — an actions
+ * menu, a [data-reveal] panel — is new markup nothing has bound yet.
+ */
+function armLiveRegionRehydration() {
+    onceGlobal('live-region-rehydrate', () => {
+        document.addEventListener('verum:content-added', (event) => {
+            initMenus();
+            initValidation();
+            initReveal(event.detail?.root ?? document);
+        });
+    });
 }
 
 /**

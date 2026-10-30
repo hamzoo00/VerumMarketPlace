@@ -1,0 +1,289 @@
+/* ================================================================
+   Notifications
+   The bell in the storefront header and the admin bar, its panel,
+   the full notifications page, and the seller's standing banner.
+   ================================================================ */
+
+/* ---------- the bell ---------- */
+.bell {
+  position: relative;
+}
+
+.bell.is-open .bell__btn {
+  background: color-mix(in srgb, var(--bone) 10%, transparent);
+}
+
+.bell__panel {
+  position: absolute;
+  right: -8px;
+  top: calc(100% + 12px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - var(--tick) - var(--hdr) - 24px));
+  background: color-mix(in srgb, var(--plate) 94%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(1.15);
+  backdrop-filter: blur(24px) saturate(1.15);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: bellIn .28s var(--ease) both;
+}
+
+.bell__panel[hidden] {
+  display: none;
+}
+
+@keyframes bellIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.bell__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.bell__head b {
+  font: 400 1.15rem/1 var(--serif);
+}
+
+.bell__head form {
+  margin: 0;
+}
+
+.bell__readall {
+  font-size: .78rem;
+}
+
+.bell__list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+}
+
+.bell__empty {
+  display: grid;
+  justify-items: center;
+  gap: .6rem;
+  padding: 2.2rem 1rem;
+  color: var(--mute);
+  font-size: .86rem;
+  text-align: center;
+}
+
+.bell__empty .ic {
+  width: 26px;
+  height: 26px;
+  opacity: .5;
+}
+
+.bell__all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--ruby-hi);
+  font: 500 .74rem/1 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.bell__all:hover {
+  background: color-mix(in srgb, var(--bone) 5%, transparent);
+}
+
+.bell__all .ic {
+  width: 14px;
+  height: 14px;
+}
+
+/* The admin bar is a flex row with its own gap; the bell sits in it. */
+.adminbar__right .bell__panel {
+  right: -4px;
+}
+
+/* ---------- one notification ---------- */
+.nitem {
+  margin: 0;
+}
+
+.nitem__btn {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: .8rem;
+  width: 100%;
+  padding: .85rem .9rem;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--bone);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .16s;
+}
+
+.nitem__btn:hover,
+.nitem__btn:focus-visible {
+  background: color-mix(in srgb, var(--bone) 6%, transparent);
+}
+
+.nitem__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  color: var(--mute);
+}
+
+.nitem__icon .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.nitem.is-unread .nitem__icon {
+  border-color: color-mix(in srgb, var(--ruby) 55%, transparent);
+  color: var(--ruby-hi);
+  background: color-mix(in srgb, var(--ruby) 10%, transparent);
+}
+
+.nitem__text {
+  display: grid;
+  gap: .25rem;
+  min-width: 0;
+}
+
+.nitem__title {
+  font: 600 .9rem/1.3 var(--sans);
+}
+
+.nitem:not(.is-unread) .nitem__title {
+  font-weight: 500;
+  color: color-mix(in srgb, var(--bone) 82%, transparent);
+}
+
+.nitem__body {
+  color: var(--mute);
+  font-size: .83rem;
+  line-height: 1.45;
+}
+
+.nitem--compact .nitem__body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nitem__when {
+  color: color-mix(in srgb, var(--mute) 80%, transparent);
+  font: 400 .72rem/1 var(--mono);
+  letter-spacing: .04em;
+}
+
+.nitem__dot {
+  width: 8px;
+  height: 8px;
+  margin-top: .45rem;
+  border-radius: 50%;
+  background: var(--ruby);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ruby) 20%, transparent);
+}
+
+/* ---------- the full page ---------- */
+.nlist__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.nlist__bar form {
+  margin: 0;
+}
+
+.nlist {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.nlist .nitem + .nitem .nitem__btn {
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 10px 10px;
+}
+
+/* ---------- a seller's standing ---------- */
+.standing {
+  display: flex;
+  gap: .9rem;
+  align-items: flex-start;
+  margin-bottom: 1.4rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
+}
+
+.standing > .ic {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  color: var(--gold-hi);
+}
+
+.standing b {
+  display: block;
+  margin-bottom: .3rem;
+  font-weight: 600;
+}
+
+.standing p {
+  margin: 0;
+  color: color-mix(in srgb, var(--bone) 85%, transparent);
+  font-size: .9rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.standing .standing__more {
+  margin-top: .5rem;
+  color: var(--mute);
+  font-size: .82rem;
+}
+
+/* Closing is final, so it reads warmer than a suspension. */
+.standing--closing {
+  border-color: color-mix(in srgb, #e0607c 45%, transparent);
+  background: color-mix(in srgb, #e0607c 8%, transparent);
+}
+
+.standing--closing > .ic {
+  color: #e0607c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bell__panel,
+  .bell__count.bump {
+    animation: none;
+  }
+}

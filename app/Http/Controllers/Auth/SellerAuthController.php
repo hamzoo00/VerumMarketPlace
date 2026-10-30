@@ -9,6 +9,7 @@ use App\Models\SellerApplication;
 use App\Rules\NotBlockedEmail;
 use App\Support\Countries;
 use App\Support\SellerCategories;
+use App\Support\StaffAlerts;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -99,6 +100,10 @@ class SellerAuthController extends Controller
         });
 
         event(new Registered($account));
+
+        if ($account->application !== null) {
+            StaffAlerts::applicationSubmitted($account->application);
+        }
 
         Auth::guard('seller')->login($account);
         $request->session()->regenerate();

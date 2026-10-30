@@ -4,29 +4,21 @@ namespace App\Notifications;
 
 use App\Contracts\AuthenticatableAccount;
 use App\Models\SellerApplication;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 /**
- * Tells an applicant what an admin decided.
+ * Tells an applicant what an admin decided — by email, under the bell,
+ * and live on the status page they are probably watching.
  *
  * Queued, so a slow or failing SMTP host never blocks the admin's action.
  */
-class SellerApplicationDecided extends Notification implements ShouldQueue
+class SellerApplicationDecided extends InAppNotification
 {
-    use Queueable;
-
     public function __construct(
         private readonly SellerApplication $application,
         private readonly string $decision,
-    ) {}
-
-    /** @return list<string> */
-    public function via(AuthenticatableAccount $notifiable): array
-    {
-        return ['mail'];
+    ) {
+        parent::__construct();
     }
 
     public function toMail(AuthenticatableAccount $notifiable): MailMessage
@@ -78,5 +70,26 @@ class SellerApplicationDecided extends Notification implements ShouldQueue
         return (new MailMessage)
             ->greeting(__('Hello :name,', ['name' => $notifiable->displayName()]))
             ->salutation(__('— The :app team', ['app' => $app]));
+    }
+
+    protected function inApp(object $notifiable): array
+    {
+        $reference = $this->application->reference;
+
+        return [
+            'type' => 'application.'.$this->decision,
+            'title' => match ($this->decision) {
+                SellerApplication::STATUS_APPROVED => __('Your application was approved'),
+                SellerApplication::STATUS_REJECTED => __('Your application was not approved'),
+                default => __('Your application needs something from you'),
+            },
+            'body' => $this->decision === SellerApplication::STATUS_APPROVED
+                ? __('Application :reference is approved. Your storefront is live.', ['reference' => $reference])
+                : ($this->application->decision_note ?? __('Application :reference was updated.', ['reference' => $reference])),
+            'url' => $this->decision === SellerApplication::STATUS_APPROVED
+                ? route('seller.dashboard')
+                : route('seller.status'),
+            'icon' => 'file',
+        ];
     }
 }

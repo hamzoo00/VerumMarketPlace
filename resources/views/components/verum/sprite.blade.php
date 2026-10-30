@@ -52,6 +52,10 @@
     <symbol id="i-yt" viewBox="0 0 24 24"><rect x="2.8" y="5.8" width="18.4" height="12.4" rx="3.8"/><path d="m10.2 9.4 4.8 2.6-4.8 2.6z"/></symbol>
     <symbol id="i-in" viewBox="0 0 24 24"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="2"/><path d="M8.2 10.6V16M8.2 7.9v.2M11.6 16v-5.4M11.6 13c0-1.5 1-2.5 2.3-2.5s2 .9 2 2.5v3"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4.5 18.8V6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8.3z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.1H4.4L6 16.5z"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.6h18.4L12 4z"/><path d="M12 10v4.4M12 17.2v.1"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10.3-10.3a2.1 2.1 0 0 0-4-4L4.5 15.5v4z"/><path d="m13.3 6.7 4 4"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10 9v6M14 9v6"/></symbol>
     <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.9 3.6-6 3.6-9.9 2.5 1.4 3.4 3.4 3.5 5.4 1-.8 1.6-2 1.7-3.4 2.5 1.8 4.2 4.6 4.2 7.9 0 3.5-2.6 6.1-6.5 6.1z"/></symbol>
   </defs>
 </svg>

@@ -32,6 +32,8 @@
 @import './verum/account.css';
 @import './verum/orders.css';
 @import './verum/admin.css';
+@import './verum/notices.css';
+@import './verum/notifications.css';
 @import './verum/premium.css';
 @import './verum/seller-tools.css';
 @import './verum/listing.css';

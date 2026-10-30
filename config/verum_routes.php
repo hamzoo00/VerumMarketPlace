@@ -79,6 +79,8 @@ return [
         'cases' => env('ROUTE_CASES', 'cases'),
         'messages' => env('ROUTE_MESSAGES', 'messages'),
         'moderation' => env('ROUTE_MODERATION', 'moderation'),
+        'notifications' => env('ROUTE_NOTIFICATIONS', 'notifications'),
+        'sellers' => env('ROUTE_ADMIN_SELLERS', 'sellers'),
         'reviews' => env('ROUTE_REVIEWS', 'reviews'),
         'bids_place' => env('ROUTE_BID', 'bid'),
     ],

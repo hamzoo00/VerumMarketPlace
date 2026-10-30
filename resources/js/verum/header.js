@@ -3,8 +3,7 @@ import { $, delegate, on, onceGlobal } from './dom.js';
 /** Sticky header state, account popover and the mobile menu. */
 
 function initStickyHeader() {
-    const header = $('#hdr');
-    if (!header) return;
+    if (!$('#hdr')) return;
 
     let lastY = window.scrollY;
 
@@ -12,6 +11,13 @@ function initStickyHeader() {
         window,
         'scroll',
         () => {
+            // Looked up on every scroll, not captured once: wire:navigate
+            // swaps the header for a new element, and a listener holding
+            // the first one painted a detached copy — the live header
+            // stayed see-through over the page as it scrolled.
+            const header = $('#hdr');
+            if (!header) return;
+
             const y = window.scrollY;
             const dy = y - lastY;
 

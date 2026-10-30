@@ -1,4 +1,5 @@
 import { $, onceGlobal } from './dom.js';
+import { connect } from './realtime.js';
 
 /**
  * One listing page, kept current.
@@ -40,14 +41,6 @@ async function refresh() {
     document.dispatchEvent(new CustomEvent('verum:content-added', {
         detail: { root: document.body },
     }));
-}
-
-async function connect() {
-    if (window.Echo) return window.Echo;
-
-    await import('../echo.js');
-
-    return window.Echo ?? null;
 }
 
 export function initListingLive() {

@@ -63,4 +63,14 @@ class Buyer extends Authenticatable implements AccountContract, MustVerifyEmail
     {
         return true;
     }
+
+    public function isClosed(): bool
+    {
+        return false;
+    }
+
+    public function accountArea(): string
+    {
+        return 'buyer';
+    }
 }

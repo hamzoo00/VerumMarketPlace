@@ -3,32 +3,23 @@
 namespace App\Notifications;
 
 use App\Models\SupportCase;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 /**
  * Tells one party what an admin decided on a case.
  *
  * Sent to the buyer who raised it and to the seller it concerns, so
- * neither learns the outcome second-hand. Delivered in-app and by email;
- * queued, so a slow SMTP host never blocks the admin's decision.
+ * neither learns the outcome second-hand. Delivered by email, under the
+ * bell and live; queued, so a slow SMTP host never blocks the decision.
  */
-class CaseDecided extends Notification implements ShouldQueue
+class CaseDecided extends InAppNotification
 {
-    use Queueable;
-
     public function __construct(
         private readonly SupportCase $case,
         /** Which side is being told — it changes the wording, not the outcome. */
         private readonly string $audience,
-    ) {}
-
-    /** @return list<string> */
-    public function via(object $notifiable): array
-    {
-        return ['mail', 'database'];
+    ) {
+        parent::__construct();
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -51,20 +42,17 @@ class CaseDecided extends Notification implements ShouldQueue
             ->salutation(__('— the :app team', ['app' => $app]));
     }
 
-    /** @return array<string, mixed> */
-    public function toArray(object $notifiable): array
+    protected function inApp(object $notifiable): array
     {
         return [
             'type' => 'case.decided',
-            'reference' => $this->case->reference,
-            'kind' => $this->case->kind,
-            'resolution' => $this->case->resolution,
             'title' => __(':kind :reference settled', [
                 'kind' => $this->case->kindLabel(),
                 'reference' => $this->case->reference,
             ]),
             'body' => $this->case->resolutionLabel(),
             'url' => $this->url(),
+            'icon' => 'scale',
         ];
     }
 

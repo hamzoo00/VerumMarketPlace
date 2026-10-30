@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccountNotice;
 use App\Models\Buyer;
 use App\Models\Seller;
 use App\Models\SellerAccount;
 use App\Models\SellerApplication;
 use App\Models\Stone;
-use App\Support\MessageOffences;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -43,39 +43,23 @@ class AdminDashboardController extends Controller
 
         $term = $validated['q'] ?? null;
 
-        return view('pages.admin.buyers', [
-            'buyers' => Buyer::query()
-                ->when($term, fn ($query, string $t) => $query
-                    ->where(fn ($inner) => $inner
-                        ->whereLike('name', "%{$t}%")
-                        ->orWhereLike('email', "%{$t}%")))
-                ->latest()
-                ->paginate(20)
-                ->withQueryString(),
-            'term' => $term,
-        ]);
-    }
-
-    public function sellers(): View
-    {
-        $accounts = SellerAccount::query()
-            ->with(['application', 'storefront'])
+        $buyers = Buyer::query()
+            ->when($term, fn ($query, string $t) => $query
+                ->where(fn ($inner) => $inner
+                    ->whereLike('name', "%{$t}%")
+                    ->orWhereLike('email', "%{$t}%")))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('pages.admin.sellers', [
-            'accounts' => $accounts,
-            // Upheld moderation flags per storefront, so a seller working
-            // to take buyers off the platform is visible from the list
-            // without opening the queue. `messages.sender_id` holds the
-            // storefront id for a seller, not the account id.
-            'flags' => MessageOffences::forSellers(
-                $accounts->getCollection()
-                    ->pluck('storefront.id')
-                    ->filter()
-                    ->map(fn ($id): int => (int) $id)
-                    ->values()
-                    ->all(),
+        return view('pages.admin.buyers', [
+            'buyers' => $buyers,
+            'term' => $term,
+            // A buyer collects warnings too — an upheld flag on a message
+            // they sent counts against them, not the seller they wrote to.
+            'warnings' => AccountNotice::warningCounts(
+                Buyer::class,
+                $buyers->getCollection()->pluck('id')->map(fn ($id): int => (int) $id)->all(),
             ),
         ]);
     }

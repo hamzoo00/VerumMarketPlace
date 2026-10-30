@@ -1,4 +1,5 @@
 import { $, onceGlobal } from './dom.js';
+import { connect } from './realtime.js';
 
 /**
  * Live catalogue.
@@ -91,14 +92,6 @@ function drop(grid, payload) {
  * Echo pulls in a WebSocket client worth ~90KB gzipped. Only catalogue
  * pages need it, so it is fetched on demand rather than in the main bundle.
  */
-async function connect() {
-    if (window.Echo) return window.Echo;
-
-    await import('../echo.js');
-
-    return window.Echo ?? null;
-}
-
 /**
  * A Livewire-owned grid is reconciled against server state on every round
  * trip, so a card patched in by hand is discarded at the next morph. There

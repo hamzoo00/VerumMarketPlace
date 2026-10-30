@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\View\Composers\AccountNavComposer;
 use App\View\Composers\NavigationComposer;
+use App\View\Composers\NotificationBellComposer;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -37,9 +38,13 @@ class AppServiceProvider extends ServiceProvider
         // Private buyer/seller areas get their own navigation.
         View::composer('pages.buyer.*', AccountNavComposer::class);
         View::composer('pages.seller.*', AccountNavComposer::class);
-        // The chat shell picks a layout per audience, so it needs the
-        // buyer nav too — the inbox is not under pages.buyer.
-        View::composer('components.verum.chat.shell', AccountNavComposer::class);
+        // The account shell picks a layout per audience, so it needs the
+        // buyer nav too — the inbox and notifications are not under
+        // pages.buyer.
+        View::composer('components.verum.account.shell', AccountNavComposer::class);
+
+        // The bell resolves its own audience wherever it is placed.
+        View::composer('components.verum.notifications.bell', NotificationBellComposer::class);
     }
 
     /**

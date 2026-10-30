@@ -55,4 +55,15 @@ trait AuthenticatableAccount
     {
         return $this->two_factor_confirmed_at !== null;
     }
+
+    /**
+     * The private channel this account's notifications are pushed on.
+     *
+     * Named by area as well as id: a buyer and a seller account may share
+     * an id, and the channel is what routes/channels.php authorises.
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'notifications.'.$this->accountArea().'.'.$this->getKey();
+    }
 }

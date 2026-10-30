@@ -63,6 +63,17 @@ class Admin extends Authenticatable implements AccountContract
         return $this->is_active;
     }
 
+    /** Deactivation is handled by `is_active`, which keeps the row usable again. */
+    public function isClosed(): bool
+    {
+        return false;
+    }
+
+    public function accountArea(): string
+    {
+        return 'admin';
+    }
+
     public function recordLogin(): void
     {
         $this->forceFill(['last_login_at' => now()])->saveQuietly();

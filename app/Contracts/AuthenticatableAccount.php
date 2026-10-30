@@ -15,6 +15,17 @@ interface AuthenticatableAccount extends Authenticatable, CanResetPassword
 {
     public function canAccessDashboard(): bool;
 
+    /**
+     * Closed for good: signing in is refused outright.
+     *
+     * Distinct from canAccessDashboard(), which a pending seller also
+     * fails while still being allowed to sign in and follow their review.
+     */
+    public function isClosed(): bool;
+
+    /** The account area this identity belongs to: buyer, seller or admin. */
+    public function accountArea(): string;
+
     /** Display name used in emails and greetings. */
     public function displayName(): string;
 

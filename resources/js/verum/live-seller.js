@@ -1,4 +1,5 @@
 import { $, onceGlobal } from './dom.js';
+import { connect } from './realtime.js';
 
 /**
  * The seller's own workspace, kept current.
@@ -42,14 +43,6 @@ async function refresh() {
     }));
 }
 
-async function connect() {
-    if (window.Echo) return window.Echo;
-
-    await import('../echo.js');
-
-    return window.Echo ?? null;
-}
-
 export function initSellerLive() {
     const host = $('[data-seller-live]');
     if (!host) return;
@@ -58,16 +51,22 @@ export function initSellerLive() {
     if (!sellerId) return;
 
     onceGlobal('live-seller-workspace', async () => {
+        let queued = null;
+
+        // A single save can fire more than once (the row, then its
+        // media), so settle before asking the server again.
+        const settle = () => {
+            clearTimeout(queued);
+            queued = setTimeout(refresh, SETTLE_MS);
+        };
+
+        // An admin's decision arrives as a notification — an approval, a
+        // suspension — and the chips on this page move with it.
+        document.addEventListener('verum:live-refresh', settle);
+
         const echo = await connect();
         if (!echo) return;
 
-        let queued = null;
-
-        echo.channel(`seller.${sellerId}.listings`).listen('.listing.changed', () => {
-            // A single save can fire more than once (the row, then its
-            // media), so settle before asking the server again.
-            clearTimeout(queued);
-            queued = setTimeout(refresh, SETTLE_MS);
-        });
+        echo.channel(`seller.${sellerId}.listings`).listen('.listing.changed', settle);
     });
 }

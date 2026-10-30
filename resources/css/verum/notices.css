@@ -1,0 +1,444 @@
+/* ================================================================
+   Notices
+   The admin's message dialog, the tabbed Settings page with its
+   read-only standard messages, and small pieces that go with them.
+   ================================================================ */
+
+/* ---------- the message dialog ---------- */
+.ndlg {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: var(--plate);
+  color: var(--bone);
+  box-shadow: var(--shadow);
+}
+
+.ndlg[open] {
+  animation: ndlgIn .3s var(--ease) both;
+}
+
+.ndlg::backdrop {
+  background: color-mix(in srgb, var(--ink) 72%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+@keyframes ndlgIn {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.ndlg__box {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.ndlg__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ndlg__title {
+  margin: 0;
+  font: 400 1.55rem/1.15 var(--serif);
+}
+
+.ndlg__x {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--mute);
+  cursor: pointer;
+}
+
+.ndlg__x:hover {
+  border-color: var(--line-2);
+  color: var(--bone);
+}
+
+.ndlg__x .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.ndlg__lede {
+  margin: -.4rem 0 0;
+  color: var(--mute);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.ndlg__label {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin: 0 0 .5rem;
+  color: var(--mute);
+  font: 500 .7rem/1 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.ndlg__label .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.ndlg__default blockquote {
+  margin: 0;
+  padding: .9rem 1rem;
+  border-left: 2px solid var(--ruby);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--bone) 4%, transparent);
+  color: color-mix(in srgb, var(--bone) 88%, transparent);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.ndlg__write textarea {
+  display: block;
+  width: 100%;
+  min-height: 7.5rem;
+  padding: .8rem .9rem;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--ink-2);
+  color: var(--bone);
+  font: 400 .92rem/1.5 var(--sans);
+  resize: vertical;
+}
+
+.ndlg__write textarea:focus {
+  outline: none;
+  border-color: var(--ruby);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ruby) 22%, transparent);
+}
+
+.ndlg__count {
+  margin: .35rem 0 0;
+  color: var(--mute);
+  font: 400 .72rem/1 var(--mono);
+  text-align: right;
+}
+
+.ndlg__note {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: 0;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.ndlg__note .ic {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.ndlg__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: .6rem;
+  padding-top: .3rem;
+}
+
+/* A destructive action says so on the button that does it. */
+.ndlg--danger [data-notice-slot="confirm"] {
+  background: #e0607c;
+  border-color: #e0607c;
+  color: #fff;
+}
+
+.ndlg--danger .ndlg__default blockquote {
+  border-left-color: #e0607c;
+}
+
+/* ---------- actions menu extras ---------- */
+.amenu__count {
+  margin-left: auto;
+  padding: 0 .45rem;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
+  color: var(--gold-hi);
+  font: 600 .7rem/1.6 var(--sans);
+}
+
+/* Forms inside the menu must not add their own spacing. */
+.amenu__pop form[data-notice] {
+  margin: 0;
+}
+
+/* ---------- settings tabs ---------- */
+.settabs {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1.6rem;
+  padding: .35rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--plate);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.settabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  flex: none;
+  padding: .65rem .95rem;
+  border-radius: 10px;
+  color: var(--mute);
+  font: 500 .86rem/1 var(--sans);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .16s, color .16s;
+}
+
+.settabs__tab .ic {
+  width: 16px;
+  height: 16px;
+}
+
+.settabs__tab:hover {
+  color: var(--bone);
+  background: color-mix(in srgb, var(--bone) 5%, transparent);
+}
+
+.settabs__tab.is-on {
+  color: var(--bone);
+  background: color-mix(in srgb, var(--ruby) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ruby) 45%, transparent);
+}
+
+.setpanel {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.setform {
+  display: grid;
+  gap: 1.4rem;
+  justify-items: start;
+}
+
+.setform > .apanel {
+  width: 100%;
+}
+
+.setfacts {
+  display: grid;
+  gap: .55rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: color-mix(in srgb, var(--bone) 85%, transparent);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+/* ---------- the standard messages, read-only ---------- */
+.noticedefs {
+  display: grid;
+  gap: .9rem;
+}
+
+.noticedef {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bone) 2%, transparent);
+}
+
+.noticedef__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .6rem;
+}
+
+.noticedef__head b {
+  margin-right: .3rem;
+  font-weight: 600;
+}
+
+.noticedef__subject {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin: 0 0 .5rem;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.noticedef__subject .ic {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.noticedef__body {
+  margin: 0;
+  padding-left: .9rem;
+  border-left: 2px solid var(--line-2);
+  color: color-mix(in srgb, var(--bone) 86%, transparent);
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+/* Placeholders are filled in when the message is sent. */
+.noticedef code {
+  padding: 0 .3rem;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--ruby) 16%, transparent);
+  color: var(--gold-hi);
+  font: 500 .8em/1.4 var(--mono);
+}
+
+.noticedef__who {
+  color: var(--mute);
+  font-size: .78rem;
+}
+
+/* ---------- editing a standard message ---------- */
+.noticedef__edit {
+  margin-top: .9rem;
+}
+
+.noticedef__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .45rem .8rem;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  color: var(--bone);
+  font: 500 .8rem/1 var(--sans);
+  list-style: none;
+  cursor: pointer;
+  transition: border-color .16s, background-color .16s;
+}
+
+.noticedef__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.noticedef__toggle:hover,
+.noticedef__edit[open] .noticedef__toggle {
+  border-color: color-mix(in srgb, var(--ruby) 55%, transparent);
+  background: color-mix(in srgb, var(--ruby) 10%, transparent);
+}
+
+.noticedef__toggle .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.noticedef__form {
+  display: grid;
+  gap: .45rem;
+  margin-top: .9rem;
+}
+
+.noticedef__form label {
+  margin-top: .35rem;
+  color: var(--mute);
+  font: 500 .7rem/1 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.noticedef__form input,
+.noticedef__form textarea {
+  width: 100%;
+  padding: .7rem .85rem;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--ink-2);
+  color: var(--bone);
+  font: 400 .9rem/1.5 var(--sans);
+}
+
+.noticedef__form textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.noticedef__form input:focus,
+.noticedef__form textarea:focus {
+  outline: none;
+  border-color: var(--ruby);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ruby) 22%, transparent);
+}
+
+.noticedef__vars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  margin: .2rem 0 0;
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+.noticedef__orig {
+  margin: .4rem 0 0;
+  padding: .7rem .85rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bone) 3%, transparent);
+  color: var(--mute);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.noticedef__orig b {
+  display: block;
+  margin-bottom: .25rem;
+  color: var(--bone);
+  font-weight: 600;
+}
+
+.noticedef__actions {
+  display: flex;
+  gap: .6rem;
+  margin-top: .4rem;
+}
+
+.noticedef__reset {
+  margin: .7rem 0 0;
+  font-size: .82rem;
+}
+
+/* ---------- listing form ---------- */
+.listingform__note {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: .8rem 0 0;
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+.listingform__note .ic {
+  width: 15px;
+  height: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ndlg[open] {
+    animation: none;
+  }
+}

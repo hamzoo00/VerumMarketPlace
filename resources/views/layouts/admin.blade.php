@@ -50,6 +50,8 @@
         </a>
 
         <div class="adminbar__right">
+            <x-verum.notifications.bell />
+
             <a class="link link--quiet" href="{{ route('home') }}" target="_blank" rel="noopener">
                 {{ __('View site') }}<x-verum.icon name="arrow-ur" />
             </a>
@@ -92,18 +94,16 @@
                 @endif
             </header>
 
-            @if (session('status'))
-                <div class="notice notice--ok" role="status">
-                    <x-verum.icon name="check" />
-                    <p>{{ session('status') }}</p>
-                </div>
-            @endif
-
+            {{-- The toast host announces session('status'); a banner here
+                 as well meant every admin action said itself twice. --}}
             <x-verum.form.errors />
 
             {{ $slot }}
         </section>
     </main>
+
+    {{-- Shared by every action that writes to a seller or buyer. --}}
+    <x-verum.admin.notice-dialog />
 
     <x-verum.toast-host />
 

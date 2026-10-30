@@ -49,6 +49,9 @@
                 <span class="badge" data-wish-count hidden>0</span>
             </button>
 
+            {{-- Signed-in accounts only; renders nothing for a guest. --}}
+            <x-verum.notifications.bell />
+
             <x-verum.account-menu />
 
             <a class="ibtn ibtn--cart" href="{{ route('cart') }}" aria-label="{{ __('Cart') }}" data-tip="{{ __('Cart') }}" id="cartIcon" wire:navigate>

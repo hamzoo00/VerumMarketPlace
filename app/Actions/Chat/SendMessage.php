@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Support\MessageModeration;
+use App\Support\StaffAlerts;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -52,6 +53,10 @@ class SendMessage
 
         // After commit, so the row is readable when the socket arrives.
         event(MessageSent::for($message->fresh(['conversation'])));
+
+        if ($message->is_flagged) {
+            StaffAlerts::messageFlagged($message);
+        }
 
         return $message;
     }

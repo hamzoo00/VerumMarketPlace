@@ -18,6 +18,7 @@ use App\Http\Controllers\Seller\SellerOfferController;
 use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerShippingController;
 use App\Models\Order;
+use App\Support\NotificationRoutes;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -46,8 +47,6 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
 
-    // The inbox is shared by all three audiences; these keep each area's
-    // own nav honest without duplicating the controller.
     /*
      * The buyer's own inbox, declared as such. Redirecting to the
      * shared /messages let whichever guard ranked highest decide the
@@ -76,6 +75,8 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::post(Seg::get('account.offers').'/{offer}', [BuyerOfferController::class, 'respond'])
         ->name('offers.respond');
 
+    NotificationRoutes::register('buyer');
+
     Route::post(Seg::get('auth.logout'), [BuyerAuthController::class, 'logout'])->name('logout');
 });
 
@@ -102,29 +103,48 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
     Route::get(Seg::get('account.status'), SellerApplicationStatusController::class)->name('status');
     Route::post(Seg::get('auth.logout'), [SellerAuthController::class, 'logout'])->name('logout');
 
+    // Also outside it: the decision on an application arrives here.
+    NotificationRoutes::register('seller');
+
     Route::middleware('seller.approved')->group(function () {
         Route::get(Seg::get('account.dashboard'), [SellerDashboardController::class, 'index'])->name('dashboard');
 
         // Inventory. `create` sits before `{listing}` so it is not swallowed
         // by the wildcard.
         Route::get(Seg::get('account.listings'), [SellerListingController::class, 'index'])->name('listings');
-        Route::get(Seg::get('account.listings').'/new', [SellerListingController::class, 'create'])->name('listings.create');
-        Route::post(Seg::get('account.listings'), [SellerListingController::class, 'store'])->name('listings.store');
-        Route::get(Seg::get('account.listings').'/{listing}/edit', [SellerListingController::class, 'edit'])->name('listings.edit');
-        Route::put(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'update'])->name('listings.update');
-        // A premium seller asks for a slot; an admin grants it.
-        Route::post(Seg::get('account.listings').'/{listing}/feature', [SellerListingController::class, 'requestFeature'])
-            ->name('listings.feature');
-
-        Route::post(Seg::get('account.listings').'/{listing}/publish', [SellerListingController::class, 'publish'])->name('listings.publish');
         Route::delete(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'destroy'])->name('listings.destroy');
 
-        // Media. One file per request so progress is real and a single
-        // rejection does not fail the batch.
-        Route::post(Seg::get('account.listings').'/{listing}/media', [SellerListingMediaController::class, 'store'])
-            ->name('listings.media.store');
-        Route::delete(Seg::get('account.listings').'/{listing}/media/{media}', [SellerListingMediaController::class, 'destroy'])
-            ->name('listings.media.destroy');
+        /*
+         * Everything that puts stock in front of buyers. A suspended or
+         * closing seller keeps their dashboard — orders still need
+         * finishing — but not these.
+         */
+        Route::middleware('seller.trading')->group(function () {
+            Route::get(Seg::get('account.listings').'/new', [SellerListingController::class, 'create'])->name('listings.create');
+            Route::post(Seg::get('account.listings'), [SellerListingController::class, 'store'])->name('listings.store');
+            Route::get(Seg::get('account.listings').'/{listing}/edit', [SellerListingController::class, 'edit'])->name('listings.edit');
+            Route::put(Seg::get('account.listings').'/{listing}', [SellerListingController::class, 'update'])->name('listings.update');
+            // A premium seller asks for a slot; an admin grants it.
+            Route::post(Seg::get('account.listings').'/{listing}/feature', [SellerListingController::class, 'requestFeature'])
+                ->name('listings.feature');
+
+            Route::post(Seg::get('account.listings').'/{listing}/publish', [SellerListingController::class, 'publish'])->name('listings.publish');
+
+            // Media. One file per request so progress is real and a single
+            // rejection does not fail the batch.
+            Route::post(Seg::get('account.listings').'/{listing}/media', [SellerListingMediaController::class, 'store'])
+                ->name('listings.media.store');
+            Route::delete(Seg::get('account.listings').'/{listing}/media/{media}', [SellerListingMediaController::class, 'destroy'])
+                ->name('listings.media.destroy');
+
+            // Answering an offer may agree a sale.
+            Route::post(Seg::get('account.offers').'/{offer}', [SellerOfferController::class, 'respond'])
+                ->name('offers.respond');
+
+            Route::post(Seg::get('account.coupons'), [SellerCouponController::class, 'store'])->name('coupons.store');
+            Route::put(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'update'])
+                ->name('coupons.update');
+        });
 
         // JSON used by the category browser.
         Route::get('categories/{kind}', [SellerListingController::class, 'categories'])->name('categories');
@@ -150,16 +170,11 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         // Cases raised about this seller; read-only, the admin settles them.
         Route::get(Seg::get('account.cases'), [SellerCaseController::class, 'index'])->name('cases');
 
-        // Offers waiting on the seller.
+        // Offers waiting on the seller; answering one is gated above.
         Route::get(Seg::get('account.offers'), [SellerOfferController::class, 'index'])->name('offers');
-        Route::post(Seg::get('account.offers').'/{offer}', [SellerOfferController::class, 'respond'])
-            ->name('offers.respond');
 
-        // Discount codes.
+        // Discount codes; creating and changing them is gated above.
         Route::get(Seg::get('account.coupons'), [SellerCouponController::class, 'index'])->name('coupons');
-        Route::post(Seg::get('account.coupons'), [SellerCouponController::class, 'store'])->name('coupons.store');
-        Route::put(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'update'])
-            ->name('coupons.update');
         Route::delete(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'destroy'])
             ->name('coupons.destroy');
 

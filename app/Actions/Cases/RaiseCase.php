@@ -6,6 +6,7 @@ use App\Models\Buyer;
 use App\Models\Listing;
 use App\Models\Seller;
 use App\Models\SupportCase;
+use App\Support\StaffAlerts;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -60,7 +61,7 @@ class RaiseCase
             ]);
         }
 
-        return DB::transaction(fn (): SupportCase => SupportCase::create([
+        $case = DB::transaction(fn (): SupportCase => SupportCase::create([
             ...$subject,
             'reference' => SupportCase::newReference($kind),
             'kind' => $kind,
@@ -69,5 +70,9 @@ class RaiseCase
             'body' => $body,
             'status' => SupportCase::STATUS_OPEN,
         ]));
+
+        StaffAlerts::caseRaised($case);
+
+        return $case;
     }
 }
