@@ -69,9 +69,19 @@ class SellerListingController extends Controller
 
         $listing = $this->saveListing->create($storefront, $request->validated());
 
+        if ($this->wantsToPublish($request)) {
+            $listing = $this->saveListing->publish($listing);
+
+            // Photographs attach to a listing that exists, so the seller
+            // lands where they can add them straight away.
+            return redirect()
+                ->route('seller.listings.edit', $listing)
+                ->with('status', $this->publishedMessage($listing).' '.__('Now add photographs — buyers decide on them.'));
+        }
+
         return redirect()
             ->route('seller.listings.edit', $listing)
-            ->with('status', __('Draft saved. Review it, then publish when you are ready.'));
+            ->with('status', __('Draft saved. Add photographs, then publish when you are ready.'));
     }
 
     public function edit(Request $request, Listing $listing): View
@@ -91,7 +101,15 @@ class SellerListingController extends Controller
     {
         $this->authoriseOwnership($request, $listing);
 
-        $this->saveListing->update($listing, $request->validated());
+        $listing = $this->saveListing->update($listing, $request->validated());
+
+        if ($this->wantsToPublish($request) && ! $listing->isPublished()) {
+            $listing = $this->saveListing->publish($listing);
+
+            return redirect()
+                ->route('seller.listings')
+                ->with('status', $this->publishedMessage($listing));
+        }
 
         return back()->with('status', __('Listing updated.'));
     }
@@ -119,11 +137,11 @@ class SellerListingController extends Controller
     {
         $this->authoriseOwnership($request, $listing);
 
-        $this->saveListing->publish($listing);
+        $listing = $this->saveListing->publish($listing);
 
         return redirect()
             ->route('seller.listings')
-            ->with('status', __(':title is live.', ['title' => $listing->title]));
+            ->with('status', $this->publishedMessage($listing));
     }
 
     public function destroy(Request $request, Listing $listing): RedirectResponse
@@ -181,6 +199,20 @@ class SellerListingController extends Controller
             'jewellery' => [Category::KIND_JEWELLERY],
             default => [Category::KIND_STONE, Category::KIND_JEWELLERY],
         };
+    }
+
+    /** The form's second button: save, then put it in front of buyers. */
+    private function wantsToPublish(Request $request): bool
+    {
+        return $request->input('intent') === 'publish';
+    }
+
+    /** Honest about where it went: live, or into the approval queue. */
+    private function publishedMessage(Listing $listing): string
+    {
+        return $listing->isAwaitingApproval()
+            ? __(':title is waiting for approval. We will tell you when it is live.', ['title' => $listing->title])
+            : __(':title is live.', ['title' => $listing->title]);
     }
 
     private function storefront(Request $request): ?Seller

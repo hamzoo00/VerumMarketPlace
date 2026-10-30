@@ -5,6 +5,7 @@ namespace App\Http\Requests\Seller;
 use App\Models\Category;
 use App\Models\Listing;
 use App\Support\Countries;
+use App\Support\GemSpec;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -14,6 +15,11 @@ use Illuminate\Validation\Validator;
  *
  * Price rules depend on the listing type, so those are applied in
  * `after()` rather than duplicated across two rule sets.
+ *
+ * Gem details are either a choice from the trade's own vocabulary or
+ * free text that has to read like words, from App\Support\GemSpec —
+ * the same lists and patterns the form and the browser check, so the
+ * two can never disagree about what is acceptable.
  */
 class ListingRequest extends FormRequest
 {
@@ -26,8 +32,8 @@ class ListingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'min:3', 'max:120'],
-            'sku' => ['nullable', 'string', 'max:60'],
+            'title' => ['required', 'string', 'min:3', 'max:120', 'regex:'.GemSpec::regex('title')],
+            'sku' => ['nullable', 'string', 'max:60', 'regex:'.GemSpec::regex('sku')],
             'description' => ['nullable', 'string', 'max:5000'],
 
             'category_id' => [
@@ -58,27 +64,56 @@ class ListingRequest extends FormRequest
             ],
             'currency' => ['required', 'string', 'size:3'],
 
-            // Decimal input; converted to integer cents before saving.
-            'price' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
-            'start_price' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
-            'reserve_price' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
-            'bid_increment' => ['nullable', 'numeric', 'min:1', 'max:100000'],
-            'auction_ends_at' => ['nullable', 'date', 'after:+1 hour'],
+            // Decimal input; converted to integer cents before saving. A
+            // price of nothing is not a price.
+            'price' => ['nullable', 'numeric', 'min:0.01', 'max:9999999', 'decimal:0,2'],
+            'start_price' => ['nullable', 'numeric', 'min:0.01', 'max:9999999', 'decimal:0,2'],
+            'reserve_price' => ['nullable', 'numeric', 'min:0.01', 'max:9999999', 'decimal:0,2'],
+            'bid_increment' => ['nullable', 'numeric', 'min:1', 'max:100000', 'decimal:0,2'],
+            'auction_ends_at' => ['nullable', 'date', 'after:+1 hour', 'before:+90 days'],
 
-            'carat' => ['nullable', 'numeric', 'min:0', 'max:99999'],
-            'dimensions' => ['nullable', 'string', 'max:80'],
-            'shape' => ['nullable', 'string', 'max:60'],
-            'cut' => ['nullable', 'string', 'max:60'],
-            'color' => ['nullable', 'string', 'max:60'],
-            'clarity' => ['nullable', 'string', 'max:60'],
-            'treatment' => ['nullable', 'string', 'max:120'],
+            'carat' => ['nullable', 'numeric', 'min:0.01', 'max:'.GemSpec::caratMax(), 'decimal:0,2'],
+            'dimensions' => ['nullable', 'string', 'max:40', 'regex:'.GemSpec::regex('dimensions')],
+            'shape' => ['nullable', Rule::in(array_keys(GemSpec::shapes()))],
+            'cut' => ['nullable', Rule::in(array_keys(GemSpec::cuttingStyles()))],
+            'color' => ['nullable', 'string', 'max:60', 'regex:'.GemSpec::regex('words')],
+            'clarity' => ['nullable', Rule::in(GemSpec::clarityGrades())],
+            'treatment' => ['nullable', 'string', 'max:120', 'regex:'.GemSpec::regex('phrase')],
             'untreated' => ['nullable', 'boolean'],
-            'origin' => ['nullable', 'string', 'max:80'],
+            'origin' => ['nullable', 'string', 'max:80', 'regex:'.GemSpec::regex('phrase')],
             'origin_country' => ['nullable', 'string', 'size:2', Rule::in(array_keys(Countries::all()))],
 
-            'lab' => ['nullable', 'string', 'max:40'],
-            'report_number' => ['nullable', 'string', 'max:60'],
-            'report_date' => ['nullable', 'date', 'before_or_equal:today'],
+            'lab' => ['nullable', Rule::in(array_keys(GemSpec::labs()))],
+            // A report number means something only alongside its lab.
+            'report_number' => ['nullable', 'required_with:report_date', 'string', 'max:40', 'regex:'.GemSpec::regex('report_number')],
+            'report_date' => ['nullable', 'date', 'before_or_equal:today', 'after:1950-01-01'],
+        ];
+    }
+
+    /**
+     * Messages that say what a good value looks like, not just that the
+     * one given was wrong — "invalid format" helps nobody fix a field.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'title.regex' => __('Describe the piece in words, e.g. 2.14 ct unheated Mogok ruby.'),
+            'sku.regex' => __('Letters, numbers, dashes and dots only.'),
+            'dimensions.regex' => __('Write the measurements like 8.1 × 6.4 × 4.2 mm.'),
+            'color.regex' => __('Describe the colour in words, e.g. Royal blue.'),
+            'treatment.regex' => __('Describe the treatment in words, e.g. Heated or None detected.'),
+            'origin.regex' => __('Name the place in words, e.g. Mogok.'),
+            'report_number.regex' => __('Use the number exactly as printed on the report.'),
+            'report_number.required_with' => __('Add the report number that goes with this date.'),
+            'shape.in' => __('Choose a shape from the list.'),
+            'cut.in' => __('Choose a cutting style from the list.'),
+            'clarity.in' => __('Choose a clarity grade from the list.'),
+            'lab.in' => __('Choose a laboratory from the list.'),
+            'carat.min' => __('Carat weight must be more than zero.'),
+            'carat.decimal' => __('Give the carat weight to two decimal places at most.'),
+            'auction_ends_at.before' => __('An auction can run for 90 days at most.'),
         ];
     }
 
@@ -89,8 +124,27 @@ class ListingRequest extends FormRequest
             function (Validator $validator): void {
                 $this->validateCategoryIsLeaf($validator);
                 $this->validatePricing($validator);
+                $this->validateOffers($validator);
             },
         ];
+    }
+
+    /** An automatic yes above the asking price would accept more than was asked. */
+    private function validateOffers(Validator $validator): void
+    {
+        if (! $this->boolean('accepts_offers') || $this->input('listing_type') === Listing::TYPE_AUCTION) {
+            return;
+        }
+
+        $price = $this->input('price');
+        $accept = $this->input('auto_accept');
+
+        if (is_numeric($price) && is_numeric($accept) && (float) $accept > (float) $price) {
+            $validator->errors()->add(
+                'auto_accept',
+                __('Auto-accept cannot be above your asking price.'),
+            );
+        }
     }
 
     /** A branch is for navigation; only a leaf can hold a listing. */

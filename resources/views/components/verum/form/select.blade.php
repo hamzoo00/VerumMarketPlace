@@ -4,36 +4,66 @@
     // so the error lookup needs its own key.
     'errorKey' => null,
     'label',
+    // value => label, or group label => [value => label] for <optgroup>s.
     'options' => [],
     'selected' => null,
     'placeholder' => null,
     'required' => false,
     'full' => false,
+    'hint' => null,
 ])
 
+@php
+    $key = $errorKey ?? $name;
+    $current = (string) old($key, $selected);
+
+    // A stored value the list no longer offers is shown, marked, rather
+    // than silently swapped for the placeholder — saving then says what
+    // to change instead of quietly clearing it.
+    $known = collect($options)
+        ->flatMap(fn ($text, $value) => is_array($text) ? array_keys($text) : [$value])
+        ->map(fn ($value): string => (string) $value);
+    $stray = $current !== '' && ! $known->contains($current);
+@endphp
+
 {{-- Native select: works without JavaScript and is accessible by default. --}}
-<div @class(['field', 'field--select', 'field--full' => $full, 'has-error' => $errors->has($errorKey ?? $name)])>
+<div @class(['field', 'field--select', 'field--full' => $full, 'has-error' => $errors->has($key)])>
     <select
-        id="f-{{ $errorKey ?? $name }}"
+        id="f-{{ $key }}"
         name="{{ $name }}"
         @required($required)
-        @if ($errors->has($errorKey ?? $name)) aria-invalid="true" aria-describedby="e-{{ $errorKey ?? $name }}" @endif
+        @if ($errors->has($key)) aria-invalid="true" aria-describedby="e-{{ $key }}" @endif
         {{ $attributes }}
     >
-        <option value="" @selected(old($errorKey ?? $name, $selected) === null || old($errorKey ?? $name, $selected) === '')>
+        <option value="" @selected($current === '')>
             {{ $placeholder ?? '' }}
         </option>
+        @if ($stray)
+            <option value="{{ $current }}" selected>{{ __(':value (not on the list)', ['value' => $current]) }}</option>
+        @endif
         @foreach ($options as $value => $text)
-            <option value="{{ $value }}" @selected((string) old($errorKey ?? $name, $selected) === (string) $value)>
-                {{ $text }}
-            </option>
+            @if (is_array($text))
+                <optgroup label="{{ $value }}">
+                    @foreach ($text as $groupValue => $groupText)
+                        <option value="{{ $groupValue }}" @selected($current === (string) $groupValue)>{{ $groupText }}</option>
+                    @endforeach
+                </optgroup>
+            @else
+                <option value="{{ $value }}" @selected($current === (string) $value)>
+                    {{ $text }}
+                </option>
+            @endif
         @endforeach
     </select>
 
-    <label for="f-{{ $errorKey ?? $name }}">{{ $label }}</label>
+    <label for="f-{{ $key }}">{{ $label }}</label>
     <x-verum.icon name="chev" class="ic field__chev" />
 
-    @error($errorKey ?? $name)
-        <p class="field__err" id="e-{{ $errorKey ?? $name }}" role="alert" data-server="true">{{ $message }}</p>
+    @error($key)
+        <p class="field__err" id="e-{{ $key }}" role="alert" data-server="true">{{ $message }}</p>
+    @else
+        @if ($hint)
+            <p class="field__hint">{{ $hint }}</p>
+        @endif
     @enderror
 </div>

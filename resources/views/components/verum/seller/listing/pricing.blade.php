@@ -9,6 +9,11 @@
     Price fields follow the chosen type. Both sets are rendered and the
     irrelevant one is hidden, so a validation redisplay keeps what was typed
     and the form still works with JavaScript off.
+
+    `data-required`, not `required`: a native required field inside the
+    hidden set would stop the form submitting at all without JavaScript.
+    validate.js treats it as required only while its set is showing; the
+    server decides for certain either way.
 --}}
 <fieldset class="fgrp" data-pricing data-type-source="f-listing_type">
     <legend class="lbl">{{ __('Price') }}</legend>
@@ -39,6 +44,9 @@
             prefix="$"
             type="number"
             step="0.01"
+            min="0.01"
+            data-decimals="2"
+            data-required
             :label="__('Price')"
             :value="old('price', $decimal($listing->price_cents))"
             full
@@ -52,6 +60,9 @@
                 prefix="$"
                 type="number"
                 step="0.01"
+                min="0.01"
+                data-decimals="2"
+                data-required
                 :label="__('Starting price')"
                 :value="old('start_price', $decimal($listing->start_price_cents))"
             />
@@ -61,6 +72,8 @@
                 prefix="$"
                 type="number"
                 step="0.01"
+                min="0.01"
+                data-decimals="2"
                 :label="__('Reserve (optional)')"
                 :value="old('reserve_price', $decimal($listing->reserve_price_cents))"
                 :hint="__('The lot will not sell below this.')"
@@ -71,6 +84,8 @@
                 prefix="$"
                 type="number"
                 step="0.01"
+                min="1"
+                data-decimals="2"
                 :label="__('Bid increment')"
                 :value="old('bid_increment', $decimal($listing->bid_increment_cents))"
             />
@@ -78,6 +93,9 @@
             <x-verum.form.field
                 name="auction_ends_at"
                 type="datetime-local"
+                :min="now()->addHour()->format('Y-m-d\\TH:i')"
+                :max="now()->addDays(90)->format('Y-m-d\\TH:i')"
+                data-required
                 :label="__('Ends at')"
                 :value="old('auction_ends_at', $listing->auction_ends_at?->format('Y-m-d\TH:i'))"
             />

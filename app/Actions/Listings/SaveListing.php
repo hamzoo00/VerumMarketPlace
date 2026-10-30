@@ -4,7 +4,9 @@ namespace App\Actions\Listings;
 
 use App\Models\Listing;
 use App\Models\Seller;
+use App\Support\GemSpec;
 use App\Support\PlatformSettings;
+use App\Support\StaffAlerts;
 use Illuminate\Support\Str;
 
 /**
@@ -34,9 +36,9 @@ class SaveListing
         return $listing->refresh();
     }
 
-    /** Draft → live. Auctions keep their own end time. */
     /**
-     * Put a listing live, or into the approval queue.
+     * Draft → live, or into the approval queue. Auctions keep their own
+     * end time.
      *
      * When the platform requires approval the row still becomes active
      * and published — it simply does not satisfy `scopePublished()`
@@ -59,6 +61,10 @@ class SaveListing
             'approval_state' => $needsApproval ? Listing::APPROVAL_PENDING : $listing->approval_state,
             'approval_requested_at' => $needsApproval ? now() : $listing->approval_requested_at,
         ]);
+
+        if ($needsApproval) {
+            StaffAlerts::approvalRequested($listing);
+        }
 
         return $listing->refresh();
     }
@@ -104,7 +110,8 @@ class SaveListing
             'auction_ends_at' => $isAuction ? ($data['auction_ends_at'] ?? null) : null,
 
             'carat' => $data['carat'] ?? null,
-            'dimensions' => $data['dimensions'] ?? null,
+            // "8.1x6.4x4.2" and "8,1 × 6,4 × 4,2 mm" are one measurement.
+            'dimensions' => GemSpec::normaliseDimensions($data['dimensions'] ?? null),
             'shape' => $data['shape'] ?? null,
             'cut' => $data['cut'] ?? null,
             'color' => $data['color'] ?? null,

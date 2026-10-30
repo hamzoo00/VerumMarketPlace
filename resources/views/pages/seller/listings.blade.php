@@ -27,9 +27,10 @@
 
     {{--
         Wrapped so live-seller.js can swap the whole region when this
-        seller's inventory changes elsewhere — another tab, or a delete.
+        seller's inventory changes elsewhere — another tab, or a delete —
+        or when an admin opens or closes feature requests in Settings.
     --}}
-    <div data-inventory @if ($storefront) data-seller-live="{{ $storefront->id }}" @endif>
+    <div data-inventory data-settings-section="listings" @if ($storefront) data-seller-live="{{ $storefront->id }}" @endif>
 
     @if ($listings->isEmpty())
         <x-verum.account.panel :title="__('Nothing here yet')" icon="gem">
