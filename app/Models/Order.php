@@ -22,6 +22,8 @@ use Illuminate\Support\Str;
  *
  * @property Carbon|null $paid_at
  * @property Carbon|null $dispatched_at
+ * @property Carbon|null $delivered_at
+ * @property Carbon|null $cancelled_at
  */
 class Order extends Model
 {

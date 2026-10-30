@@ -74,6 +74,12 @@
                 @endif
             </header>
 
+            {{-- Always rendered, even when empty, so a suspension arriving
+                 over the socket has somewhere to appear. --}}
+            <div data-live-region="standing">
+                <x-verum.seller.standing :$account />
+            </div>
+
             {{-- The toast host shows session('status'); a banner here too
                  meant every seller action announced itself twice. --}}
             <x-verum.form.errors />

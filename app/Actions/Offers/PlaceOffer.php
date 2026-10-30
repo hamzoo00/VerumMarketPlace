@@ -21,6 +21,12 @@ class PlaceOffer
 {
     public function handle(Listing $listing, Buyer $buyer, int $amountCents, ?string $message = null): Offer
     {
+        if (! ($listing->seller?->isTrading() ?? true)) {
+            throw ValidationException::withMessages([
+                'amount' => __('This seller is not taking offers right now.'),
+            ]);
+        }
+
         $problem = OfferRules::rejectionReason($listing, $amountCents);
 
         if ($problem !== null) {

@@ -16,7 +16,9 @@ class SellerController extends Controller
     public function index(): View
     {
         return view('pages.sellers.index', [
+            // A suspended or closing seller is off the site entirely.
             'sellers' => Seller::query()
+                ->visible()
                 ->withCount(['listings as listings_published_count' => fn ($query) => $query->published()])
                 ->orderByDesc('rating')
                 ->get(),
@@ -25,6 +27,10 @@ class SellerController extends Controller
 
     public function show(Seller $seller): View
     {
+        // Not found rather than forbidden: a hidden storefront should not
+        // confirm that it exists.
+        abort_if($seller->isHidden(), 404);
+
         $seller->load([
             'reviews' => fn ($query) => $query->orderByDesc('reviewed_on'),
         ]);

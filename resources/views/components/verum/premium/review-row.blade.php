@@ -48,52 +48,86 @@
     </div>
 
     <div class="revrow__acts">
+        @php
+            $action = route('admin.listings.review', $listing);
+            $replace = ['listing' => $listing->title];
+        @endphp
+
+        {{-- Every decision tells the seller; the dialog shows what. --}}
         @if ($mode === 'approval')
             @if ($listing->approval_state !== Listing::APPROVAL_APPROVED)
-                <form method="POST" action="{{ route('admin.listings.review', $listing) }}">
-                    @csrf
-                    @method('PUT')
+                <x-verum.admin.notice-form
+                    :$action
+                    method="PUT"
+                    kind="listing_approved"
+                    :$replace
+                    :title="__('Approve “:listing”', $replace)"
+                    :lede="__('It goes live on the site at once.')"
+                    :confirm="__('Approve')"
+                >
                     <input type="hidden" name="action" value="approve">
                     <button class="btn btn--ruby btn--sm" type="submit">{{ __('Approve') }}</button>
-                </form>
+                </x-verum.admin.notice-form>
             @endif
 
             @if ($listing->approval_state !== Listing::APPROVAL_REJECTED)
-                {{-- A reason is required: a rejection a seller cannot act
-                     on just gets resubmitted unchanged. --}}
-                <form method="POST" action="{{ route('admin.listings.review', $listing) }}" class="revrow__reject">
-                    @csrf
-                    @method('PUT')
+                {{-- Whatever is sent becomes the reason on the seller's
+                     inventory, so they know what to fix. --}}
+                <x-verum.admin.notice-form
+                    :$action
+                    method="PUT"
+                    kind="listing_rejected"
+                    :$replace
+                    :title="__('Reject “:listing”', $replace)"
+                    :lede="__('The seller sees this reason on their inventory, so say what to fix.')"
+                    :confirm="__('Reject')"
+                    danger
+                >
                     <input type="hidden" name="action" value="reject">
-                    <input class="revrow__reason" type="text" name="reason" required maxlength="200"
-                        placeholder="{{ __('Why?') }}" aria-label="{{ __('Reason for rejection') }}">
                     <button class="btn btn--ghost btn--sm" type="submit">{{ __('Reject') }}</button>
-                </form>
+                </x-verum.admin.notice-form>
             @endif
         @else
             @if ($listing->feature_state !== Listing::FEATURE_ACTIVE)
-                <form method="POST" action="{{ route('admin.listings.review', $listing) }}" class="revrow__feature">
-                    @csrf
-                    @method('PUT')
+                <x-verum.admin.notice-form
+                    :$action
+                    method="PUT"
+                    kind="feature_granted"
+                    :$replace
+                    :title="__('Feature “:listing”', $replace)"
+                    :lede="__('It joins the featured section on the home page.')"
+                    :confirm="__('Feature')"
+                    class="revrow__feature"
+                >
                     <input type="hidden" name="action" value="feature">
                     <input class="revrow__days" type="number" name="days" min="1" max="365"
                         placeholder="{{ __('Days') }}" aria-label="{{ __('Days to feature for') }}">
                     <button class="btn btn--ruby btn--sm" type="submit">{{ __('Feature') }}</button>
-                </form>
+                </x-verum.admin.notice-form>
 
-                <form method="POST" action="{{ route('admin.listings.review', $listing) }}">
-                    @csrf
-                    @method('PUT')
+                <x-verum.admin.notice-form
+                    :$action
+                    method="PUT"
+                    kind="feature_declined"
+                    :$replace
+                    :title="__('Decline featuring “:listing”', $replace)"
+                    :confirm="__('Decline')"
+                >
                     <input type="hidden" name="action" value="decline">
                     <button class="btn btn--ghost btn--sm" type="submit">{{ __('Decline') }}</button>
-                </form>
+                </x-verum.admin.notice-form>
             @else
-                <form method="POST" action="{{ route('admin.listings.review', $listing) }}">
-                    @csrf
-                    @method('PUT')
+                <x-verum.admin.notice-form
+                    :$action
+                    method="PUT"
+                    kind="feature_ended"
+                    :$replace
+                    :title="__('Remove “:listing” from featured', $replace)"
+                    :confirm="__('Remove')"
+                >
                     <input type="hidden" name="action" value="unfeature">
                     <button class="btn btn--ghost btn--sm" type="submit">{{ __('Remove from featured') }}</button>
-                </form>
+                </x-verum.admin.notice-form>
             @endif
         @endif
     </div>

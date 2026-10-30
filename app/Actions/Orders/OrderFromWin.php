@@ -34,6 +34,12 @@ class OrderFromWin
             return null;
         }
 
+        // A lot that closes while its seller is suspended closes unsold:
+        // the sweep ends it rather than creating an order nobody can fill.
+        if (! ($listing->seller?->isTrading() ?? true)) {
+            return null;
+        }
+
         // `bids` is append-only, so the top row is the winner.
         $top = $listing->bids()->orderByDesc('amount_cents')->orderBy('id')->first();
 

@@ -74,6 +74,14 @@ class PlaceBid
             ]);
         }
 
+        // A lot whose seller was suspended mid-auction stays visible on a
+        // page opened earlier; the bid is refused here, not on that page.
+        if (! ($listing->seller?->isTrading() ?? true)) {
+            throw ValidationException::withMessages([
+                'amount' => __('This seller is not taking bids right now.'),
+            ]);
+        }
+
         $minimum = AuctionRules::minimumBid($listing);
 
         if ($amountCents < $minimum) {

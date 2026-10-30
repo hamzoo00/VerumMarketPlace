@@ -28,6 +28,14 @@ class RespondToOffer
      */
     public function accept(Offer $offer): Offer
     {
+        // Refused before the offer settles, so a stopped seller does not
+        // leave an "accepted" offer with no order behind it.
+        if (! ($offer->listing?->seller?->isTrading() ?? true)) {
+            throw ValidationException::withMessages([
+                'decision' => __('This seller is not taking orders right now.'),
+            ]);
+        }
+
         $accepted = $this->settle($offer, Offer::STATUS_ACCEPTED);
 
         $this->orderFromWin->forOffer($accepted);

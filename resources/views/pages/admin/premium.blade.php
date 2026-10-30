@@ -31,6 +31,8 @@
         <button class="btn btn--ghost btn--sm" type="submit">{{ __('Search') }}</button>
     </form>
 
+    {{-- Re-read when another admin changes a seller's standing. --}}
+    <div data-live-region="premium" data-staff-area="premium">
     @if ($sellers->isEmpty())
         <x-verum.account.panel :title="__('No sellers')" icon="badge">
             <x-verum.account.empty
@@ -45,6 +47,7 @@
                 @php
                     $isPremium = PremiumStatus::isPremium($seller);
                     $isCertified = PremiumStatus::isCertified($seller);
+                    $action = route('admin.premium.update', $seller);
                 @endphp
 
                 <article class="revrow revrow--seller">
@@ -75,21 +78,33 @@
 
                     <div class="revrow__acts">
                         @if ($isPremium)
-                            <form method="POST" action="{{ route('admin.premium.update', $seller) }}">
-                                @csrf
-                                @method('PUT')
+                            <x-verum.admin.notice-form
+                                :$action
+                                method="PUT"
+                                kind="premium_revoked"
+                                :title="__('End premium for :seller', ['seller' => $seller->name])"
+                                :lede="__('Any featured listings come down with it. The certificate stays.')"
+                                :confirm="__('End premium')"
+                                danger
+                            >
                                 <input type="hidden" name="action" value="revoke">
                                 <button class="btn btn--ghost btn--sm" type="submit">{{ __('End premium') }}</button>
-                            </form>
+                            </x-verum.admin.notice-form>
                         @else
-                            <form method="POST" action="{{ route('admin.premium.update', $seller) }}" class="revrow__feature">
-                                @csrf
-                                @method('PUT')
+                            <x-verum.admin.notice-form
+                                :$action
+                                method="PUT"
+                                kind="premium_granted"
+                                :title="__('Grant premium to :seller', ['seller' => $seller->name])"
+                                :lede="__('Leave months empty for no end date.')"
+                                :confirm="__('Grant premium')"
+                                class="revrow__feature"
+                            >
                                 <input type="hidden" name="action" value="grant">
                                 <input class="revrow__days" type="number" name="months" min="1" max="120"
                                     placeholder="{{ __('Months') }}" aria-label="{{ __('Months of premium') }}">
                                 <button class="btn btn--ruby btn--sm" type="submit">{{ __('Grant premium') }}</button>
-                            </form>
+                            </x-verum.admin.notice-form>
                         @endif
 
                         @if ($isCertified)
@@ -97,21 +112,34 @@
                                 {{ __('View certificate') }}
                             </a>
 
-                            <form method="POST" action="{{ route('admin.premium.update', $seller) }}">
-                                @csrf
-                                @method('PUT')
+                            <x-verum.admin.notice-form
+                                :$action
+                                method="PUT"
+                                kind="decertified"
+                                :title="__('Withdraw the certificate of :seller', ['seller' => $seller->name])"
+                                :lede="__('It disappears from every listing they publish, and the reference stops being valid.')"
+                                :confirm="__('Withdraw')"
+                                danger
+                            >
                                 <input type="hidden" name="action" value="decertify">
                                 <button class="link" type="submit">{{ __('Withdraw') }}</button>
-                            </form>
+                            </x-verum.admin.notice-form>
                         @else
-                            <form method="POST" action="{{ route('admin.premium.update', $seller) }}" class="revrow__feature">
-                                @csrf
-                                @method('PUT')
+                            <x-verum.admin.notice-form
+                                :$action
+                                method="PUT"
+                                kind="certified"
+                                :replace="['reference' => $seller->certificate_reference ?? __('(a new reference)')]"
+                                :title="__('Issue a certificate to :seller', ['seller' => $seller->name])"
+                                :lede="__('The note, if any, is printed on the certificate itself.')"
+                                :confirm="__('Issue certificate')"
+                                class="revrow__feature"
+                            >
                                 <input type="hidden" name="action" value="certify">
                                 <input class="revrow__reason" type="text" name="note" maxlength="160"
                                     placeholder="{{ __('Note (optional)') }}" aria-label="{{ __('Certificate note') }}">
                                 <button class="btn btn--ghost btn--sm" type="submit">{{ __('Issue certificate') }}</button>
-                            </form>
+                            </x-verum.admin.notice-form>
                         @endif
                     </div>
                 </article>
@@ -120,4 +148,5 @@
 
         <div class="pager">{{ $sellers->onEachSide(1)->links() }}</div>
     @endif
+    </div>
 </x-layouts::admin>

@@ -10,7 +10,7 @@ class AboutController extends Controller
     public function __invoke(): View
     {
         return view('pages.about', [
-            'sellers' => Seller::orderByDesc('rating')->get(),
+            'sellers' => Seller::query()->visible()->orderByDesc('rating')->get(),
         ]);
     }
 }

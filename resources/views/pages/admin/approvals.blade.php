@@ -13,13 +13,16 @@
     :heading="__('Approvals')"
     :lede="__('Stones waiting to go public.')"
 >
+    {{-- Re-read when a seller asks, another admin decides, or approval is
+         switched on or off in Settings — the banner is part of it. --}}
+    <div data-live-region="approvals" data-staff-area="approvals">
     @unless ($approvalRequired)
         <div class="notice" role="status">
             <x-verum.icon name="info" />
             <div>
                 <b>{{ __('Approval is switched off.') }}</b>
                 <p>{{ __('New listings go live on their own. Anything already queued still waits for you.') }}</p>
-                <a class="link" href="{{ route('admin.settings') }}" wire:navigate>{{ __('Change this in settings') }}</a>
+                <a class="link" href="{{ route('admin.settings', ['section' => 'listings']) }}" wire:navigate>{{ __('Change this in settings') }}</a>
             </div>
         </div>
     @endunless
@@ -52,4 +55,5 @@
 
         <div class="pager">{{ $listings->onEachSide(1)->links() }}</div>
     @endif
+    </div>
 </x-layouts::admin>

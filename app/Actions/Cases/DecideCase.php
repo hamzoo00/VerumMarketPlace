@@ -2,10 +2,12 @@
 
 namespace App\Actions\Cases;
 
+use App\Actions\Notices\IssueNotice;
 use App\Models\Admin;
 use App\Models\Listing;
 use App\Models\SupportCase;
 use App\Notifications\CaseDecided;
+use App\Support\StaffBoard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -21,6 +23,8 @@ use Illuminate\Validation\ValidationException;
  */
 class DecideCase
 {
+    public function __construct(private readonly IssueNotice $notices) {}
+
     public function review(SupportCase $case): SupportCase
     {
         $case->update(['status' => SupportCase::STATUS_REVIEWING]);
@@ -66,6 +70,14 @@ class DecideCase
         });
 
         $this->tellBothSides($settled);
+
+        // A warning given through a case counts like any other. The case
+        // email has already told the seller, so it is recorded, not sent.
+        if ($resolution === 'seller_warned') {
+            $this->notices->record($settled->subjectSeller()?->account, 'case_warning', $note, $admin, $settled);
+        }
+
+        StaffBoard::changed(StaffBoard::CASES, StaffBoard::SELLERS);
 
         return $settled;
     }

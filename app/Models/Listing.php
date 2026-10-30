@@ -234,6 +234,10 @@ class Listing extends Model implements HasMedia
      * `approval_state` null means the listing predates the rule, so it
      * stays visible: switching approval on must not blank the catalogue.
      *
+     * A storefront taken down (its seller suspended or closing) hides
+     * every listing it holds from here too, without touching their rows,
+     * so reinstating a seller puts the catalogue back exactly as it was.
+     *
      * @param  Builder<self>  $query
      */
     public function scopePublished(Builder $query): void
@@ -242,7 +246,8 @@ class Listing extends Model implements HasMedia
             ->whereNotNull('published_at')
             ->where(fn (Builder $inner) => $inner
                 ->whereNull('approval_state')
-                ->orWhere('approval_state', self::APPROVAL_APPROVED));
+                ->orWhere('approval_state', self::APPROVAL_APPROVED))
+            ->whereDoesntHave('seller', fn (Builder $seller) => $seller->whereNotNull('hidden_at'));
     }
 
     /**
@@ -324,9 +329,29 @@ class Listing extends Model implements HasMedia
         return $this->status === self::STATUS_DRAFT;
     }
 
+    /**
+     * Published in the seller's sense: they put it live.
+     *
+     * Not the same as a buyer being able to see it — for that, see
+     * isPubliclyVisible().
+     */
     public function isPublished(): bool
     {
         return $this->status === self::STATUS_ACTIVE && $this->published_at !== null;
+    }
+
+    /**
+     * What scopePublished() decides, for one loaded row.
+     *
+     * The live catalogue announces on this, not on isPublished(): a
+     * listing waiting for approval, or one whose storefront is down, must
+     * not reach an open shop page that a reload would not show it on.
+     */
+    public function isPubliclyVisible(): bool
+    {
+        return $this->isPublished()
+            && in_array($this->approval_state, [null, self::APPROVAL_APPROVED], true)
+            && ! ($this->seller?->isHidden() ?? false);
     }
 
     public function hasEnded(): bool

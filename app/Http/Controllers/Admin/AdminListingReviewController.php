@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Notices\IssueNotice;
 use App\Actions\Premium\DecideListingReview;
+use App\Http\Controllers\Concerns\RespondsToActions;
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
 use App\Support\PlatformSettings;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -22,6 +25,8 @@ use RuntimeException;
  */
 class AdminListingReviewController extends Controller
 {
+    use RespondsToActions;
+
     public function __construct(private readonly DecideListingReview $decide) {}
 
     public function approvals(Request $request): View
@@ -68,37 +73,36 @@ class AdminListingReviewController extends Controller
         ]);
     }
 
-    public function decide(Request $request, Listing $listing): RedirectResponse
+    public function decide(Request $request, Listing $listing): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'action' => ['required', Rule::in(['approve', 'reject', 'feature', 'decline', 'unfeature'])],
-            // Required only for a rejection: a reason a seller cannot
-            // act on is worse than none, because they resubmit as-is.
-            'reason' => ['required_if:action,reject', 'nullable', 'string', 'max:200'],
+            // Optional for every decision, a rejection included: left
+            // empty, the seller gets the default, which says what to fix.
+            'message' => ['nullable', 'string', 'max:'.IssueNotice::MAX_LENGTH],
             'days' => ['nullable', 'integer', 'min:1', 'max:365'],
         ]);
 
         $admin = $request->user('admin');
+        $note = $validated['message'] ?? null;
 
         try {
-            $message = match ($validated['action']) {
-                'approve' => tap(__('Listing approved.'), fn () => $this->decide->approve($listing, $admin)),
-                'reject' => tap(__('Listing rejected.'), fn () => $this->decide->reject(
-                    $listing,
-                    $admin,
-                    (string) $validated['reason'],
-                )),
+            $done = match ($validated['action']) {
+                'approve' => tap(__('Listing approved. The seller has been told.'), fn () => $this->decide->approve($listing, $admin, $note)),
+                'reject' => tap(__('Listing rejected. The seller has been told why.'), fn () => $this->decide->reject($listing, $admin, $note)),
                 'feature' => tap(__('Listing featured.'), fn () => $this->decide->feature(
                     $listing,
                     $validated['days'] ?? null,
+                    $admin,
+                    $note,
                 )),
-                'decline' => tap(__('Feature request declined.'), fn () => $this->decide->declineFeature($listing)),
-                default => tap(__('Listing unfeatured.'), fn () => $this->decide->unfeature($listing)),
+                'decline' => tap(__('Feature request declined.'), fn () => $this->decide->declineFeature($listing, $admin, $note)),
+                default => tap(__('Listing unfeatured.'), fn () => $this->decide->unfeature($listing, $admin, $note)),
             };
         } catch (RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
+            return $this->refused($request, $e->getMessage());
         }
 
-        return back()->with('status', $message);
+        return $this->done($request, $done);
     }
 }

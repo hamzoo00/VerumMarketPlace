@@ -26,6 +26,14 @@ return [
             'no_response' => 'Seller will not reply',
             'other' => 'Something else',
         ],
+
+        /*
+         * How long after delivery a buyer can still raise a dispute.
+         * Thirty days, the common marketplace standard. A closing seller
+         * stays open until the last parcel could arrive and this window
+         * has run out, so a buyer is never left with nobody to answer.
+         */
+        'window_days' => (int) env('DISPUTE_WINDOW_DAYS', 30),
     ],
 
     'audits' => [

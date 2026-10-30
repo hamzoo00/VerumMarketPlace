@@ -2,12 +2,15 @@
 
 use App\Actions\Listings\SaveListing;
 use App\Actions\Premium\DecidePremium;
+use App\Events\PlatformSettingsChanged;
+use App\Events\StaffBoardChanged;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Listing;
 use App\Models\Seller;
 use App\Models\SellerAccount;
 use App\Support\PlatformSettings;
+use Illuminate\Support\Facades\Event;
 
 /** Every premium page renders: a Blade slip is invisible to a unit test. */
 beforeEach(function (): void {
@@ -34,11 +37,16 @@ it('keeps the premium pages away from everyone else', function (): void {
     $this->get(route('admin.settings'))->assertRedirect();
 });
 
-it('saves settings from the form', function (): void {
+it('saves settings one section at a time', function (): void {
     $this->actingAs($this->admin, 'admin')
-        ->put(route('admin.settings.update'), [
+        ->put(route('admin.settings.update', 'commission'), [
             'commission_enabled' => '1',
             'commission_percent' => '7.5',
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($this->admin, 'admin')
+        ->put(route('admin.settings.update', 'listings'), [
             'listing_approval_required' => '1',
             'featured_slots' => '8',
         ])
@@ -51,6 +59,52 @@ it('saves settings from the form', function (): void {
         // An unchecked box posts nothing, so featuring must read as off.
         ->and(PlatformSettings::featuringEnabled())->toBeFalse();
 });
+
+it('leaves other sections alone when one is saved', function (): void {
+    PlatformSettings::put(['listing_approval_required' => true]);
+
+    // The commission tab has no approval box; saving it must not read
+    // that box's absence as "switch approval off".
+    $this->actingAs($this->admin, 'admin')
+        ->put(route('admin.settings.update', 'commission'), ['commission_percent' => '5'])
+        ->assertRedirect();
+
+    PlatformSettings::flush();
+
+    expect(PlatformSettings::approvalRequired())->toBeTrue();
+});
+
+it('tells open pages when a section is saved, by name only', function (): void {
+    Event::fake([PlatformSettingsChanged::class, StaffBoardChanged::class]);
+
+    $this->actingAs($this->admin, 'admin')
+        ->put(route('admin.settings.update', 'listings'), ['featured_slots' => '6'])
+        ->assertRedirect();
+
+    // Sellers' pages: the listing form's button, the inventory's feature requests.
+    Event::assertDispatched(
+        PlatformSettingsChanged::class,
+        fn (PlatformSettingsChanged $event): bool => $event->broadcastWith() === ['sections' => ['listings']],
+    );
+
+    // Admin pages whose banners read it, and other admins' Settings.
+    Event::assertDispatched(
+        StaffBoardChanged::class,
+        fn (StaffBoardChanged $event): bool => $event->areas === ['settings', 'approvals', 'features'],
+    );
+});
+
+it('shows each settings section with its standard messages', function (string $section, string $sample): void {
+    $this->actingAs($this->admin, 'admin')
+        ->get(route('admin.settings', ['section' => $section]))
+        ->assertOk()
+        ->assertSee($sample);
+})->with([
+    'accounts' => ['accounts', 'Selling suspended'],
+    'moderation' => ['moderation', 'Flag upheld'],
+    'listings' => ['listings', 'Listing not approved'],
+    'orders' => ['orders', 'store closed'],
+]);
 
 it('shows the certificate card once one is issued', function (): void {
     app(DecidePremium::class)->certify($this->seller, $this->admin, 'Checked in person.');
@@ -109,12 +163,16 @@ it('decides a listing from the admin queue', function (): void {
     expect($listing->fresh()->approval_state)->toBe(Listing::APPROVAL_APPROVED);
 });
 
-it('requires a reason to reject', function (): void {
+it('rejects with the standard reason when the admin writes none', function (): void {
     $listing = Listing::factory()->for($this->seller)->for($this->category)->create();
 
     $this->actingAs($this->admin, 'admin')
         ->put(route('admin.listings.review', $listing), ['action' => 'reject'])
-        ->assertSessionHasErrors('reason');
+        ->assertRedirect();
+
+    // The seller still learns what to fix: the default asks them to check
+    // exactly what reviewers look at, and it is kept as the listing's note.
+    expect($listing->fresh()->approval_note)->toContain('photographs');
 });
 
 it('lets a premium seller ask to feature from their inventory', function (): void {
@@ -137,4 +195,28 @@ it('tells an ordinary seller featuring is not for them', function (): void {
         ->assertSessionHas('error');
 
     expect($listing->fresh()->feature_state)->toBeNull();
+});
+
+it('fills each queue row’s message dialog with that listing’s standard words', function (): void {
+    Listing::factory()->for($this->seller)->for($this->category)->create([
+        'title' => 'Royal blue Ceylon sapphire',
+        'status' => Listing::STATUS_ACTIVE,
+        'published_at' => now(),
+        'approval_state' => Listing::APPROVAL_PENDING,
+        'approval_requested_at' => now(),
+    ]);
+
+    $this->actingAs($this->admin, 'admin')
+        ->get(route('admin.approvals'))
+        ->assertOk()
+        ->assertSee('data-notice-dialog', false)
+        ->assertSee('data-notice-default="Your listing “Royal blue Ceylon sapphire” has been approved', false);
+});
+
+it('renders the premium page’s actions as message forms', function (): void {
+    $this->actingAs($this->admin, 'admin')
+        ->get(route('admin.premium', ['filter' => 'all']))
+        ->assertOk()
+        ->assertSee('Grant premium to '.$this->seller->name)
+        ->assertSee('Issue a certificate to '.$this->seller->name);
 });

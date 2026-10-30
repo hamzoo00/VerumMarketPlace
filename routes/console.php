@@ -26,3 +26,12 @@ Schedule::command('currency:refresh')
 Schedule::command('auctions:close')
     ->everyMinute()
     ->withoutOverlapping();
+
+/*
+ * A closing seller's window is measured in days, so hourly is plenty —
+ * and nothing is lost by running late: the account simply stays open
+ * a little longer for buyers whose parcels are still on the way.
+ */
+Schedule::command('sellers:finish-closures')
+    ->hourly()
+    ->withoutOverlapping();

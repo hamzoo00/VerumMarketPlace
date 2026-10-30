@@ -22,6 +22,15 @@ class EnsureSellerIsApproved
             return redirect()->guest(route('seller.login'));
         }
 
+        // A session opened before the account closed ends here; sign-in
+        // itself already refuses a closed account.
+        if ($account->isClosed()) {
+            auth('seller')->logout();
+
+            return redirect()->route('seller.login')
+                ->with('error', __('This seller account has been closed.'));
+        }
+
         if (! $account->isApproved()) {
             return $request->expectsJson()
                 ? response()->json([

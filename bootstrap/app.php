@@ -3,6 +3,7 @@
 use App\Http\Middleware\AuthenticateAnyAccount;
 use App\Http\Middleware\AuthenticateArea;
 use App\Http\Middleware\EnsureAdminIsActive;
+use App\Http\Middleware\EnsureSellerCanTrade;
 use App\Http\Middleware\EnsureSellerIsApproved;
 use App\Http\Middleware\RedirectIfAuthenticatedAccount;
 use App\Support\DisplayCurrency;
@@ -38,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'seller.approved' => EnsureSellerIsApproved::class,
+            'seller.trading' => EnsureSellerCanTrade::class,
             'admin.active' => EnsureAdminIsActive::class,
             'auth.area' => AuthenticateArea::class,
             'guest.account' => RedirectIfAuthenticatedAccount::class,

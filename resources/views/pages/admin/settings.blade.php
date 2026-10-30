@@ -1,74 +1,60 @@
+@php
+    $section = $sections[$current];
+@endphp
+
 <x-layouts::admin
     :title="__('Platform settings')"
     :heading="__('Settings')"
-    :lede="__('What the marketplace charges, and what it checks before a stone goes live.')"
+    :lede="__('How the marketplace runs, and what it says when you act without writing your own words.')"
 >
-    <form method="POST" action="{{ route('admin.settings.update') }}" class="cform setform">
-        @csrf
-        @method('PUT')
+    {{-- One category at a time; each saves only what it shows. --}}
+    <nav class="settabs" aria-label="{{ __('Settings sections') }}">
+        @foreach ($sections as $key => $tab)
+            <a
+                href="{{ route('admin.settings', ['section' => $key]) }}"
+                @class(['settabs__tab', 'is-on' => $current === $key])
+                @if ($current === $key) aria-current="page" @endif
+                wire:navigate
+            >
+                <x-verum.icon :name="$tab['icon']" />{{ __($tab['label']) }}
+            </a>
+        @endforeach
+    </nav>
 
-        <x-verum.form.errors />
+    <div class="setpanel">
+        @if ($section['settings'] !== [])
+            {{-- Another admin's save moves these switches here too; one
+                 with unsaved changes holds still until it is sent. --}}
+            <div data-live-region="settings-form" data-staff-area="settings">
+                <form method="POST" action="{{ route('admin.settings.update', $current) }}" class="cform setform" data-live-form data-validate>
+                    @csrf
+                    @method('PUT')
 
-        <x-verum.account.panel :title="__('Commission')" icon="scale">
-            <p class="mute">
-                {{ __('A percentage of each sale, recorded on the order as it is placed. Postage is excluded — the seller pays the carrier out of it.') }}
-            </p>
+                    <x-dynamic-component :component="'verum.admin.settings.'.$current" :$settings />
 
-            <label class="chk">
-                <input type="checkbox" name="commission_enabled" value="1" @checked($settings['commission_enabled'])>
-                <span>{{ __('Charge commission on every sale') }}</span>
-            </label>
-
-            <div class="fgrid">
-                <x-verum.form.field
-                    name="commission_percent"
-                    type="number"
-                    :label="__('Rate')"
-                    :value="$settings['commission_percent']"
-                    step="0.1"
-                    prefix="%"
-                    :hint="__('Between 0 and 50. A rate of zero with the toggle on charges nothing.')"
-                />
+                    <button class="btn btn--ruby" type="submit">
+                        {{ __('Save :section settings', ['section' => mb_strtolower(__($section['label']))]) }}
+                    </button>
+                </form>
             </div>
-        </x-verum.account.panel>
+        @endif
 
-        <x-verum.account.panel :title="__('Listing approval')" icon="check">
-            <p class="mute">
-                {{ __('Independent of commission: a platform that takes no cut may still want to see what goes up.') }}
-            </p>
+        @if ($current === 'accounts')
+            <x-verum.account.panel :title="__('Closing an account')" icon="clock" :hint="__('What “Delete account” does on the Sellers page.')">
+                <ul class="setfacts">
+                    <li>{{ __('The storefront and every listing come off the site at once, and no new order, bid or offer is taken.') }}</li>
+                    <li>{{ __('Orders not yet dispatched are cancelled, and each buyer is sent an apology.') }}</li>
+                    <li>{{ __('Orders on their way keep the account open until they could arrive, plus :days days for the buyer to dispute.', ['days' => $disputeDays]) }}</li>
+                    <li>{{ __('An open case holds it open too. After that the account closes for good and its email cannot apply to sell again.') }}</li>
+                </ul>
+            </x-verum.account.panel>
+        @endif
 
-            <label class="chk">
-                <input type="checkbox" name="listing_approval_required" value="1" @checked($settings['listing_approval_required'])>
-                <span>{{ __('Every new listing needs approving before it is public') }}</span>
-            </label>
-
-            <p class="mute">
-                {{ __('Listings already live stay live — switching this on queues what comes next, not the catalogue.') }}
-            </p>
-        </x-verum.account.panel>
-
-        <x-verum.account.panel :title="__('Featured listings')" icon="spark">
-            <p class="mute">
-                {{ __('Premium sellers ask for a slot; you grant it. This only decides whether the queue is open.') }}
-            </p>
-
-            <label class="chk">
-                <input type="checkbox" name="featuring_enabled" value="1" @checked($settings['featuring_enabled'])>
-                <span>{{ __('Accept feature requests from premium sellers') }}</span>
-            </label>
-
-            <div class="fgrid">
-                <x-verum.form.field
-                    name="featured_slots"
-                    type="number"
-                    :label="__('Slots on the storefront')"
-                    :value="$settings['featured_slots']"
-                    min="1"
-                    max="24"
-                />
+        @if ($notices !== [])
+            {{-- Re-read after a save here or another admin's edit. --}}
+            <div data-live-region="notice-templates" data-staff-area="settings">
+                <x-verum.admin.settings.notice-defaults :$notices />
             </div>
-        </x-verum.account.panel>
-
-        <button class="btn btn--ruby" type="submit">{{ __('Save settings') }}</button>
-    </form>
+        @endif
+    </div>
 </x-layouts::admin>

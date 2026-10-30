@@ -13,13 +13,16 @@
     :heading="__('Featured')"
     :lede="__('Premium sellers ask; you decide what the storefront shows.')"
 >
+    {{-- Re-read when a seller asks, another admin decides, or featuring is
+         switched on or off in Settings — the banner is part of it. --}}
+    <div data-live-region="features" data-staff-area="features">
     @unless ($featuringEnabled)
         <div class="notice" role="status">
             <x-verum.icon name="info" />
             <div>
                 <b>{{ __('Feature requests are closed.') }}</b>
                 <p>{{ __('Sellers cannot ask for a slot while this is off.') }}</p>
-                <a class="link" href="{{ route('admin.settings') }}" wire:navigate>{{ __('Change this in settings') }}</a>
+                <a class="link" href="{{ route('admin.settings', ['section' => 'listings']) }}" wire:navigate>{{ __('Change this in settings') }}</a>
             </div>
         </div>
     @endunless
@@ -56,4 +59,5 @@
 
         <div class="pager">{{ $listings->onEachSide(1)->links() }}</div>
     @endif
+    </div>
 </x-layouts::admin>

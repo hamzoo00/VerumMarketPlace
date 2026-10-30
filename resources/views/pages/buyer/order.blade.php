@@ -10,7 +10,8 @@
 >
     <a class="link" href="{{ route('buyer.orders') }}" wire:navigate>{{ __('← All orders') }}</a>
 
-    <div class="ogrid">
+    {{-- Re-read when the seller or an admin changes the order. --}}
+    <div class="ogrid" data-live-region="order">
         <x-verum.account.panel :title="__('What you bought')" icon="gem">
             <x-verum.order.lines :$order />
             <x-verum.order.summary :$order />

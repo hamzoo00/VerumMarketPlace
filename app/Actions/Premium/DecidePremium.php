@@ -2,10 +2,12 @@
 
 namespace App\Actions\Premium;
 
+use App\Actions\Notices\IssueNotice;
 use App\Models\Admin;
 use App\Models\Listing;
 use App\Models\Seller;
 use App\Support\PremiumStatus;
+use App\Support\StaffBoard;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -18,16 +20,23 @@ use Illuminate\Support\Facades\DB;
  * Premium and the certificate are granted separately on purpose: a
  * seller may be premium while their paperwork is still being checked,
  * and withdrawing a certificate must not cost them their standing.
+ *
+ * Every decision tells the seller — the admin's words or the default —
+ * and tells open admin pages to re-read.
  */
 class DecidePremium
 {
+    public function __construct(private readonly IssueNotice $notices) {}
+
     /** @param  int|null  $months  Null runs indefinitely. */
-    public function grant(Seller $seller, ?int $months = null): Seller
+    public function grant(Seller $seller, ?int $months = null, ?Admin $admin = null, ?string $message = null): Seller
     {
         $seller->update([
             'premium_since' => $seller->premium_since ?? now(),
             'premium_until' => $months === null ? null : now()->addMonths($months),
         ]);
+
+        $this->tell($seller, 'premium_granted', $message, $admin, route('seller.listings'));
 
         return $seller->refresh();
     }
@@ -40,9 +49,9 @@ class DecidePremium
      * The certificate is deliberately left alone: it says an admin
      * checked them, which stays true.
      */
-    public function revoke(Seller $seller): Seller
+    public function revoke(Seller $seller, ?Admin $admin = null, ?string $message = null): Seller
     {
-        return DB::transaction(function () use ($seller): Seller {
+        $revoked = DB::transaction(function () use ($seller): Seller {
             $seller->update(['premium_since' => null, 'premium_until' => null]);
 
             Listing::query()
@@ -56,6 +65,10 @@ class DecidePremium
 
             return $seller->refresh();
         });
+
+        $this->tell($revoked, 'premium_revoked', $message, $admin, route('seller.dashboard'));
+
+        return $revoked;
     }
 
     /**
@@ -64,7 +77,7 @@ class DecidePremium
      * The reference is kept once issued: re-certifying a seller must not
      * invalidate a reference a buyer has already seen or scanned.
      */
-    public function certify(Seller $seller, Admin $admin, ?string $note = null): Seller
+    public function certify(Seller $seller, Admin $admin, ?string $note = null, ?string $message = null): Seller
     {
         $seller->update([
             'certificate_reference' => $seller->certificate_reference
@@ -74,7 +87,13 @@ class DecidePremium
             'certificate_note' => $note,
         ]);
 
-        return $seller->refresh();
+        $seller->refresh();
+
+        $this->tell($seller, 'certified', $message, $admin, route('seller.storefront'), [
+            'reference' => (string) $seller->certificate_reference,
+        ]);
+
+        return $seller;
     }
 
     /**
@@ -83,7 +102,7 @@ class DecidePremium
      * The reference is cleared as well, so nothing can be presented as
      * a live certificate afterwards.
      */
-    public function decertify(Seller $seller): Seller
+    public function decertify(Seller $seller, ?Admin $admin = null, ?string $message = null): Seller
     {
         $seller->update([
             'certificate_reference' => null,
@@ -92,6 +111,16 @@ class DecidePremium
             'certificate_note' => null,
         ]);
 
+        $this->tell($seller, 'decertified', $message, $admin, route('seller.dashboard'));
+
         return $seller->refresh();
+    }
+
+    /** @param  array<string, string>  $replace */
+    private function tell(Seller $seller, string $kind, ?string $message, ?Admin $admin, string $link, array $replace = []): void
+    {
+        $this->notices->send($seller->account, $kind, $message, $admin, $seller, $replace, $link);
+
+        StaffBoard::changed(StaffBoard::PREMIUM);
     }
 }

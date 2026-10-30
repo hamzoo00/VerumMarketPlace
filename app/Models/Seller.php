@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\SellerFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property Carbon|null $premium_since
  * @property Carbon|null $premium_until
  * @property Carbon|null $certified_at
+ * @property Carbon|null $hidden_at
  * @property list<string>|null $specialties
  */
 class Seller extends Model implements HasMedia
@@ -38,7 +40,36 @@ class Seller extends Model implements HasMedia
             'premium_since' => 'datetime',
             'premium_until' => 'datetime',
             'certified_at' => 'datetime',
+            'hidden_at' => 'datetime',
         ];
+    }
+
+    /**
+     * On the public site: not suspended, not closing, not closed.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeVisible(Builder $query): void
+    {
+        $query->whereNull('hidden_at');
+    }
+
+    /** Taken off the site while its account is suspended or closing. */
+    public function isHidden(): bool
+    {
+        return $this->hidden_at !== null;
+    }
+
+    /**
+     * Can take a new order, bid or offer.
+     *
+     * Read off the storefront, which every sale already loads, rather
+     * than the account: the two are kept in step by DecideSellerStanding,
+     * and a seeded storefront may have no account at all.
+     */
+    public function isTrading(): bool
+    {
+        return ! $this->isHidden();
     }
 
     /** @return BelongsTo<Admin, $this> */

@@ -47,6 +47,55 @@ return [
         'featured_slots' => ['type' => 'int', 'default' => 6, 'min' => 1, 'max' => 24],
     ],
 
+    /*
+     * How the Settings page is divided. Each section owns its settings
+     * and the notices sent from its part of the admin, so one tab saves
+     * only what it shows — an unticked box on another tab is never read
+     * as "switch this off".
+     *
+     * `staff_areas` names the admin pages whose banners read a section's
+     * settings, so saving it refreshes them live (App\Support\StaffBoard).
+     */
+    'sections' => [
+        'commission' => [
+            'label' => 'Commission',
+            'icon' => 'scale',
+            'settings' => ['commission_enabled', 'commission_percent'],
+            'notices' => null,
+        ],
+        'listings' => [
+            'label' => 'Listings',
+            'icon' => 'gem',
+            'settings' => ['listing_approval_required', 'featuring_enabled', 'featured_slots'],
+            'notices' => 'listings',
+            'staff_areas' => ['approvals', 'features'],
+        ],
+        'accounts' => [
+            'label' => 'Sellers & buyers',
+            'icon' => 'user',
+            'settings' => [],
+            'notices' => 'accounts',
+        ],
+        'moderation' => [
+            'label' => 'Moderation',
+            'icon' => 'eye',
+            'settings' => [],
+            'notices' => 'moderation',
+        ],
+        'premium' => [
+            'label' => 'Premium',
+            'icon' => 'badge',
+            'settings' => [],
+            'notices' => 'premium',
+        ],
+        'orders' => [
+            'label' => 'Orders',
+            'icon' => 'box',
+            'settings' => [],
+            'notices' => 'orders',
+        ],
+    ],
+
     // Certificate references: VRC-2026-0042.
     'certificate_prefix' => 'VRC',
 

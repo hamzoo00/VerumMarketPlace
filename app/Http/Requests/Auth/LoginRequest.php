@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Contracts\AuthenticatableAccount;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,18 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey($guard));
+
+        // Told plainly, but only to someone who knew the password — the
+        // closure is not something to confirm to anyone who asks.
+        $account = Auth::guard($guard)->user();
+
+        if ($account instanceof AuthenticatableAccount && $account->isClosed()) {
+            Auth::guard($guard)->logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('This account has been closed.'),
+            ]);
+        }
     }
 
     /** @throws ValidationException */

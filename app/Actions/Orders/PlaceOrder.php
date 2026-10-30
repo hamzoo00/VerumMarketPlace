@@ -62,6 +62,13 @@ class PlaceOrder
                 throw new RuntimeException('That listing has no storefront.');
             }
 
+            // Whatever the route — checkout, a won lot, an accepted offer —
+            // a suspended or closing seller takes no new order. Checked
+            // here because a page opened before the decision still posts.
+            if (! $seller->isTrading()) {
+                throw new RuntimeException(__('This seller is not taking orders right now.'));
+            }
+
             $this->assertAvailable($listing, $origin);
 
             $currency = $listing->currency;

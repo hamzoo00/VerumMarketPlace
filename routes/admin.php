@@ -5,10 +5,13 @@ use App\Http\Controllers\Admin\AdminCaseController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingReviewController;
 use App\Http\Controllers\Admin\AdminModerationController;
+use App\Http\Controllers\Admin\AdminNoticeTemplateController;
 use App\Http\Controllers\Admin\AdminPremiumController;
+use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminSessionController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Chat\ConversationController;
+use App\Support\NotificationRoutes;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Support\Facades\Route;
 
@@ -71,7 +74,18 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
          * works one at a time.
          */
         Route::get('settings', [AdminSettingsController::class, 'edit'])->name('settings');
-        Route::put('settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+        // One section at a time, so a tab saves only what it shows.
+        Route::put('settings/{section}', [AdminSettingsController::class, 'update'])
+            ->whereAlpha('section')
+            ->name('settings.update');
+
+        // The standard messages: an admin's wording, or back to the default.
+        Route::put('settings/notices/{kind}', [AdminNoticeTemplateController::class, 'update'])
+            ->where('kind', '[a-z_]+')
+            ->name('notices.update');
+        Route::delete('settings/notices/{kind}', [AdminNoticeTemplateController::class, 'destroy'])
+            ->where('kind', '[a-z_]+')
+            ->name('notices.reset');
 
         Route::get('approvals', [AdminListingReviewController::class, 'approvals'])->name('approvals');
         Route::get('features', [AdminListingReviewController::class, 'features'])->name('features');
@@ -102,7 +116,14 @@ Route::prefix(Seg::get('admin'))->name('admin.')->group(function () {
             ->name('messages.store');
 
         Route::get('buyers', [AdminDashboardController::class, 'buyers'])->name('buyers');
-        Route::get('sellers', [AdminDashboardController::class, 'sellers'])->name('sellers');
+
+        // Seller standing: warn, suspend, reinstate, close.
+        Route::get(Seg::get('account.sellers'), [AdminSellerController::class, 'index'])->name('sellers');
+        Route::put(Seg::get('account.sellers').'/{account}', [AdminSellerController::class, 'update'])
+            ->whereNumber('account')
+            ->name('sellers.update');
+
+        NotificationRoutes::register('admin');
 
         Route::post(Seg::get('auth.logout'), [AdminSessionController::class, 'destroy'])->name('logout');
     });

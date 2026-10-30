@@ -29,10 +29,14 @@ class ListingChanged implements ShouldBroadcast
 
     public const DROP = 'drop';
 
+    public const TOUCH = 'touch';
+
     /** @param  array<string, mixed>  $payload */
     private function __construct(
         public array $payload,
         public int $sellerId,
+        /** False for a change only the seller's workspace cares about. */
+        private readonly bool $public = true,
     ) {}
 
     /** A listing that is now publicly visible, with its rendered card. */
@@ -66,15 +70,31 @@ class ListingChanged implements ShouldBroadcast
         ], (int) $listing->seller_id);
     }
 
+    /**
+     * Something changed that no buyer can see — a listing approved into
+     * nothing yet, rejected, queued — but its seller's inventory shows.
+     *
+     * Sent to the seller's channel only. On the public one it would make
+     * every open shop grid re-query for a stone it never displayed.
+     */
+    public static function touch(Listing $listing): self
+    {
+        return new self([
+            'action' => self::TOUCH,
+            'slug' => $listing->slug,
+            'card' => null,
+        ], (int) $listing->seller_id, public: false);
+    }
+
     /** @return array<int, Channel> */
     public function broadcastOn(): array
     {
-        return [
+        return array_values(array_filter([
             // Everyone browsing the catalogue.
-            new Channel('listings'),
+            $this->public ? new Channel('listings') : null,
             // The seller's own workspace, so their inventory list keeps up.
             new Channel('seller.'.$this->sellerId.'.listings'),
-        ];
+        ]));
     }
 
     public function broadcastAs(): string

@@ -12,6 +12,8 @@
     :heading="__('Moderation')"
     :lede="__('Suspected attempts to move a deal off :app. Messages were delivered — these are the record.', ['app' => config('app.name')])"
 >
+    {{-- Re-read when a message is flagged or another admin rules on one. --}}
+    <div data-live-region="moderation" data-staff-area="moderation">
     <nav class="adminfilters" aria-label="{{ __('Filter by state') }}">
         @foreach ($states as $value => $label)
             <a
@@ -74,13 +76,27 @@
                         </a>
 
                         @if ($message->review_state === null)
-                            <form method="POST" action="{{ route('admin.moderation.review', $message) }}" class="offeract">
-                                @csrf
+                            {{-- Upholding warns the sender and sends the other
+                                 party a safety notice; the dialog shows the
+                                 sender's message before it goes. --}}
+                            <x-verum.admin.notice-form
+                                :action="route('admin.moderation.review', $message)"
+                                kind="flag_warning"
+                                :replace="[
+                                    'counterpart' => $message->conversation?->counterpartName($message->sender_type) ?? __('the other party'),
+                                    'excerpt' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::squish((string) $message->body), 80),
+                                ]"
+                                :title="__('Uphold this flag')"
+                                :lede="__('The :side who wrote it gets this warning, which counts on their account. The other party is sent a short safety notice, without the flagged text.', ['side' => $message->sender_type])"
+                                :confirm="__('Uphold and warn')"
+                                class="offeract"
+                            >
                                 <input type="hidden" name="verdict" value="{{ \App\Models\Message::REVIEW_UPHELD }}">
                                 <button class="btn btn--ruby btn--sm" type="submit">{{ __('Uphold') }}</button>
-                            </form>
+                            </x-verum.admin.notice-form>
 
-                            <form method="POST" action="{{ route('admin.moderation.review', $message) }}" class="offeract">
+                            {{-- Nobody is told about a false positive. --}}
+                            <form method="POST" action="{{ route('admin.moderation.review', $message) }}" class="offeract" data-live-form>
                                 @csrf
                                 <input type="hidden" name="verdict" value="{{ \App\Models\Message::REVIEW_CLEARED }}">
                                 <button class="btn btn--ghost btn--sm" type="submit">{{ __('False positive') }}</button>
@@ -95,4 +111,5 @@
 
         <div class="pager">{{ $messages->onEachSide(1)->links() }}</div>
     @endif
+    </div>
 </x-layouts::admin>

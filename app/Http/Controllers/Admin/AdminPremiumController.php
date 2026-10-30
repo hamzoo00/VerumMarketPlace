@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Notices\IssueNotice;
 use App\Actions\Premium\DecidePremium;
+use App\Http\Controllers\Concerns\RespondsToActions;
 use App\Http\Controllers\Controller;
 use App\Models\Seller;
 use App\Support\PremiumStatus;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,6 +23,8 @@ use Illuminate\Validation\Rule;
  */
 class AdminPremiumController extends Controller
 {
+    use RespondsToActions;
+
     public function __construct(private readonly DecidePremium $decide) {}
 
     public function index(Request $request): View
@@ -51,31 +56,39 @@ class AdminPremiumController extends Controller
         ]);
     }
 
-    public function update(Request $request, Seller $seller): RedirectResponse
+    public function update(Request $request, Seller $seller): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'action' => ['required', Rule::in(['grant', 'revoke', 'certify', 'decertify'])],
             'months' => ['nullable', 'integer', 'min:1', 'max:120'],
+            // Printed on the certificate itself, not sent to anyone.
             'note' => ['nullable', 'string', 'max:160'],
+            'message' => ['nullable', 'string', 'max:'.IssueNotice::MAX_LENGTH],
         ]);
 
-        $message = match ($validated['action']) {
+        $admin = $request->user('admin');
+        $message = $validated['message'] ?? null;
+
+        $done = match ($validated['action']) {
             'grant' => tap(__('Premium granted.'), fn () => $this->decide->grant(
                 $seller,
                 $validated['months'] ?? null,
+                $admin,
+                $message,
             )),
             // Says plainly what else it costs them, because featured
             // listings come down with it.
-            'revoke' => tap(__('Premium revoked; featured listings removed.'), fn () => $this->decide->revoke($seller)),
+            'revoke' => tap(__('Premium revoked; featured listings removed.'), fn () => $this->decide->revoke($seller, $admin, $message)),
             'certify' => tap(__('Certificate issued.'), fn () => $this->decide->certify(
                 $seller,
-                $request->user('admin'),
+                $admin,
                 $validated['note'] ?? null,
+                $message,
             )),
-            default => tap(__('Certificate withdrawn.'), fn () => $this->decide->decertify($seller)),
+            default => tap(__('Certificate withdrawn.'), fn () => $this->decide->decertify($seller, $admin, $message)),
         };
 
-        return back()->with('status', $message);
+        return $this->done($request, $done);
     }
 
     /** The certificate as a buyer will see it, before issuing one. */

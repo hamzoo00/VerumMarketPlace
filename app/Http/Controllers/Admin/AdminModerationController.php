@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Chat\ReviewFlag;
+use App\Actions\Notices\IssueNotice;
+use App\Http\Controllers\Concerns\RespondsToActions;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Support\MessageOffences;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -19,6 +23,8 @@ use Illuminate\Validation\Rule;
  */
 class AdminModerationController extends Controller
 {
+    use RespondsToActions;
+
     public function index(Request $request): View
     {
         $validated = $request->validate([
@@ -52,23 +58,22 @@ class AdminModerationController extends Controller
     /**
      * Record a verdict.
      *
-     * `cleared` is a false positive — worth recording, because a rule
-     * that clears often is a rule that needs narrowing.
+     * Upholding warns the sender and sends the other party a safety
+     * notice; ReviewFlag decides who hears what. `cleared` is a false
+     * positive — worth recording, because a rule that clears often is a
+     * rule that needs narrowing.
      */
-    public function review(Request $request, Message $message): RedirectResponse
+    public function review(Request $request, Message $message, ReviewFlag $reviewFlag): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'verdict' => ['required', Rule::in([Message::REVIEW_CLEARED, Message::REVIEW_UPHELD])],
+            'message' => ['nullable', 'string', 'max:'.IssueNotice::MAX_LENGTH],
         ]);
 
-        $message->update([
-            'review_state' => $validated['verdict'],
-            'reviewed_by' => $request->user('admin')?->id,
-            'reviewed_at' => now(),
-        ]);
+        $reviewFlag->handle($message, $request->user('admin'), $validated['verdict'], $validated['message'] ?? null);
 
-        return back()->with('status', $validated['verdict'] === Message::REVIEW_UPHELD
-            ? __('Flag upheld.')
+        return $this->done($request, $validated['verdict'] === Message::REVIEW_UPHELD
+            ? __('Flag upheld. The sender was warned and the other party told how to stay safe.')
             : __('Marked as a false positive.'));
     }
 }
