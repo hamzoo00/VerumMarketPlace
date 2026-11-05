@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Carriers;
 use App\Support\Countries;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,9 @@ use Illuminate\Support\Str;
  * @property Carbon|null $dispatched_at
  * @property Carbon|null $delivered_at
  * @property Carbon|null $cancelled_at
+ * @property Carbon|null $tracking_status_at
+ * @property Carbon|null $tracking_registered_at
+ * @property Carbon|null $tracking_synced_at
  */
 class Order extends Model
 {
@@ -56,6 +60,9 @@ class Order extends Model
             'dispatched_at' => 'datetime',
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'tracking_status_at' => 'datetime',
+            'tracking_registered_at' => 'datetime',
+            'tracking_synced_at' => 'datetime',
         ];
     }
 
@@ -81,6 +88,29 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * The parcel's journey, newest first — courier scans and the seller's
+     * updates together, as the buyer reads them.
+     *
+     * @return HasMany<ShipmentEvent, $this>
+     */
+    public function shipmentEvents(): HasMany
+    {
+        return $this->hasMany(ShipmentEvent::class)->latest('occurred_at')->latest('id');
+    }
+
+    /** The carrier's own page for this parcel, or null before it is posted. */
+    public function trackingUrl(): ?string
+    {
+        return Carriers::trackingUrl($this->tracking_carrier, $this->tracking_number);
+    }
+
+    /** In the post: the stage where a parcel can still move. */
+    public function isInTransit(): bool
+    {
+        return $this->status === self::STATUS_DISPATCHED;
     }
 
     /**

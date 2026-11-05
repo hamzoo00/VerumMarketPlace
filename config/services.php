@@ -75,4 +75,9 @@ return [
         'premium_plan_id' => env('PAYPAL_PREMIUM_PLAN_ID'),
     ],
 
+    // Parcel tracking API (config/verum_tracking.php, TRACKING_DRIVER=17track).
+    'seventeentrack' => [
+        'key' => env('SEVENTEENTRACK_KEY'),
+    ],
+
 ];

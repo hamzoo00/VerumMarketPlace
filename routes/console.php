@@ -35,3 +35,14 @@ Schedule::command('auctions:close')
 Schedule::command('sellers:finish-closures')
     ->hourly()
     ->withoutOverlapping();
+
+/*
+ * Courier scans for parcels on the road. The webhook delivers most of
+ * them; this catches a missed push and is the only source on a machine
+ * the provider cannot reach. Each parcel is asked at most every few
+ * hours (config/verum_tracking.php), so hourly costs little.
+ */
+Schedule::command('tracking:sync')
+    ->hourly()
+    ->withoutOverlapping()
+    ->runInBackground();

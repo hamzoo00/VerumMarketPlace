@@ -4,6 +4,7 @@ namespace App\Actions\Orders;
 
 use App\Models\Listing;
 use App\Models\Order;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -43,9 +44,16 @@ class AdvanceOrder
         ]);
     }
 
-    public function markDelivered(Order $order): Order
+    /**
+     * Delivered — when the courier scanned it, if it did, rather than when
+     * anyone noticed: the dispute window and a closing seller's last day
+     * are both counted from this date.
+     */
+    public function markDelivered(Order $order, ?CarbonInterface $at = null): Order
     {
-        return $this->move($order, Order::STATUS_DELIVERED, ['delivered_at' => now()]);
+        $at = $at === null || $at->isFuture() ? now() : $at;
+
+        return $this->move($order, Order::STATUS_DELIVERED, ['delivered_at' => $at]);
     }
 
     /**

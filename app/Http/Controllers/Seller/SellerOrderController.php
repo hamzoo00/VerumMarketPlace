@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Seller;
 
 use App\Actions\Orders\AdvanceOrder;
 use App\Actions\Payments\SettleRefund;
+use App\Actions\Shipping\TrackShipment;
 use App\Http\Controllers\Controller;
-use App\Jobs\PushTrackingToPayPal;
 use App\Models\Order;
 use App\Support\Carriers;
 use Illuminate\Contracts\View\View;
@@ -30,6 +30,7 @@ class SellerOrderController extends Controller
     public function __construct(
         private readonly AdvanceOrder $advance,
         private readonly SettleRefund $refunds,
+        private readonly TrackShipment $shipments,
     ) {}
 
     public function index(Request $request): View
@@ -71,7 +72,7 @@ class SellerOrderController extends Controller
 
         return view('pages.seller.order', [
             'account' => $request->user('seller'),
-            'order' => $order->load(['items.listing', 'buyer']),
+            'order' => $order->load(['items.listing', 'buyer', 'shipmentEvents']),
         ]);
     }
 
@@ -91,8 +92,8 @@ class SellerOrderController extends Controller
 
         try {
             $message = match ($validated['action']) {
-                'dispatched' => $this->dispatch($order, $validated['tracking_carrier'] ?? null, $validated['tracking_number'] ?? null),
-                'delivered' => tap(__('Marked as delivered.'), fn () => $this->advance->markDelivered($order)),
+                'dispatched' => $this->dispatch($request, $order, $validated['tracking_carrier'] ?? null, $validated['tracking_number'] ?? null),
+                'delivered' => tap(__('Marked as delivered. The buyer has been told.'), fn () => $this->shipments->delivered($order, $request->user('seller'))),
                 default => $this->cancel($order, $validated['reason'] ?? null),
             };
         } catch (RuntimeException $e) {
@@ -102,16 +103,13 @@ class SellerOrderController extends Controller
         return back()->with('status', $message);
     }
 
-    private function dispatch(Order $order, ?string $carrier, ?string $tracking): string
+    private function dispatch(Request $request, Order $order, ?string $carrier, ?string $tracking): string
     {
-        $this->advance->markDispatched($order, $carrier, $tracking === null ? null : trim($tracking));
+        $this->shipments->dispatch($order, $request->user('seller'), $carrier, $tracking);
 
-        // PayPal protects the seller against "never arrived" with this.
-        if ($tracking !== null) {
-            PushTrackingToPayPal::dispatch($order->id);
-        }
-
-        return __('Marked as dispatched.');
+        return $tracking === null
+            ? __('Marked as dispatched.')
+            : __('Marked as dispatched. The buyer has the tracking link.');
     }
 
     /** A paid order is refunded through PayPal before it is cancelled. */

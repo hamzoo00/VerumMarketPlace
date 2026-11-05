@@ -45,7 +45,7 @@ class BuyerOrderController extends Controller
 
         return view('pages.buyer.order', [
             'buyer' => $request->user('buyer'),
-            'order' => $order->load(['items.listing', 'seller']),
+            'order' => $order->load(['items.listing', 'seller', 'shipmentEvents']),
         ]);
     }
 

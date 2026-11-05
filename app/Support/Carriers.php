@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Str;
+
 /**
  * The carriers a parcel can go with, and where to follow one.
  *
@@ -55,16 +57,35 @@ final class Carriers
         return self::all()[$key ?? '']['paypal'] ?? 'OTHER';
     }
 
+    /** The tracking API's code for the carrier; null lets it detect one from the number. */
+    public static function trackerCode(?string $key): ?int
+    {
+        $code = self::all()[$key ?? '']['17track'] ?? null;
+
+        return $code === null ? null : (int) $code;
+    }
+
+    /**
+     * The number as carriers match it: no spaces, upper case.
+     *
+     * Receipts print "7712 3456 7890"; a courier API and a webhook both
+     * key on "771234567890". Stored this way, a report finds its order.
+     */
+    public static function normaliseNumber(string $number): string
+    {
+        return Str::upper((string) preg_replace('/\s+/', '', $number));
+    }
+
     /** The HTML `pattern` and the server regex, from one string. */
     public static function trackingPattern(): string
     {
         return (string) config('verum_shipping.tracking_pattern');
     }
 
-    /** @return array<string, array{name: string, paypal: string, url: string}> */
+    /** @return array<string, array{name: string, paypal: string, '17track': int|null, url: string}> */
     private static function all(): array
     {
-        /** @var array<string, array{name: string, paypal: string, url: string}> */
+        /** @var array<string, array{name: string, paypal: string, '17track': int|null, url: string}> */
         return config('verum_shipping.carriers', []);
     }
 }

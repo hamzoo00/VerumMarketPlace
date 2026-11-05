@@ -11,6 +11,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\FakeCourierController;
 use App\Http\Controllers\FakePayPalController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\SellWithUsController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StoneController;
+use App\Http\Controllers\TrackingWebhookController;
 use App\Http\Controllers\VerifyController;
 use App\Support\RouteSegments as Seg;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -146,6 +148,24 @@ Route::get(Seg::get('payments').'/simulator/{session}', [FakePayPalController::c
 Route::post(Seg::get('payments').'/simulator/{session}', [FakePayPalController::class, 'decide'])
     ->where('session', '[A-Za-z0-9\-]+')
     ->name('payments.simulator.decide');
+
+/*
+ * The tracking API's pushes. Like PayPal's, no CSRF token can be sent,
+ * so nothing is believed until the driver checks the signature.
+ */
+Route::post(Seg::get('webhooks').'/tracking', TrackingWebhookController::class)
+    ->withoutMiddleware([PreventRequestForgery::class])
+    ->middleware('throttle:240,1')
+    ->name('webhooks.tracking');
+
+// The local courier. 404 unless TRACKING_DRIVER=fake; signed links only.
+Route::middleware('signed')->group(function () {
+    Route::get(Seg::get('tracking').'/simulator/{order}', [FakeCourierController::class, 'show'])
+        ->name('tracking.simulator');
+    Route::post(Seg::get('tracking').'/simulator/{order}', [FakeCourierController::class, 'scan'])
+        ->middleware('throttle:60,1')
+        ->name('tracking.simulator.scan');
+});
 
 Route::get(Seg::get('cart'), [CartController::class, 'index'])->name('cart');
 Route::get(Seg::get('checkout'), [CartController::class, 'checkout'])->name('checkout');

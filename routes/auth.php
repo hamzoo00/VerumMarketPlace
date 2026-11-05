@@ -6,6 +6,7 @@ use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
 use App\Http\Controllers\Buyer\BuyerOrderController;
+use App\Http\Controllers\Buyer\BuyerParcelController;
 use App\Http\Controllers\Buyer\BuyerPaymentController;
 use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Seller\SellerListingMediaController;
 use App\Http\Controllers\Seller\SellerOfferController;
 use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerPaymentController;
+use App\Http\Controllers\Seller\SellerShipmentController;
 use App\Http\Controllers\Seller\SellerShippingController;
 use App\Models\Order;
 use App\Support\NotificationRoutes;
@@ -54,6 +56,9 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::get(Seg::get('account.orders').'/{order}/paid', [BuyerPaymentController::class, 'returned'])->name('orders.paid');
     Route::get(Seg::get('account.orders').'/{order}/pay/cancelled', [BuyerPaymentController::class, 'cancelled'])
         ->name('orders.pay.cancelled');
+
+    // On to the carrier's own page; the bell can only link inside the site.
+    Route::get(Seg::get('account.orders').'/{order}/track', BuyerParcelController::class)->name('orders.track');
 
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
@@ -207,6 +212,14 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         ]))->name('checkouts');
         Route::get(Seg::get('account.orders').'/{order}', [SellerOrderController::class, 'show'])->name('orders.show');
         Route::put(Seg::get('account.orders').'/{order}', [SellerOrderController::class, 'update'])->name('orders.update');
+
+        // Where the parcel has got to, and a mistyped number put right.
+        Route::post(Seg::get('account.orders').'/{order}/shipment', [SellerShipmentController::class, 'store'])
+            ->middleware('throttle:30,1')
+            ->name('orders.shipment.store');
+        Route::put(Seg::get('account.orders').'/{order}/shipment', [SellerShipmentController::class, 'update'])
+            ->middleware('throttle:10,1')
+            ->name('orders.shipment.update');
         Route::get(Seg::get('account.storefront'), [SellerDashboardController::class, 'storefront'])->name('storefront');
         Route::get(Seg::get('account.settings'), [SellerDashboardController::class, 'settings'])->name('settings');
 

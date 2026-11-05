@@ -36,6 +36,7 @@ return [
     'currency' => env('ROUTE_CURRENCY', 'currency'),
     'payments' => env('ROUTE_PAYMENTS_PUBLIC', 'payments'),
     'webhooks' => env('ROUTE_WEBHOOKS', 'webhooks'),
+    'tracking' => env('ROUTE_TRACKING_PUBLIC', 'tracking'),
 
     /*
     | Account areas

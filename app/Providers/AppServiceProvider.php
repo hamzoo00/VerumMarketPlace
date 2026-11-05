@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Contracts\ParcelTracker;
 use App\Contracts\PaymentGateway;
 use App\Support\Payments\FakePaymentGateway;
 use App\Support\Payments\PayPalGateway;
+use App\Support\Tracking\FakeParcelTracker;
+use App\Support\Tracking\NullParcelTracker;
+use App\Support\Tracking\SeventeenTrack;
 use App\View\Composers\AccountNavComposer;
 use App\View\Composers\NavigationComposer;
 use App\View\Composers\NotificationBellComposer;
@@ -36,6 +40,19 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return $this->app->make(FakePaymentGateway::class);
+        });
+
+        // TRACKING_DRIVER, the same way. The courier simulator would let a
+        // seller "deliver" their own parcel under a carrier's name, so it
+        // never runs in production; "off" is the honest alternative.
+        $this->app->bind(ParcelTracker::class, function (): ParcelTracker {
+            return match (config('verum_tracking.driver')) {
+                '17track' => $this->app->make(SeventeenTrack::class),
+                'off' => $this->app->make(NullParcelTracker::class),
+                default => $this->app->isProduction()
+                    ? throw new RuntimeException('TRACKING_DRIVER must be "17track" or "off" in production.')
+                    : $this->app->make(FakeParcelTracker::class),
+            };
         });
     }
 

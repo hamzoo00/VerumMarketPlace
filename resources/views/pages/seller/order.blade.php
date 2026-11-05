@@ -15,17 +15,28 @@
 
     {{-- Re-read when the buyer pays: the notification lands on this channel. --}}
     <div class="ogrid" data-live-region="order">
-        <x-verum.account.panel :title="__('Order')" icon="gem">
-            <x-verum.order.lines :$order />
-            <x-verum.order.summary :$order />
+        <div class="ogrid__main">
+            <x-verum.account.panel :title="__('Order')" icon="gem">
+                <x-verum.order.lines :$order />
+                <x-verum.order.summary :$order />
 
-            @if ($order->buyer_note)
-                <p class="onote">
-                    <x-verum.icon name="info" />
-                    {{ $order->buyer_note }}
-                </p>
+                @if ($order->buyer_note)
+                    <p class="onote">
+                        <x-verum.icon name="info" />
+                        {{ $order->buyer_note }}
+                    </p>
+                @endif
+            </x-verum.account.panel>
+
+            @if (in_array($order->status, [Order::STATUS_PAID, Order::STATUS_DISPATCHED, Order::STATUS_DELIVERED], true))
+                <x-verum.account.panel :title="__('Delivery')" icon="globe"
+                    :hint="__('Your updates and the carrier’s scans, as the buyer sees them.')">
+                    <x-verum.order.tracking :$order />
+                    <x-verum.order.shipment-form :$order />
+                    <x-verum.order.timeline :$order />
+                </x-verum.account.panel>
             @endif
-        </x-verum.account.panel>
+        </div>
 
         <div class="ogrid__side">
             <x-verum.account.panel :title="__('Next step')" icon="box">
@@ -74,7 +85,7 @@
                         <button class="btn btn--ruby btn--block" type="submit">{{ __('Mark as dispatched') }}</button>
                     </form>
                 @elseif ($order->status === Order::STATUS_DISPATCHED)
-                    <x-verum.order.tracking :$order />
+                    <p class="mute">{{ __('On its way. A carrier scan marks it delivered by itself; use this if you know it arrived.') }}</p>
 
                     <form method="POST" action="{{ route('seller.orders.update', $order) }}">
                         @csrf
@@ -84,7 +95,6 @@
                     </form>
                 @else
                     <p class="mute">{{ __('Nothing left to do on this one.') }}</p>
-                    <x-verum.order.tracking :$order />
                 @endif
 
                 @if ($order->isCancellable())

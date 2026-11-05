@@ -1,0 +1,225 @@
+/* =============================================================
+   Parcel tracking — the delivery panel on both order pages, the
+   seller's update form, and the local courier simulator.
+   ============================================================= */
+
+/* The order page's main column holds more than one panel now. */
+.ogrid__main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* Order status tones the status pill has always named. */
+.chip--on {
+  border-color: color-mix(in srgb, var(--bone) 35%, var(--line-2));
+  color: var(--bone);
+}
+
+.chip--off {
+  border-style: dashed;
+  color: var(--mute);
+}
+
+.otrack__state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 10px 0 0;
+  font-size: .78rem;
+}
+
+.otrack__sim {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: .78rem;
+}
+
+.otrack__sim .ic {
+  width: 14px;
+  height: 14px;
+}
+
+/* -------------------------------------------------------------
+   Timeline: newest first, a rail down the left, each step marked
+   with where it came from.
+   ------------------------------------------------------------- */
+.shipline {
+  display: grid;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shipline__step {
+  position: relative;
+  padding: 0 0 18px 22px;
+  color: var(--mute);
+}
+
+.shipline__step::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 7px;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: var(--plate);
+}
+
+.shipline__step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 19px;
+  bottom: 2px;
+  width: 1px;
+  background: var(--line);
+}
+
+.shipline__step:last-child {
+  padding-bottom: 0;
+}
+
+.shipline__step.is-latest {
+  color: var(--bone);
+}
+
+.shipline__step.is-latest::before {
+  border-color: var(--ok);
+  background: var(--ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent);
+}
+
+.shipline__step.is-latest.is-warn::before {
+  border-color: var(--gold);
+  background: var(--gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 18%, transparent);
+}
+
+/* A problem reads as a hollow ring, apart from the filled "waiting" one. */
+.shipline__step.is-latest.is-off::before {
+  border: 2px solid var(--ruby-hi);
+  background: transparent;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ruby) 18%, transparent);
+}
+
+.shipline__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.shipline__head b {
+  font-weight: 500;
+  font-size: .9rem;
+}
+
+.shipline__src {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--mute);
+  font: .68rem var(--mono);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.shipline__src .ic {
+  width: 12px;
+  height: 12px;
+}
+
+.shipline__src.is-courier {
+  color: color-mix(in srgb, var(--ok) 80%, var(--bone));
+}
+
+.shipline__text {
+  margin: 4px 0 0;
+  font-size: .84rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.shipline__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+  color: var(--mute);
+  font: .7rem var(--mono);
+}
+
+/* -------------------------------------------------------------
+   Seller's update form
+   ------------------------------------------------------------- */
+.shipform {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.shipform__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
+.shipform__foot small {
+  flex: 1 1 240px;
+  font-size: .74rem;
+}
+
+.shipfix {
+  margin-top: 14px;
+  font-size: .84rem;
+}
+
+.shipfix summary {
+  color: var(--mute);
+  cursor: pointer;
+}
+
+.shipfix summary:hover {
+  color: var(--bone);
+}
+
+.shipfix form {
+  margin-top: 12px;
+}
+
+.shipfix small {
+  display: block;
+  margin-top: 8px;
+  font-size: .74rem;
+}
+
+/* -------------------------------------------------------------
+   Courier simulator (test mode)
+   ------------------------------------------------------------- */
+.couriersim {
+  display: grid;
+  gap: 14px;
+}
+
+.couriersim__scans {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .shipline__head {
+    flex-direction: column;
+  }
+}

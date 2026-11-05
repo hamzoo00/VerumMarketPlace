@@ -80,17 +80,21 @@ return [
     |
     | Carriers without a reliable tracking page of their own go to
     | 17TRACK, which recognises the carrier from the number itself.
+    |
+    | `17track` is that provider's code for the carrier, given when the
+    | number is registered for live status (config/verum_tracking.php);
+    | null lets it detect the carrier from the number.
     */
     'carriers' => [
-        'dhl' => ['name' => 'DHL Express', 'paypal' => 'DHL', 'url' => 'https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=:number'],
-        'fedex' => ['name' => 'FedEx', 'paypal' => 'FEDEX', 'url' => 'https://www.fedex.com/fedextrack/?trknbr=:number'],
-        'ups' => ['name' => 'UPS', 'paypal' => 'UPS', 'url' => 'https://www.ups.com/track?tracknum=:number'],
-        'usps' => ['name' => 'USPS', 'paypal' => 'USPS', 'url' => 'https://tools.usps.com/go/TrackConfirmAction?tLabels=:number'],
-        'royal_mail' => ['name' => 'Royal Mail', 'paypal' => 'OTHER', 'url' => 'https://www.royalmail.com/track-your-item#/tracking-results/:number'],
-        'aramex' => ['name' => 'Aramex', 'paypal' => 'ARAMEX', 'url' => 'https://t.17track.net/en#nums=:number'],
-        'tnt' => ['name' => 'TNT', 'paypal' => 'TNT', 'url' => 'https://t.17track.net/en#nums=:number'],
-        'ems' => ['name' => 'EMS / national post', 'paypal' => 'OTHER', 'url' => 'https://t.17track.net/en#nums=:number'],
-        'other' => ['name' => 'Another carrier', 'paypal' => 'OTHER', 'url' => 'https://t.17track.net/en#nums=:number'],
+        'dhl' => ['name' => 'DHL Express', 'paypal' => 'DHL', '17track' => 100001, 'url' => 'https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=:number'],
+        'fedex' => ['name' => 'FedEx', 'paypal' => 'FEDEX', '17track' => 100003, 'url' => 'https://www.fedex.com/fedextrack/?trknbr=:number'],
+        'ups' => ['name' => 'UPS', 'paypal' => 'UPS', '17track' => 100002, 'url' => 'https://www.ups.com/track?tracknum=:number'],
+        'usps' => ['name' => 'USPS', 'paypal' => 'USPS', '17track' => 21051, 'url' => 'https://tools.usps.com/go/TrackConfirmAction?tLabels=:number'],
+        'royal_mail' => ['name' => 'Royal Mail', 'paypal' => 'OTHER', '17track' => 11031, 'url' => 'https://www.royalmail.com/track-your-item#/tracking-results/:number'],
+        'aramex' => ['name' => 'Aramex', 'paypal' => 'ARAMEX', '17track' => 100006, 'url' => 'https://t.17track.net/en#nums=:number'],
+        'tnt' => ['name' => 'TNT', 'paypal' => 'TNT', '17track' => 100004, 'url' => 'https://t.17track.net/en#nums=:number'],
+        'ems' => ['name' => 'EMS / national post', 'paypal' => 'OTHER', '17track' => null, 'url' => 'https://t.17track.net/en#nums=:number'],
+        'other' => ['name' => 'Another carrier', 'paypal' => 'OTHER', '17track' => null, 'url' => 'https://t.17track.net/en#nums=:number'],
     ],
 
     // Letters, digits, spaces and dashes — every carrier's numbers fit.
