@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Orders\AdvanceOrder;
 use App\Actions\Orders\PlaceOrder;
 use App\Models\Buyer;
 use App\Models\Category;
@@ -90,9 +91,11 @@ it('renders both order lists and the seller detail', function (): void {
         ->assertOk()
         ->assertSee($order->reference);
 
+    // Paid only through PayPal, so the seller is pointed there, not at a button.
     $this->get(route('seller.orders.show', $order))
         ->assertOk()
-        ->assertSee('Mark as paid');
+        ->assertSee('Connect PayPal')
+        ->assertDontSee('Mark as paid');
 });
 
 it('walks an order through fulfilment from the seller panel', function (): void {
@@ -103,19 +106,25 @@ it('walks an order through fulfilment from the seller panel', function (): void 
         'country' => 'LK',
     ]);
 
+    // PayPal confirms the money (CompleteCheckout); the seller cannot.
     $this->actingAs($this->account, 'seller')
         ->put(route('seller.orders.update', $order), ['action' => 'paid'])
-        ->assertRedirect();
+        ->assertSessionHasErrors('action');
+
+    app(AdvanceOrder::class)->markPaid($order);
 
     $this->put(route('seller.orders.update', $order), [
         'action' => 'dispatched',
-        'tracking_carrier' => 'DHL',
-        'tracking_number' => 'ABC123',
+        'tracking_carrier' => 'dhl',
+        'tracking_number' => 'JD0146000012',
     ])->assertRedirect();
 
-    expect($order->fresh()->tracking_number)->toBe('ABC123');
+    expect($order->fresh()->tracking_number)->toBe('JD0146000012');
 
-    // Out of turn: already posted, so there is nothing to confirm.
-    $this->put(route('seller.orders.update', $order), ['action' => 'paid'])
-        ->assertSessionHas('error');
+    // Out of turn: already posted, so it cannot be posted again.
+    $this->put(route('seller.orders.update', $order), [
+        'action' => 'dispatched',
+        'tracking_carrier' => 'dhl',
+        'tracking_number' => 'JD0146000012',
+    ])->assertSessionHas('error');
 });

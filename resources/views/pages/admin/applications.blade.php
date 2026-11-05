@@ -55,6 +55,9 @@
                             <td data-label="{{ __('Business') }}">
                                 <span class="atable__strong">{{ $application->business_name }}</span>
                                 <small>{{ $application->country }}</small>
+                                @unless (\App\Support\Countries::hasPayPal($application->country))
+                                    <span class="pill pill--bad" title="{{ __('A seller here cannot be paid through PayPal.') }}">{{ __('No PayPal') }}</span>
+                                @endunless
                             </td>
                             <td data-label="{{ __('Applicant') }}">
                                 {{ $application->sellerAccount?->email }}

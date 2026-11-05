@@ -34,6 +34,8 @@ return [
     'checkout' => env('ROUTE_CHECKOUT', 'checkout'),
     'search' => env('ROUTE_SEARCH', 'search'),
     'currency' => env('ROUTE_CURRENCY', 'currency'),
+    'payments' => env('ROUTE_PAYMENTS_PUBLIC', 'payments'),
+    'webhooks' => env('ROUTE_WEBHOOKS', 'webhooks'),
 
     /*
     | Account areas
@@ -80,6 +82,7 @@ return [
         'messages' => env('ROUTE_MESSAGES', 'messages'),
         'moderation' => env('ROUTE_MODERATION', 'moderation'),
         'notifications' => env('ROUTE_NOTIFICATIONS', 'notifications'),
+        'payments' => env('ROUTE_PAYMENTS', 'payments'),
         'sellers' => env('ROUTE_ADMIN_SELLERS', 'sellers'),
         'reviews' => env('ROUTE_REVIEWS', 'reviews'),
         'bids_place' => env('ROUTE_BID', 'bid'),

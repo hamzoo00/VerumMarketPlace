@@ -6,6 +6,7 @@ use App\Http\Controllers\Buyer\BuyerCaseController;
 use App\Http\Controllers\Buyer\BuyerDashboardController;
 use App\Http\Controllers\Buyer\BuyerOfferController;
 use App\Http\Controllers\Buyer\BuyerOrderController;
+use App\Http\Controllers\Buyer\BuyerPaymentController;
 use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\Seller\SellerApplicationStatusController;
 use App\Http\Controllers\Seller\SellerBrandingController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Seller\SellerListingController;
 use App\Http\Controllers\Seller\SellerListingMediaController;
 use App\Http\Controllers\Seller\SellerOfferController;
 use App\Http\Controllers\Seller\SellerOrderController;
+use App\Http\Controllers\Seller\SellerPaymentController;
 use App\Http\Controllers\Seller\SellerShippingController;
 use App\Models\Order;
 use App\Support\NotificationRoutes;
@@ -44,6 +46,15 @@ Route::middleware('auth:buyer')->prefix($buyer)->name('buyer.')->group(function 
     Route::get(Seg::get('account.saved'), [BuyerDashboardController::class, 'saved'])->name('saved');
     Route::get(Seg::get('account.orders'), [BuyerOrderController::class, 'index'])->name('orders');
     Route::get(Seg::get('account.orders').'/{order}', [BuyerOrderController::class, 'show'])->name('orders.show');
+
+    // Paying through PayPal: off to PayPal, then back to one of these two.
+    Route::post(Seg::get('account.orders').'/{order}/pay', [BuyerPaymentController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('orders.pay');
+    Route::get(Seg::get('account.orders').'/{order}/paid', [BuyerPaymentController::class, 'returned'])->name('orders.paid');
+    Route::get(Seg::get('account.orders').'/{order}/pay/cancelled', [BuyerPaymentController::class, 'cancelled'])
+        ->name('orders.pay.cancelled');
+
     Route::get(Seg::get('account.bids'), [BuyerDashboardController::class, 'bids'])->name('bids');
     Route::get(Seg::get('account.settings'), [BuyerDashboardController::class, 'settings'])->name('settings');
 
@@ -141,6 +152,11 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
             Route::post(Seg::get('account.offers').'/{offer}', [SellerOfferController::class, 'respond'])
                 ->name('offers.respond');
 
+            // Premium is a selling benefit, so a suspended store cannot start it.
+            Route::post(Seg::get('account.payments').'/premium', [SellerPaymentController::class, 'subscribe'])
+                ->middleware('throttle:10,1')
+                ->name('payments.subscribe');
+
             Route::post(Seg::get('account.coupons'), [SellerCouponController::class, 'store'])->name('coupons.store');
             Route::put(Seg::get('account.coupons').'/{coupon}', [SellerCouponController::class, 'update'])
                 ->name('coupons.update');
@@ -193,6 +209,24 @@ Route::middleware('auth:seller')->prefix($seller)->name('seller.')->group(functi
         Route::put(Seg::get('account.orders').'/{order}', [SellerOrderController::class, 'update'])->name('orders.update');
         Route::get(Seg::get('account.storefront'), [SellerDashboardController::class, 'storefront'])->name('storefront');
         Route::get(Seg::get('account.settings'), [SellerDashboardController::class, 'settings'])->name('settings');
+
+        /*
+         * Getting paid: the seller's own PayPal, connected through PayPal
+         * and back. Outside the trading gate — a suspended store still
+         * needs to be paid for orders it is finishing.
+         */
+        Route::get(Seg::get('account.payments'), [SellerPaymentController::class, 'show'])->name('payments');
+        Route::post(Seg::get('account.payments').'/paypal', [SellerPaymentController::class, 'connect'])
+            ->middleware('throttle:10,1')
+            ->name('payments.connect');
+        Route::get(Seg::get('account.payments').'/paypal/return', [SellerPaymentController::class, 'connected'])
+            ->name('payments.connected');
+        Route::delete(Seg::get('account.payments').'/paypal', [SellerPaymentController::class, 'disconnect'])
+            ->name('payments.disconnect');
+        Route::get(Seg::get('account.payments').'/premium/return', [SellerPaymentController::class, 'subscribed'])
+            ->name('payments.subscribed');
+        Route::delete(Seg::get('account.payments').'/premium', [SellerPaymentController::class, 'unsubscribe'])
+            ->name('payments.unsubscribe');
     });
 });
 

@@ -42,6 +42,7 @@ return [
         'label' => 'Account',
         'items' => [
             ['key' => 'storefront', 'label' => 'My store', 'icon' => 'shield', 'built' => true],
+            ['key' => 'payments', 'label' => 'Payments & premium', 'icon' => 'card', 'built' => true],
             ['key' => 'settings', 'label' => 'Settings', 'icon' => 'user', 'built' => true],
         ],
     ],

@@ -7,7 +7,12 @@
         <x-verum.account.panel :title="__('Application')" icon="file">
             <dl class="specs">
                 <div><dt>{{ __('Status') }}</dt><dd><x-verum.admin.status-pill :status="$application->status" /></dd></div>
-                <div><dt>{{ __('Country') }}</dt><dd>{{ $application->country }}</dd></div>
+                <div><dt>{{ __('Country') }}</dt><dd>
+                    {{ $application->country }}
+                    @unless (\App\Support\Countries::hasPayPal($application->country))
+                        <span class="pill pill--bad">{{ __('PayPal is not available here — this seller could not be paid') }}</span>
+                    @endunless
+                </dd></div>
                 <div><dt>{{ __('Trade license') }}</dt><dd>{{ $application->trade_license_number ?? __('Not given') }}</dd></div>
                 <div>
                     <dt>{{ __('Sells') }}</dt>

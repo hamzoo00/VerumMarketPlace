@@ -69,4 +69,34 @@ final class Countries
     {
         return $iso !== null && array_key_exists($iso, self::all());
     }
+
+    /**
+     * The ISO code for a stored name or code. Seller applications keep
+     * the name ("Pakistan"); anything else is matched as given.
+     */
+    public static function code(?string $nameOrIso): ?string
+    {
+        if ($nameOrIso === null || $nameOrIso === '') {
+            return null;
+        }
+
+        if (self::exists(strtoupper($nameOrIso))) {
+            return strtoupper($nameOrIso);
+        }
+
+        $match = array_search(mb_strtolower($nameOrIso), array_map(mb_strtolower(...), self::options()), true);
+
+        return is_string($match) ? $match : null;
+    }
+
+    /**
+     * Can someone here open a PayPal account — and so be paid? Sellers
+     * from a country on the list cannot receive a single sale.
+     */
+    public static function hasPayPal(?string $nameOrIso): bool
+    {
+        $code = self::code($nameOrIso);
+
+        return $code === null || ! in_array($code, (array) config('verum_payments.unavailable_countries', []), true);
+    }
 }

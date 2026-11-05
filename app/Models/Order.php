@@ -77,6 +77,30 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /** @return HasMany<Payment, $this> */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Can the buyer pay for this now?
+     *
+     * Awaiting payment, and the seller has somewhere to be paid. The
+     * address may still be blank (an auction win): PayPal then asks the
+     * buyer for one and CompleteCheckout copies it here.
+     */
+    public function isPayable(): bool
+    {
+        return $this->status === self::STATUS_AWAITING_PAYMENT
+            && (bool) $this->seller?->canReceivePayments();
+    }
+
+    public function hasAddress(): bool
+    {
+        return filled($this->ship_to_line1) && filled($this->ship_to_country);
+    }
+
     /** @return BelongsTo<Coupon, $this> */
     public function coupon(): BelongsTo
     {

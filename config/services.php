@@ -51,4 +51,28 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | PayPal
+    |--------------------------------------------------------------------------
+    |
+    | Read only when PAYMENTS_DRIVER=paypal (config/verum_payments.php).
+    | Sandbox and live keys are different pairs from the same developer
+    | dashboard; switching to production is PAYPAL_MODE=live plus the live
+    | pair, nothing else. `partner_merchant_id` is the platform's own
+    | merchant id, which receives the commission. `webhook_id` is the id
+    | PayPal shows for the webhook pointing at /webhooks/paypal.
+    |
+    */
+
+    'paypal' => [
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'client_secret' => env('PAYPAL_CLIENT_SECRET'),
+        'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+        'partner_merchant_id' => env('PAYPAL_PARTNER_MERCHANT_ID'),
+        'bn_code' => env('PAYPAL_BN_CODE'),
+        'premium_plan_id' => env('PAYPAL_PREMIUM_PLAN_ID'),
+    ],
+
 ];

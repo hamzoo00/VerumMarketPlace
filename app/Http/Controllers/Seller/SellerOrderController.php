@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Actions\Orders\AdvanceOrder;
+use App\Actions\Payments\SettleRefund;
 use App\Http\Controllers\Controller;
+use App\Jobs\PushTrackingToPayPal;
 use App\Models\Order;
+use App\Support\Carriers;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,10 +20,17 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Every status change goes through AdvanceOrder, so the panel cannot
  * invent a transition the rest of the app does not know about.
+ *
+ * There is no "mark as paid": an order is paid when PayPal says the
+ * money moved (CompleteCheckout), never on the seller's word — a button
+ * would let a sale be settled off the platform and skip the commission.
  */
 class SellerOrderController extends Controller
 {
-    public function __construct(private readonly AdvanceOrder $advance) {}
+    public function __construct(
+        private readonly AdvanceOrder $advance,
+        private readonly SettleRefund $refunds,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -70,31 +80,52 @@ class SellerOrderController extends Controller
         $this->authoriseSeller($request, $order);
 
         $validated = $request->validate([
-            'action' => ['required', Rule::in(['paid', 'dispatched', 'delivered', 'cancelled'])],
-            'tracking_carrier' => ['nullable', 'string', 'max:64'],
-            'tracking_number' => ['nullable', 'string', 'max:128'],
+            'action' => ['required', Rule::in(['dispatched', 'delivered', 'cancelled'])],
+            'tracking_carrier' => ['nullable', 'required_with:tracking_number', Rule::in(array_keys(Carriers::options()))],
+            'tracking_number' => ['nullable', 'string', 'regex:~^'.Carriers::trackingPattern().'$~'],
             'reason' => ['nullable', 'string', 'max:200'],
+        ], [
+            'tracking_number.regex' => __('A tracking number is letters, digits and dashes, as printed on the receipt.'),
+            'tracking_carrier.required_with' => __('Choose the carrier, so the buyer can follow the parcel.'),
         ]);
 
         try {
             $message = match ($validated['action']) {
-                'paid' => tap(__('Marked as paid.'), fn () => $this->advance->markPaid($order)),
-                'dispatched' => tap(__('Marked as dispatched.'), fn () => $this->advance->markDispatched(
-                    $order,
-                    $validated['tracking_carrier'] ?? null,
-                    $validated['tracking_number'] ?? null,
-                )),
+                'dispatched' => $this->dispatch($order, $validated['tracking_carrier'] ?? null, $validated['tracking_number'] ?? null),
                 'delivered' => tap(__('Marked as delivered.'), fn () => $this->advance->markDelivered($order)),
-                default => tap(__('Order cancelled.'), fn () => $this->advance->cancel(
-                    $order,
-                    $validated['reason'] ?? null,
-                )),
+                default => $this->cancel($order, $validated['reason'] ?? null),
             };
         } catch (RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
 
         return back()->with('status', $message);
+    }
+
+    private function dispatch(Order $order, ?string $carrier, ?string $tracking): string
+    {
+        $this->advance->markDispatched($order, $carrier, $tracking === null ? null : trim($tracking));
+
+        // PayPal protects the seller against "never arrived" with this.
+        if ($tracking !== null) {
+            PushTrackingToPayPal::dispatch($order->id);
+        }
+
+        return __('Marked as dispatched.');
+    }
+
+    /** A paid order is refunded through PayPal before it is cancelled. */
+    private function cancel(Order $order, ?string $reason): string
+    {
+        if ($order->status === Order::STATUS_PAID) {
+            $this->refunds->cancelPaidOrder($order, $reason);
+
+            return __('Order cancelled and the buyer refunded through PayPal.');
+        }
+
+        $this->advance->cancel($order, $reason);
+
+        return __('Order cancelled.');
     }
 
     /** A seller reaches only their own sales; another gets 403. */

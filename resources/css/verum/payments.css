@@ -1,0 +1,141 @@
+/* ================================================================
+   Payments
+   The seller's Payments & premium page, the buyer's pay panel on an
+   order, and the local PayPal simulator.
+   ================================================================ */
+
+/* ---------- seller: getting paid + premium ---------- */
+.paygrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.4rem;
+  margin-bottom: 1.4rem;
+}
+
+.paygrid form {
+  margin: 0;
+}
+
+.paystate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  margin: 0 0 .7rem;
+  color: var(--mute);
+  font-weight: 600;
+}
+
+.paystate .ic {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  color: var(--ruby);
+}
+
+.paystate.is-on {
+  color: var(--bone);
+}
+
+.paystate.is-on .ic {
+  color: var(--ok);
+}
+
+.paystate .mono {
+  color: var(--mute);
+  font: 500 .78rem/1 var(--mono);
+}
+
+/* ---------- buyer: paying for an order ---------- */
+.opay {
+  display: grid;
+  gap: .7rem;
+  margin: 1rem 0 .4rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--ruby) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ruby) 6%, transparent);
+}
+
+.opay p {
+  margin: 0;
+}
+
+.opay form {
+  margin: 0;
+}
+
+.opay__note {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  margin: 0 0 .8rem;
+  color: var(--mute);
+  font-size: .86rem;
+  line-height: 1.5;
+}
+
+.opay .opay__note {
+  margin: 0;
+}
+
+.opay__note .ic {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: .1rem;
+}
+
+/* The tracking line wraps under a long number rather than overflowing. */
+.otrack__num {
+  flex-wrap: wrap;
+}
+
+.otrack__num .link {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+/* ---------- the PayPal simulator ---------- */
+.paysim {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.paysim__facts {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bone) 3%, transparent);
+}
+
+.paysim__facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.paysim__facts dt {
+  color: var(--mute);
+  font-size: .86rem;
+}
+
+.paysim__facts dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.paysim__actions {
+  display: grid;
+  gap: .7rem;
+  justify-items: center;
+}
+
+.paysim__actions .btn {
+  width: 100%;
+}

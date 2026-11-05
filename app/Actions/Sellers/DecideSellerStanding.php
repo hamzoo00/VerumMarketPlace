@@ -4,15 +4,19 @@ namespace App\Actions\Sellers;
 
 use App\Actions\Notices\IssueNotice;
 use App\Actions\Orders\AdvanceOrder;
+use App\Actions\Payments\SettleRefund;
 use App\Events\ListingChanged;
 use App\Models\AccountNotice;
 use App\Models\Admin;
 use App\Models\BlockedEmail;
 use App\Models\Listing;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Seller;
 use App\Models\SellerAccount;
 use App\Support\ClosureWindow;
+use App\Support\Payments\PaymentFailed;
+use App\Support\StaffAlerts;
 use App\Support\StaffBoard;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +44,7 @@ class DecideSellerStanding
     public function __construct(
         private readonly IssueNotice $notices,
         private readonly AdvanceOrder $orders,
+        private readonly SettleRefund $refunds,
     ) {}
 
     public function warn(SellerAccount $account, Admin $admin, ?string $message = null): ?AccountNotice
@@ -224,7 +229,37 @@ class DecideSellerStanding
             ->whereIn('status', [Order::STATUS_AWAITING_PAYMENT, Order::STATUS_PAID])
             ->with('buyer')
             ->get()
-            ->map(fn (Order $order): Order => $this->orders->cancel($order, __('The seller closed their store.')));
+            ->map(fn (Order $order): Order => $this->cancelOne($order));
+    }
+
+    /**
+     * A paid order is refunded through PayPal as it is cancelled. If
+     * PayPal refuses, the order is cancelled anyway — the store is
+     * closing — and the admins are told to refund the buyer by hand.
+     */
+    private function cancelOne(Order $order): Order
+    {
+        $reason = __('The seller closed their store.');
+
+        if ($order->status !== Order::STATUS_PAID) {
+            return $this->orders->cancel($order, $reason);
+        }
+
+        try {
+            // The closure apology tells the buyer; no second message.
+            return $this->refunds->cancelPaidOrder($order, $reason, notify: false);
+        } catch (PaymentFailed) {
+            $cancelled = $this->orders->cancel($order, $reason);
+            $payment = $cancelled->payments()->where('status', Payment::STATUS_COMPLETED)->latest('id')->first();
+
+            if ($payment !== null) {
+                StaffAlerts::paymentProblem($payment, __('Refund needed'), __(':reference was cancelled when its store closed, but PayPal did not refund it. Refund the buyer by hand.', [
+                    'reference' => $cancelled->reference,
+                ]));
+            }
+
+            return $cancelled;
+        }
     }
 
     /** @param  Collection<int, Order>  $cancelled */

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /*
@@ -47,4 +49,17 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Press a button on the PayPal simulator someone was just sent to
+ * (PAYMENTS_DRIVER=fake), and return where PayPal would send them next.
+ */
+function simulatePayPal(TestResponse $toPayPal, string $decision = 'approve'): string
+{
+    $session = Str::afterLast((string) $toPayPal->headers->get('Location'), '/');
+
+    return (string) test()->post(route('payments.simulator.decide', $session), ['decision' => $decision])
+        ->assertRedirect()
+        ->headers->get('Location');
 }

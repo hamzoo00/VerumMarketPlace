@@ -19,6 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property Carbon|null $premium_until
  * @property Carbon|null $certified_at
  * @property Carbon|null $hidden_at
+ * @property Carbon|null $paypal_connected_at
  * @property list<string>|null $specialties
  */
 class Seller extends Model implements HasMedia
@@ -41,6 +42,7 @@ class Seller extends Model implements HasMedia
             'premium_until' => 'datetime',
             'certified_at' => 'datetime',
             'hidden_at' => 'datetime',
+            'paypal_connected_at' => 'datetime',
         ];
     }
 
@@ -70,6 +72,24 @@ class Seller extends Model implements HasMedia
     public function isTrading(): bool
     {
         return ! $this->isHidden();
+    }
+
+    /**
+     * Has a PayPal account a buyer can pay.
+     *
+     * Every sale is paid straight to the seller's own PayPal, so without
+     * one an order can be placed but not paid.
+     */
+    public function canReceivePayments(): bool
+    {
+        return $this->paypal_merchant_id !== null && $this->paypal_connected_at !== null;
+    }
+
+    /** Premium is renewing every month through PayPal. */
+    public function hasPremiumSubscription(): bool
+    {
+        return $this->premium_subscription_id !== null
+            && $this->premium_subscription_status === 'active';
     }
 
     /** @return BelongsTo<Admin, $this> */

@@ -11,9 +11,11 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Chat\ConversationController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\FakePayPalController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
+use App\Http\Controllers\PayPalWebhookController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\SellWithUsController;
@@ -21,6 +23,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StoneController;
 use App\Http\Controllers\VerifyController;
 use App\Support\RouteSegments as Seg;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -126,6 +129,23 @@ Route::get(Seg::get('help'), HelpController::class)->name('help');
 Route::get(Seg::get('search'), SearchController::class)->name('search');
 
 Route::post(Seg::get('currency'), CurrencyController::class)->name('currency.switch');
+
+/*
+ * PayPal's webhooks. No CSRF token — PayPal cannot send one — so the
+ * controller trusts nothing until PayPal confirms the signature.
+ */
+Route::post(Seg::get('webhooks').'/paypal', PayPalWebhookController::class)
+    ->withoutMiddleware([PreventRequestForgery::class])
+    ->middleware('throttle:120,1')
+    ->name('webhooks.paypal');
+
+// The local PayPal simulator. Every request 404s unless PAYMENTS_DRIVER=fake.
+Route::get(Seg::get('payments').'/simulator/{session}', [FakePayPalController::class, 'show'])
+    ->where('session', '[A-Za-z0-9\-]+')
+    ->name('payments.simulator');
+Route::post(Seg::get('payments').'/simulator/{session}', [FakePayPalController::class, 'decide'])
+    ->where('session', '[A-Za-z0-9\-]+')
+    ->name('payments.simulator.decide');
 
 Route::get(Seg::get('cart'), [CartController::class, 'index'])->name('cart');
 Route::get(Seg::get('checkout'), [CartController::class, 'checkout'])->name('checkout');

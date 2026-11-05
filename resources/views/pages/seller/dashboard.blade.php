@@ -8,6 +8,17 @@
         Counted from `listings` by SellerStats, and re-read over the socket
         whenever this seller's inventory changes — see live-seller.js.
     --}}
+    @if ($storefront && ! $storefront->canReceivePayments())
+        <div class="notice" role="status">
+            <x-verum.icon name="card" />
+            <div>
+                <b>{{ __('Connect PayPal to get paid') }}</b>
+                <p>{{ __('Buyers pay straight into your PayPal account. Until it is connected they can order, but not pay.') }}</p>
+                <a class="link" href="{{ route('seller.payments') }}" wire:navigate>{{ __('Connect PayPal') }}</a>
+            </div>
+        </div>
+    @endif
+
     <ul class="astats" @if ($storefront) data-seller-live="{{ $storefront->id }}" @endif>
         <x-verum.account.stat :label="__('Live listings')" :value="$stats->live" />
         <x-verum.account.stat :label="__('Active lots')" :value="$stats->activeLots" />

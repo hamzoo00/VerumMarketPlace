@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Admin;
 use App\Models\Listing;
 use App\Models\Message;
+use App\Models\Payment;
 use App\Models\SellerApplication;
 use App\Models\SupportCase;
 use App\Notifications\StaffAlert;
@@ -81,6 +82,23 @@ final class StaffAlerts
             route('admin.features'),
             'spark',
             StaffBoard::FEATURES,
+        );
+    }
+
+    /**
+     * PayPal reports trouble with a sale: a dispute opened, money taken
+     * back, or a buyer paying for an order that was already cancelled.
+     * The admin cannot settle it here — PayPal does — but should know.
+     */
+    public static function paymentProblem(Payment $payment, string $title, string $body): void
+    {
+        self::send(
+            'alert.payment',
+            $title,
+            $body,
+            route('admin.sellers', ['q' => $payment->seller?->name]),
+            'card',
+            StaffBoard::SELLERS,
         );
     }
 

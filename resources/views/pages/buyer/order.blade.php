@@ -21,6 +21,8 @@
             <x-verum.account.panel :title="__('Status')" icon="box">
                 <x-verum.order.status-pill :$order />
 
+                <x-verum.order.payment :$order />
+
                 {{-- Each step shows when it happened, not merely that it
                      did: a dispute asks when the parcel was posted. --}}
                 <ul class="otrack">
@@ -42,12 +44,7 @@
                     </li>
                 </ul>
 
-                @if ($order->tracking_number)
-                    <p class="otrack__num">
-                        <x-verum.icon name="globe" />
-                        {{ $order->tracking_carrier }} · <b>{{ $order->tracking_number }}</b>
-                    </p>
-                @endif
+                <x-verum.order.tracking :$order />
 
                 @if ($order->isCancelled() && $order->cancelled_reason)
                     <p class="mute">{{ $order->cancelled_reason }}</p>

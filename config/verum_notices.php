@@ -231,7 +231,7 @@ return [
             'to' => 'The buyer',
             'subject' => 'Your order :order was cancelled',
             'action' => 'View the order',
-            'body' => 'We are sorry — your order :order has been cancelled because the seller has closed their store on :app. If you have already paid the seller, they must refund you in full. If they do not, open a dispute and we will step in.',
+            'body' => 'We are sorry — your order :order has been cancelled because the seller has closed their store on :app. Anything you paid through PayPal is being refunded to you in full. If it has not reached you within a few days, open a dispute and we will step in.',
         ],
     ],
 

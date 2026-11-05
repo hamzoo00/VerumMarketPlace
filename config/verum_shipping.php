@@ -72,4 +72,28 @@ return [
         'max_rates_per_seller' => 12,
     ],
 
+    /*
+    | Carriers a seller picks when marking an order dispatched. The buyer
+    | gets a "Track parcel" link to `url` with the number filled in
+    | (App\Support\Carriers), and the number is also given to PayPal under
+    | `paypal`, which protects the seller if a buyer says it never came.
+    |
+    | Carriers without a reliable tracking page of their own go to
+    | 17TRACK, which recognises the carrier from the number itself.
+    */
+    'carriers' => [
+        'dhl' => ['name' => 'DHL Express', 'paypal' => 'DHL', 'url' => 'https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=:number'],
+        'fedex' => ['name' => 'FedEx', 'paypal' => 'FEDEX', 'url' => 'https://www.fedex.com/fedextrack/?trknbr=:number'],
+        'ups' => ['name' => 'UPS', 'paypal' => 'UPS', 'url' => 'https://www.ups.com/track?tracknum=:number'],
+        'usps' => ['name' => 'USPS', 'paypal' => 'USPS', 'url' => 'https://tools.usps.com/go/TrackConfirmAction?tLabels=:number'],
+        'royal_mail' => ['name' => 'Royal Mail', 'paypal' => 'OTHER', 'url' => 'https://www.royalmail.com/track-your-item#/tracking-results/:number'],
+        'aramex' => ['name' => 'Aramex', 'paypal' => 'ARAMEX', 'url' => 'https://t.17track.net/en#nums=:number'],
+        'tnt' => ['name' => 'TNT', 'paypal' => 'TNT', 'url' => 'https://t.17track.net/en#nums=:number'],
+        'ems' => ['name' => 'EMS / national post', 'paypal' => 'OTHER', 'url' => 'https://t.17track.net/en#nums=:number'],
+        'other' => ['name' => 'Another carrier', 'paypal' => 'OTHER', 'url' => 'https://t.17track.net/en#nums=:number'],
+    ],
+
+    // Letters, digits, spaces and dashes — every carrier's numbers fit.
+    'tracking_pattern' => '[A-Za-z0-9 \\-]{6,40}',
+
 ];

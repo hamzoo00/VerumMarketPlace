@@ -57,5 +57,6 @@
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10.3-10.3a2.1 2.1 0 0 0-4-4L4.5 15.5v4z"/><path d="m13.3 6.7 4 4"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10 9v6M14 9v6"/></symbol>
     <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.9 3.6-6 3.6-9.9 2.5 1.4 3.4 3.4 3.5 5.4 1-.8 1.6-2 1.7-3.4 2.5 1.8 4.2 4.6 4.2 7.9 0 3.5-2.6 6.1-6.5 6.1z"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></symbol>
   </defs>
 </svg>

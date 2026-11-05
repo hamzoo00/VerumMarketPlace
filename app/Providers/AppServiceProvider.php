@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Contracts\PaymentGateway;
+use App\Support\Payments\FakePaymentGateway;
+use App\Support\Payments\PayPalGateway;
 use App\View\Composers\AccountNavComposer;
 use App\View\Composers\NavigationComposer;
 use App\View\Composers\NotificationBellComposer;
@@ -11,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +23,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // PAYMENTS_DRIVER picks who answers. The simulator moves no money,
+        // so production refuses it outright rather than quietly faking
+        // every checkout.
+        $this->app->bind(PaymentGateway::class, function (): PaymentGateway {
+            if (config('verum_payments.driver') === 'paypal') {
+                return $this->app->make(PayPalGateway::class);
+            }
+
+            if ($this->app->isProduction()) {
+                throw new RuntimeException('PAYMENTS_DRIVER must be "paypal" in production.');
+            }
+
+            return $this->app->make(FakePaymentGateway::class);
+        });
     }
 
     /**

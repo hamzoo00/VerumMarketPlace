@@ -8,6 +8,7 @@ use App\Models\Listing;
 use App\Models\Seller;
 use App\Support\PremiumStatus;
 use App\Support\StaffBoard;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -37,6 +38,30 @@ class DecidePremium
         ]);
 
         $this->tell($seller, 'premium_granted', $message, $admin, route('seller.listings'));
+
+        return $seller->refresh();
+    }
+
+    /**
+     * Premium paid by subscription, running to the date PayPal next bills.
+     *
+     * The seller is told once, when it starts. A renewal only moves the
+     * date — a monthly "you are still premium" email would be noise.
+     */
+    public function subscribed(Seller $seller, CarbonInterface $until): Seller
+    {
+        $starting = ! PremiumStatus::isPremium($seller);
+
+        $seller->update([
+            'premium_since' => $starting ? now() : $seller->premium_since,
+            'premium_until' => $until,
+        ]);
+
+        if ($starting) {
+            $this->tell($seller, 'premium_granted', null, null, route('seller.listings'));
+        } else {
+            StaffBoard::changed(StaffBoard::PREMIUM);
+        }
 
         return $seller->refresh();
     }
